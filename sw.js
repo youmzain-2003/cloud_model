@@ -1,12 +1,26 @@
 /* Club Scout service worker — cache shell for offline use */
-const CACHE = "club-scout-v2-sheet";
+const CACHE = "club-scout-v3-sheets-tool";
 const ASSETS = [
   "./",
   "./index.html",
+  "./tool.html",
   "./mobile.html",
   "./manifest.webmanifest",
   "./icon.svg",
   "./sw.js",
+  "./assets/app.css",
+  "./assets/club_data.js",
+  "./assets/sheet.js",
+  "./assets/tool.js",
+  "./sheet/index.html",
+  "./sheet/01-tiers.html",
+  "./sheet/02-trainer.html",
+  "./sheet/03-sire.html",
+  "./sheet/04-family.html",
+  "./sheet/05-cross.html",
+  "./sheet/06-combo.html",
+  "./sheet/07-weight.html",
+  "./sheet/08-points.html",
 ];
 
 self.addEventListener("install", (event) => {

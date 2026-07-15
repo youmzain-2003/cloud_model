@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e1914" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Club Scout 補完ツール</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/app.css" />
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav">
+      <a href="./index.html">ホーム</a>
+      <a href="./sheet/index.html">判断シート</a>
+      <a href="./tool.html" class="on">ツール</a>
+    </nav>
+    <p class="kicker">COMPANION TOOL</p>
+    <h1 class="brand">補完ツール</h1>
+    <p class="sub">シートを見ながら、厩舎・父・牝系・クロス・体重・点数をその場で照会・試算します（オフライン可）。</p>
+
+    <section class="card" id="lookup">
+      <h2>1. 名前照会</h2>
+      <label class="field">キーワード（厩舎 / 父 / 牝系）
+        <input id="lookupQ" placeholder="例: 須貝 / カナロア / Stitching" />
+      </label>
+      <div id="lookupOut" class="result muted">入力すると候補を表示</div>
+    </section>
+
+    <section class="card" id="weight">
+      <h2>2. 馬体重の統合判定</h2>
+      <div class="grid2">
+        <label class="field">体重 (kg)
+          <input id="wKg" type="number" inputmode="numeric" placeholder="417" />
+        </label>
+        <label class="field">厩舎
+          <input id="wTrainer" list="trainerList" placeholder="須貝尚介" />
+        </label>
+        <label class="field">父
+          <input id="wSire" list="sireList" placeholder="ロードカナロア" />
+        </label>
+        <label class="field">牝系（母母・任意）
+          <input id="wFamily" list="familyList" placeholder="Stitching" />
+        </label>
+      </div>
+      <button class="primary" type="button" id="btnWeight">体重を判定</button>
+      <div id="weightOut" class="result muted">未判定</div>
+    </section>
+
+    <section class="card" id="decide">
+      <h2>3. カタログ即断（checklist採点）</h2>
+      <div class="grid2">
+        <label class="field">馬名（任意）
+          <input id="dName" placeholder="ディメンシオン'24" />
+        </label>
+        <label class="field">一口価格（万円）
+          <input id="dPrice" type="number" inputmode="decimal" step="0.1" placeholder="2.2" />
+        </label>
+        <label class="field">厩舎
+          <input id="dTrainer" list="trainerList" placeholder="須貝尚介" />
+        </label>
+        <label class="field">父
+          <input id="dSire" list="sireList" placeholder="ロードカナロア" />
+        </label>
+        <label class="field">牝系（母母）
+          <input id="dFamily" list="familyList" placeholder="手動なら下で等級指定" />
+        </label>
+        <label class="field">看板牝系（任意）
+          <input id="dSig" list="familyList" placeholder="Stitching" />
+        </label>
+        <label class="field">全体牝系（上書き）
+          <select id="dOverall">
+            <option value="auto">自動（データ）</option>
+            <option value="S">最上級（S）</option>
+            <option value="A">上級（A）</option>
+            <option value="B">標準（B）</option>
+            <option value="C">控えめ（C）</option>
+            <option value="U">データ不足（U）</option>
+          </select>
+        </label>
+        <label class="field">広尾独自（上書き）
+          <select id="dUnique">
+            <option value="auto">自動（データ）</option>
+            <option value="S">最上級（S）</option>
+            <option value="A">上級（A）</option>
+            <option value="B">標準（B）</option>
+            <option value="C">控えめ（C）</option>
+            <option value="none">なし</option>
+          </select>
+        </label>
+        <label class="field">クロス（上書き）
+          <select id="dCross">
+            <option value="auto">自動（データ）</option>
+            <option value="S">最上級（S）</option>
+            <option value="A">上級（A）</option>
+            <option value="B">標準（B）</option>
+            <option value="C">控えめ（C）</option>
+            <option value="none">なし</option>
+          </select>
+        </label>
+        <label class="field">近況
+          <select id="dKinjou">
+            <option value="none">なし</option>
+            <option value="good">順調・快調（+1）</option>
+            <option value="mild">停滞・減量など（-1）</option>
+          </select>
+        </label>
+        <label class="field">体重 (kg・任意)
+          <input id="dWeight" type="number" inputmode="numeric" placeholder="417" />
+        </label>
+        <label class="field">募集
+          <select id="dStatus">
+            <option value="募集中">募集中</option>
+            <option value="残口わずか">残口わずか</option>
+            <option value="満口">満口</option>
+          </select>
+        </label>
+      </div>
+      <label class="field" style="display:flex;align-items:center;gap:8px;color:var(--ink)">
+        <input type="checkbox" id="dInjury" /> 近況に骨折・跛行・手術・予後不良
+      </label>
+      <button class="primary" type="button" id="btnDecide">判定する</button>
+      <div id="decideOut" class="result muted">未判定</div>
+    </section>
+
+    <p class="foot">
+      データ版: <span id="ver"></span><br />
+      意思決定支援であり、的中・利益・満口取得を保証しません。<br />
+      詳細表は <a href="./sheet/index.html">判断シート</a> を参照。
+    </p>
+  </div>
+
+  <datalist id="trainerList"></datalist>
+  <datalist id="sireList"></datalist>
+  <datalist id="familyList"></datalist>
+
+  <script src="./assets/club_data.js"></script>
+  <script src="./assets/tool.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>

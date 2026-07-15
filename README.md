@@ -1,57 +1,52 @@
 # Club Scout（cloud_model）
 
-広尾サラブレッド倶楽部向けのカタログ即断ツール置き場です。
+広尾一口の**スマホ判断シート**と**補完ツール**、および Desktop 正本パッケージです。
 
 > **意思決定支援であり、的中・利益・満口取得を保証するものではありません。**
 
-## 正本（今朝 Desktop 時点）
+## スマホで使う（主用途）
 
-`club_scout/` … `C:\Users\youmz\Desktop\club_scout` を zip で受け取った正本。
+公開URL: https://youmzain-2003.github.io/cloud_model/  
+（初回のみ Settings → Pages → `main` / `/ (root)`）
 
-```
-club_scout/
-  POCKET_CARD.txt
-  decision.py / decide_cli.py / scorer.py / app.py …
-  rules/buy_checklist.yaml      # 配点・即PASS・コンボ
-  rules/hiroo_hit_map.yaml      # 厩舎・父・ヒット地図
-  data/family_trainer_ranks.json
-  data/candidates.json
-  …
-```
+| 入口 | 内容 |
+|------|------|
+| `/` | ホーム |
+| `/sheet/` | 判断シート複数ページ（厩舎・父・牝系・クロス・コンボ・馬体重・配点） |
+| `/tool.html` | 補完ツール（照会・体重統合判定・即断採点） |
 
-ローカル CLI 例:
+ホーム画面に追加すればオフライン参照可。
+
+### 段階の日本語
+
+| 記号 | 日本語 |
+|------|--------|
+| S | 最上級 |
+| A | 上級 |
+| B | 標準 |
+| C | 控えめ |
+| U | データ不足 |
+| top / mid / low | 上位 / 中位 / 下位 |
+
+### 馬体重
+
+- **採点に効く正本**: 420kg 以下で軽量アラート
+- **運用ガイド**: 厩舎・父の型から OK 帯を統合（狭い帯を採用）。詳細はシート 07 とツール
+
+## 正本（Desktop）
+
+`club_scout/` … 今朝 zip の正本（YAML / decision / ranks）。  
+更新したらこのフォルダを差し替えて push → `assets/club_data.js` を再生成するとシート/ツールも更新されます。
 
 ```bash
-cd club_scout
-python decide_cli.py --name ディメンシオン'24 --dam ディメンシオン --trainer 須貝尚介 --sire ロードカナロア --price 2.2
+python3 scripts/build_club_data.py   # 追加予定/手元なら同様の生成
 ```
 
-母→母母の DB 解決は Autumn_Horses 側 DB（`config/db.yaml`）がある環境で有効。本公開リポ単体では JSON ランク＋YAML フォールバックが主になります。
+現行はルートで生成した `assets/club_data.js` をコミットしています。
 
-## スマホ判断シート（GitHub Pages・ルート）
+## 更新のしかた
 
-```
-index.html              … NotebookLM風の判断シート1枚（評価点・基準・見る順）
-mobile.html             … 点数計算機（補助）
-manifest.webmanifest / sw.js / icon.svg
-```
-
-- 期待URL: https://youmzain-2003.github.io/cloud_model/
-- Pages 初回だけ Settings → Pages → **Deploy from a branch** → `main` / `/ (root)` が必要（API では 403）
-
-スマホ: URL を一度開く → ホーム画面に追加 → カタログ横でシート参照。
-
-## 判定尺（正本と同じ）
-
-| スコア | verdict |
-|--------|---------|
-| 12+ | GO |
-| 8–11 | HOLD |
-| 〜7 | PASS |
-
-即PASS: 満口 / 骨折・跛行・手術・予後不良 / 一口4万超
-
-## メモ
-
-- private `Autumn_Horses` の同梱版と同期するときは、まずこの `club_scout/` を正とする。
-- ルートの `mobile.html` は単体配布用。点数表を正本 YAML に完全一致させる作業は随時。
+1. 手元 `club_scout` を編集  
+2. `cloud_model` の `club_scout/` に反映  
+3. データJSを再生成して commit / push  
+4. スマホはページを再読み込み（必要ならSW更新）

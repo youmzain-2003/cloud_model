@@ -1,7 +1,7 @@
 {
-  "name": "Club Scout 判断シート",
+  "name": "Club Scout 判断シート＆ツール",
   "short_name": "Club Scout",
-  "description": "広尾一口の評価点・評価基準を1枚で見る判断シート。意思決定支援であり的中保証ではありません。",
+  "description": "広尾一口の判断シートと補完ツール。意思決定支援であり的中保証ではありません。",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
