@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Club Scout">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a3a2f"/>
+      <stop offset="55%" stop-color="#0f241c"/>
+      <stop offset="100%" stop-color="#c4a35a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#g)"/>
+  <path d="M108 340c28-86 78-148 148-180 42-18 86-24 128-14-36 34-62 78-74 130-8 34-8 68 2 102-44 4-84-8-122-36-30-22-56-56-82-102z" fill="#f3e6c4" opacity=".92"/>
+  <circle cx="352" cy="168" r="28" fill="#f3e6c4"/>
+  <path d="M156 388h200c8 0 14 8 11 15l-18 42c-2 5-7 8-12 8H175c-5 0-10-3-12-8l-18-42c-3-7 3-15 11-15z" fill="#c4a35a"/>
+  <text x="256" y="455" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="700" fill="#f3e6c4">CS</text>
+</svg>

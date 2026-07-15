@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f241c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="広尾サラブレッド倶楽部のカタログ即断ツール（オフライン対応）。意思決定支援であり的中保証ではありません。" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <title>Club Scout — 広尾一口即断</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0c1a14;
+      --bg1: #142820;
+      --bg2: #1c3429;
+      --ink: #f2ebe0;
+      --muted: #b7c4ba;
+      --gold: #d4b06a;
+      --gold-dim: #9a8048;
+      --go: #3dbe7a;
+      --hold: #e0a84a;
+      --pass: #d25b5b;
+      --line: rgba(212, 176, 106, 0.28);
+      --field: rgba(255, 255, 255, 0.04);
+      --radius: 14px;
+      --font-display: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+      --font-body: "IBM Plex Sans JP", "Hiragino Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(212, 176, 106, 0.16), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(61, 190, 122, 0.08), transparent 50%),
+        linear-gradient(165deg, var(--bg0), var(--bg1) 45%, #101f18 100%);
+      background-attachment: fixed;
+    }
+
+    .wrap {
+      width: min(720px, 100%);
+      margin: 0 auto;
+      padding: 18px 16px 40px;
+    }
+
+    header.app-head {
+      padding: 8px 2px 18px;
+      animation: rise 0.55s ease both;
+    }
+    .brand {
+      font-family: var(--font-display);
+      font-size: clamp(1.85rem, 6vw, 2.35rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.15;
+      margin: 0 0 6px;
+      background: linear-gradient(120deg, #f7efd8, var(--gold) 55%, #eee2c2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .tagline {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    .offline-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 0.78rem;
+      color: var(--gold);
+      border: 1px solid var(--line);
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(212, 176, 106, 0.08);
+    }
+    .offline-pill .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--go);
+      box-shadow: 0 0 0 0 rgba(61, 190, 122, 0.5);
+      animation: pulse 2.2s ease infinite;
+    }
+    .offline-pill.is-offline .dot { background: var(--hold); animation: none; }
+
+    form.panel {
+      display: grid;
+      gap: 14px;
+      animation: rise 0.65s ease 0.08s both;
+    }
+    fieldset {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--field);
+      padding: 14px 14px 12px;
+    }
+    legend {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      color: var(--gold);
+      padding: 0 6px;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 560px) {
+      .grid2 { grid-template-columns: 1fr; }
+    }
+    label {
+      display: grid;
+      gap: 5px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    label.span2 { grid-column: 1 / -1; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.28);
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font: inherit;
+      font-size: 0.95rem;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid rgba(212, 176, 106, 0.45);
+      border-color: var(--gold-dim);
+    }
+    .checks {
+      display: grid;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--ink);
+    }
+    .check input { width: auto; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: sticky;
+      bottom: 10px;
+      z-index: 5;
+      padding-top: 4px;
+    }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.primary {
+      flex: 1 1 160px;
+      background: linear-gradient(135deg, #c9a65a, #e6c984);
+      color: #1a1408;
+      box-shadow: 0 8px 24px rgba(212, 176, 106, 0.22);
+    }
+    button.ghost {
+      flex: 0 0 auto;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+    button:active { transform: translateY(1px); }
+
+    #result {
+      display: none;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,0.28);
+      padding: 16px;
+      animation: rise 0.45s ease both;
+    }
+    #result.show { display: block; }
+    .verdict-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .verdict {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 8vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      margin: 0;
+    }
+    .verdict.GO { color: var(--go); }
+    .verdict.HOLD { color: var(--hold); }
+    .verdict.PASS { color: var(--pass); }
+    .points {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .hard {
+      margin: 8px 0 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(210, 91, 91, 0.15);
+      border: 1px solid rgba(210, 91, 91, 0.35);
+      color: #ffb4b4;
+      font-size: 0.9rem;
+    }
+    .meta {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .chip {
+      font-size: 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 9px;
+      color: var(--ink);
+      background: rgba(255,255,255,0.03);
+    }
+    .detail {
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+    .detail li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.88rem;
+      padding: 7px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.08);
+    }
+    .detail .pts { font-variant-numeric: tabular-nums; color: var(--gold); font-weight: 600; }
+    .hints {
+      margin: 12px 0 0;
+      padding-left: 1.1rem;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+    .disclaimer {
+      margin: 18px 2px 0;
+      color: #8f9c93;
+      font-size: 0.75rem;
+      line-height: 1.55;
+      animation: rise 0.7s ease 0.12s both;
+    }
+    .guide {
+      margin-top: 16px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 14px;
+    }
+    .guide ol { margin: 6px 0 0; padding-left: 1.2rem; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(61, 190, 122, 0.45); }
+      70% { box-shadow: 0 0 0 8px rgba(61, 190, 122, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(61, 190, 122, 0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-head">
+      <h1 class="brand">Club Scout</h1>
+      <p class="tagline">広尾のカタログをその場で即断。<br />月約1万円前提の優先順位づけ支援。</p>
+      <div class="offline-pill" id="netPill"><span class="dot"></span><span id="netLabel">オンライン（初回でキャッシュ）</span></div>
+    </header>
+
+    <form class="panel" id="form" autocomplete="off">
+      <fieldset>
+        <legend>基本</legend>
+        <div class="grid2">
+          <label class="span2">馬名（任意）
+            <input name="name" placeholder="例: ヴァルティアラ" />
+          </label>
+          <label>父
+            <input name="sire" list="sireList" placeholder="例: ロードカナロア" />
+          </label>
+          <label>予定厩舎
+            <input name="trainer" list="trainerList" placeholder="例: 須貝尚介" />
+          </label>
+          <label>一口価格（万円）
+            <input name="unit_price" type="number" inputmode="decimal" step="0.1" min="0" placeholder="2.2" />
+          </label>
+          <label>総額（任意・万円）
+            <input name="total_price" type="number" inputmode="decimal" step="1" min="0" placeholder="6600" />
+          </label>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" name="sold_out" /> 満口・残口ほぼなし（募集終了扱い）</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>母系・クロス</legend>
+        <div class="grid2">
+          <label>母（任意）
+            <input name="dam" placeholder="例: ディメンシオン" />
+          </label>
+          <label>母母 family_mare
+            <input name="family_mare" list="familyList" placeholder="例: ディメンシオン / ステラリード" />
+          </label>
+          <label>看板（母母母など）
+            <input name="signature" list="signatureList" placeholder="例: スティッチング" />
+          </label>
+          <label>牝系総合 family_overall
+            <select name="family_overall">
+              <option value="auto">自動（辞書）</option>
+              <option value="S">S</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="U">U（不明）</option>
+            </select>
+          </label>
+          <label>広尾独自牝系
+            <select name="hiroo_unique">
+              <option value="auto">自動（辞書）</option>
+              <option value="S">S</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </label>
+          <label>クロス
+            <select name="cross">
+              <option value="B">B（標準）</option>
+              <option value="S">S</option>
+              <option value="A">A</option>
+              <option value="C">C</option>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>近況・ハードパス</legend>
+        <div class="grid2">
+          <label>近況
+            <select name="kinjou">
+              <option value="none">特記なし</option>
+              <option value="good">好調・追切良好（+1）</option>
+              <option value="concern">軽微懸念（-1）</option>
+            </select>
+          </label>
+          <label>馬体重（kg・任意）
+            <input name="weight" type="number" inputmode="numeric" step="1" min="0" placeholder="417" />
+          </label>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" name="injury" /> 骨折・跛行・手術・予後不良の記載あり → 即PASS</label>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="primary">判定する</button>
+        <button type="button" class="ghost" id="btnReset">リセット</button>
+        <button type="button" class="ghost" id="btnDemo">ヴァルティアラ例</button>
+      </div>
+    </form>
+
+    <section id="result" aria-live="polite"></section>
+
+    <p class="disclaimer">
+      本ツールは意思決定支援であり、的中・利益・満口取得を保証するものではありません。
+      カタログ・近況・クラブ発表を最終確認のうえ、自己責任で判断してください。
+      スコア目安: 12+ GO / 8–11 HOLD / 〜7 PASS。一口4万超・満口・重大故障は即PASS。
+    </p>
+
+    <div class="guide">
+      <strong>カタログで見る順</strong>
+      <ol>
+        <li>募集状況（満口なら即終了）</li>
+        <li>母 → 母母（family_mare）→ 必要なら看板</li>
+        <li>予定厩舎（広尾実績）／クロス</li>
+        <li>父・一口価格</li>
+        <li>近況があれば加減点</li>
+      </ol>
+      <p style="margin:10px 0 0">スマホ: このページを一度開く → ホーム画面に追加 → 以降オフライン利用可。</p>
+    </div>
+  </div>
+
+  <datalist id="familyList"></datalist>
+  <datalist id="signatureList"></datalist>
+  <datalist id="trainerList"></datalist>
+  <datalist id="sireList"></datalist>
+
+  <script>
+  /**
+   * Club Scout — embedded rules (from handoff §4–§6)
+   * Regenerated for public cloud_model when Autumn_Horses was unreadable.
+   */
+  const LOOKUPS = {
+    hiroo_unique: {
+      S: [
+        "ステラリード", "ウェルシュステラ", "ミスペンバリー", "ディメンシオン",
+        "stellarid", "welsh stella", "miss penberry", "dimension"
+      ],
+      A: [
+        "エンパイアブルー", "ゴッドフロアー", "パラスアテナ", "リリカ",
+        "empire blue", "god flora", "pallas athena"
+      ],
+      B: ["シークインザダーク", "シークウィンザダーク"],
+      C: ["ウインアルエット", "アルエット", "スーンシャイン", "ミンティエアー"]
+    },
+    signature_line: {
+      S: ["スティッチング", "stitching"],
+      A: ["エアグルーヴ", "air groove"]
+    },
+    trainer_hiroo: {
+      S: ["矢作芳人", "矢作"],
+      A: ["須貝尚介", "須貝", "高柳大輔", "高柳大", "高柳瑞樹", "高柳瑞", "荒川義弘", "荒川"],
+      B: ["木村哲也", "木村", "松永幹夫", "松永"],
+      C: ["黒岩陽一", "黒岩", "村田一誠", "村田"],
+      U: []
+    },
+    sire_tier: {
+      top: [
+        "ロードカナロア", "エピファネイア", "コントレイル", "キズナ", "サートゥルナーリア",
+        "ドゥラメンテ", "リオンディーズ", "レイパパレ", "スルーセブンティ", "ルメールシチー"
+      ],
+      mid: [
+        "ルーラーシップ", "キタサンブラック", "リアルスティール", "シルバーステート",
+        "ホッコータルマエ", "スクリーンヒーロー", "マインドユアビスケッツ", "イスラボナータ"
+      ],
+      low: ["エイシンフラッシュ", "パイロ", "シニスターミニスター"]
+    }
+  };
+
+  const POINTS = {
+    family_overall: { S: 4, A: 3, B: 1, C: 0, U: 0 },
+    hiroo_unique: { S: 3, A: 2, B: 0, C: 0 },
+    signature_line: { S: 2, A: 1, none: 0 },
+    trainer_hiroo: { S: 3, A: 2, B: 1, C: -1, U: 0, none: 0 },
+    cross: { S: 3, A: 2, B: 0, C: -1 },
+    sire_tier: { top: 2, mid: 1, low: 0, unknown: 0 },
+    combo: { C1: 2, C2: 2, C3: 2, C4: 1, C5: -2 }
+  };
+
+  function norm(s) {
+    return String(s || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[ａ-ｚＡ-Ｚ０-９]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xfee0));
+  }
+
+  function matchTier(dict, raw) {
+    const n = norm(raw);
+    if (!n) return null;
+    for (const [tier, names] of Object.entries(dict)) {
+      for (const name of names) {
+        const nn = norm(name);
+        if (n === nn || n.includes(nn) || nn.includes(n)) return tier;
+      }
+    }
+    return null;
+  }
+
+  function resolveFamily(input) {
+    const mare = input.family_mare || input.dam || "";
+    let unique = input.hiroo_unique;
+    if (unique === "auto" || !unique) {
+      unique = matchTier(LOOKUPS.hiroo_unique, mare) || "C";
+    }
+    let overall = input.family_overall;
+    if (overall === "auto" || !overall) {
+      // unique S/A elevates overall; thin names stay C
+      if (unique === "S") overall = "S";
+      else if (unique === "A") overall = "A";
+      else if (unique === "B") overall = "B";
+      else overall = matchTier(LOOKUPS.hiroo_unique, mare) ? unique : (mare ? "U" : "U");
+    }
+    let sig = matchTier(LOOKUPS.signature_line, input.signature) || "none";
+    return { family_overall: overall, hiroo_unique: unique, signature_line: sig, family_mare: mare };
+  }
+
+  function resolveTrainer(raw) {
+    if (!raw || !String(raw).trim()) return "none";
+    return matchTier(LOOKUPS.trainer_hiroo, raw) || "U";
+  }
+
+  function resolveSire(raw) {
+    if (!raw || !String(raw).trim()) return "unknown";
+    for (const tier of ["top", "mid", "low"]) {
+      if (matchTier({ [tier]: LOOKUPS.sire_tier[tier] }, raw)) return tier;
+    }
+    return "unknown";
+  }
+
+  function priceScore(unit) {
+    if (unit == null || Number.isNaN(unit)) return { tier: "unknown", pts: 0, hard: false };
+    if (unit > 4.0) return { tier: ">4.0", pts: 0, hard: true, reason: "一口4万超は即PASS" };
+    if (unit <= 2.0) return { tier: "≦2.0", pts: 2, hard: false };
+    if (unit < 2.5) return { tier: "2.0–2.5", pts: 1, hard: false };
+    if (unit <= 3.5) return { tier: "2.5–3.5", pts: 0, hard: false };
+    return { tier: "3.5–4.0", pts: -1, hard: false };
+  }
+
+  function decide(input) {
+    const detail = [];
+    let points = 0;
+    let hard_pass_reason = null;
+
+    if (input.sold_out) hard_pass_reason = "満口・募集終了";
+    if (input.injury) hard_pass_reason = hard_pass_reason || "骨折・跛行・手術・予後不良の記載";
+
+    const fam = resolveFamily(input);
+    const trainer = resolveTrainer(input.trainer);
+    const sire = resolveSire(input.sire);
+    const cross = input.cross || "B";
+    const unit = input.unit_price == null || input.unit_price === "" ? null : Number(input.unit_price);
+    const price = priceScore(unit);
+    if (price.hard) hard_pass_reason = hard_pass_reason || price.reason;
+
+    const add = (label, key, tier, table) => {
+      const pts = table[tier] ?? 0;
+      points += pts;
+      detail.push({ label, key, tier, pts });
+      return pts;
+    };
+
+    add("牝系総合", "family_overall", fam.family_overall, POINTS.family_overall);
+    add("広尾独自牝系", "hiroo_unique", fam.hiroo_unique, POINTS.hiroo_unique);
+    add("看板ライン", "signature_line", fam.signature_line, POINTS.signature_line);
+    add("厩舎（広尾）", "trainer_hiroo", trainer, POINTS.trainer_hiroo);
+    add("クロス", "cross", cross, POINTS.cross);
+    add("父ランク", "sire_tier", sire, POINTS.sire_tier);
+    points += price.pts;
+    detail.push({ label: "一口価格", key: "price", tier: price.tier, pts: price.pts });
+
+    // kinjou
+    let kinPts = 0;
+    let kinTier = "none";
+    if (input.kinjou === "good") { kinPts += 1; kinTier = "好調"; }
+    if (input.kinjou === "concern") { kinPts -= 1; kinTier = "軽微懸念"; }
+    const w = input.weight == null || input.weight === "" ? null : Number(input.weight);
+    if (w != null && !Number.isNaN(w) && w > 0 && w <= 420) {
+      kinPts -= 1;
+      kinTier = kinTier === "none" ? "420kg以下" : kinTier + "／420kg以下";
+    }
+    points += kinPts;
+    detail.push({ label: "近況・体重", key: "kinjou", tier: kinTier, pts: kinPts });
+
+    // expensive without unique/cross protection
+    const expensiveWeak =
+      unit != null &&
+      unit >= 2.5 &&
+      !["S", "A"].includes(fam.hiroo_unique) &&
+      !["S", "A"].includes(cross);
+
+    const combo_hints = [];
+    const ua = ["S", "A"].includes(fam.hiroo_unique);
+    const ta = ["S", "A"].includes(trainer);
+    const ca = ["S", "A"].includes(cross);
+    const fa = ["S", "A"].includes(fam.family_overall);
+
+    if (ua && ta) {
+      points += POINTS.combo.C1;
+      combo_hints.push("C1 独自牝系S/A × 厩舎S/A → GO寄り");
+      detail.push({ label: "コンボ C1", key: "C1", tier: "hit", pts: POINTS.combo.C1 });
+    }
+    if (ca) {
+      points += POINTS.combo.C2;
+      combo_hints.push("C2 クロスS/A → GO寄り");
+      detail.push({ label: "コンボ C2", key: "C2", tier: "hit", pts: POINTS.combo.C2 });
+    }
+    if (fa && sire === "top" && unit != null && unit <= 2.0) {
+      points += POINTS.combo.C3;
+      combo_hints.push("C3 全体S/A × 上位父 × ≦2万 → GO寄り");
+      detail.push({ label: "コンボ C3", key: "C3", tier: "hit", pts: POINTS.combo.C3 });
+    }
+    if (fam.signature_line === "S" || fam.signature_line === "A") {
+      points += POINTS.combo.C4;
+      combo_hints.push("C4 看板が一段深い → HOLD〜条件付き加点");
+      detail.push({ label: "コンボ C4", key: "C4", tier: "hit", pts: POINTS.combo.C4 });
+    }
+    if (expensiveWeak) {
+      points += POINTS.combo.C5;
+      combo_hints.push("C5 高額なのに独自/クロス弱い → PASS寄り");
+      detail.push({ label: "コンボ C5", key: "C5", tier: "hit", pts: POINTS.combo.C5 });
+      if (unit >= 2.5 && !hard_pass_reason) {
+        // soft note only; scoring already applied
+      }
+    }
+
+    // recommend units under ~10k/month (hiroo shares often 40+ mouths conceptually; keep simple)
+    let recommend_units = 0;
+    let verdict;
+    if (hard_pass_reason) {
+      verdict = "PASS";
+      recommend_units = 0;
+    } else if (points >= 12) {
+      verdict = "GO";
+      recommend_units = unit != null && unit <= 2.0 ? 2 : 1;
+    } else if (points >= 8) {
+      verdict = "HOLD";
+      recommend_units = 1;
+    } else {
+      verdict = "PASS";
+      recommend_units = 0;
+    }
+
+    // note: 須貝 + 芝向き牝系 is OK (Valtiara); do not over-penalize from Yerba pattern
+    if (trainer === "A" && /須貝/.test(String(input.trainer || "")) && fam.hiroo_unique === "S") {
+      combo_hints.push("注: 須貝は芝マイル〜中距離・牝向き。独自S牝系との一致は減点しない");
+    }
+
+    return {
+      name: input.name || "",
+      verdict,
+      points,
+      detail,
+      combo_hints,
+      recommend_units,
+      hard_pass_reason,
+      tiers: {
+        family_overall: fam.family_overall,
+        hiroo_unique: fam.hiroo_unique,
+        signature_line: fam.signature_line,
+        trainer_hiroo: trainer,
+        cross,
+        sire_tier: sire,
+        price: price.tier
+      }
+    };
+  }
+
+  // expose for tests / console
+  window.ClubScout = { decide, LOOKUPS, POINTS, matchTier, resolveFamily };
+
+  function fillDatalist(id, values) {
+    const el = document.getElementById(id);
+    el.innerHTML = values.map((v) => `<option value="${v}"></option>`).join("");
+  }
+  fillDatalist("familyList", [
+    ...LOOKUPS.hiroo_unique.S.filter((x) => /[ぁ-んァ-ン一-龥]/.test(x)),
+    ...LOOKUPS.hiroo_unique.A.filter((x) => /[ぁ-んァ-ン一-龥]/.test(x)),
+    ...LOOKUPS.hiroo_unique.C.filter((x) => /[ぁ-んァ-ン一-龥]/.test(x))
+  ]);
+  fillDatalist("signatureList", [
+    ...LOOKUPS.signature_line.S.filter((x) => /[ぁ-んァ-ン一-龥]/.test(x)),
+    ...LOOKUPS.signature_line.A.filter((x) => /[ぁ-んァ-ン一-龥]/.test(x))
+  ]);
+  fillDatalist("trainerList", [
+    ...LOOKUPS.trainer_hiroo.S,
+    ...LOOKUPS.trainer_hiroo.A,
+    ...LOOKUPS.trainer_hiroo.B,
+    ...LOOKUPS.trainer_hiroo.C
+  ].filter((x, i, a) => a.indexOf(x) === i && x.length > 1));
+  fillDatalist("sireList", [...LOOKUPS.sire_tier.top, ...LOOKUPS.sire_tier.mid]);
+
+  function readForm(fd) {
+    return {
+      name: fd.get("name"),
+      sire: fd.get("sire"),
+      trainer: fd.get("trainer"),
+      unit_price: fd.get("unit_price"),
+      total_price: fd.get("total_price"),
+      sold_out: fd.get("sold_out") === "on",
+      dam: fd.get("dam"),
+      family_mare: fd.get("family_mare"),
+      signature: fd.get("signature"),
+      family_overall: fd.get("family_overall"),
+      hiroo_unique: fd.get("hiroo_unique"),
+      cross: fd.get("cross"),
+      kinjou: fd.get("kinjou"),
+      weight: fd.get("weight"),
+      injury: fd.get("injury") === "on"
+    };
+  }
+
+  function render(result) {
+    const el = document.getElementById("result");
+    const chips = Object.entries(result.tiers)
+      .map(([k, v]) => `<span class="chip">${k}: ${v}</span>`)
+      .join("");
+    const details = result.detail
+      .map((d) => `<li><span>${d.label} <small style="color:#8f9c93">(${d.tier})</small></span><span class="pts">${d.pts >= 0 ? "+" : ""}${d.pts}</span></li>`)
+      .join("");
+    const hints = result.combo_hints.length
+      ? `<ul class="hints">${result.combo_hints.map((h) => `<li>${h}</li>`).join("")}</ul>`
+      : "";
+    const hard = result.hard_pass_reason
+      ? `<p class="hard">即PASS: ${result.hard_pass_reason}</p>`
+      : "";
+    const title = result.name ? `${result.name} — ` : "";
+    el.innerHTML = `
+      <div class="verdict-row">
+        <h2 class="verdict ${result.verdict}">${result.verdict}</h2>
+        <div class="points">${result.points} pt</div>
+      </div>
+      ${hard}
+      <p class="meta">${title}推奨口数の目安: <strong style="color:var(--ink)">${result.recommend_units}</strong>（月約1万の制約下での参考）</p>
+      <div class="chips">${chips}</div>
+      <ul class="detail">${details}</ul>
+      ${hints}
+    `;
+    el.classList.add("show");
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  document.getElementById("form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = readForm(new FormData(e.target));
+    render(decide(input));
+  });
+
+  document.getElementById("btnReset").addEventListener("click", () => {
+    document.getElementById("form").reset();
+    const r = document.getElementById("result");
+    r.classList.remove("show");
+    r.innerHTML = "";
+  });
+
+  document.getElementById("btnDemo").addEventListener("click", () => {
+    const f = document.getElementById("form");
+    f.name.value = "ヴァルティアラ";
+    f.sire.value = "ロードカナロア";
+    f.trainer.value = "須貝尚介";
+    f.unit_price.value = "2.2";
+    f.total_price.value = "6600";
+    f.dam.value = "ディメンシオン";
+    f.family_mare.value = "ディメンシオン";
+    f.signature.value = "";
+    f.family_overall.value = "auto";
+    f.hiroo_unique.value = "auto";
+    f.cross.value = "B";
+    f.kinjou.value = "none";
+    f.weight.value = "417";
+    f.sold_out.checked = false;
+    f.injury.checked = false;
+    render(decide(readForm(new FormData(f))));
+  });
+
+  // online / offline indicator
+  function syncNet() {
+    const online = navigator.onLine;
+    const pill = document.getElementById("netPill");
+    const label = document.getElementById("netLabel");
+    pill.classList.toggle("is-offline", !online);
+    label.textContent = online ? "オンライン（初回でキャッシュ）" : "オフライン利用中";
+  }
+  window.addEventListener("online", syncNet);
+  window.addEventListener("offline", syncNet);
+  syncNet();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+  </script>
+</body>
+</html>

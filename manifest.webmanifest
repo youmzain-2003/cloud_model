@@ -1,0 +1,20 @@
+{
+  "name": "Club Scout — 広尾一口即断",
+  "short_name": "Club Scout",
+  "description": "広尾サラブレッド倶楽部の出資判断をカタログ入力だけで即断するオフラインツール。的中保証ではありません。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f241c",
+  "theme_color": "#0f241c",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
