@@ -28,16 +28,18 @@ python decide_cli.py --name ディメンシオン'24 --dam ディメンシオン
 
 母→母母の DB 解決は Autumn_Horses 側 DB（`config/db.yaml`）がある環境で有効。本公開リポ単体では JSON ランク＋YAML フォールバックが主になります。
 
-## スマホオフライン（GitHub Pages 用・ルート）
+## スマホ判断シート（GitHub Pages・ルート）
 
 ```
-index.html / mobile.html / manifest.webmanifest / sw.js / icon.svg
+index.html              … NotebookLM風の判断シート1枚（評価点・基準・見る順）
+mobile.html             … 点数計算機（補助）
+manifest.webmanifest / sw.js / icon.svg
 ```
 
 - 期待URL: https://youmzain-2003.github.io/cloud_model/
 - Pages 初回だけ Settings → Pages → **Deploy from a branch** → `main` / `/ (root)` が必要（API では 403）
 
-スマホ: URL を一度開く → ホーム画面に追加 → 以降オフライン。
+スマホ: URL を一度開く → ホーム画面に追加 → カタログ横でシート参照。
 
 ## 判定尺（正本と同じ）
 
