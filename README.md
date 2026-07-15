@@ -29,20 +29,21 @@ cloud_model/
 2. 共有メニュー等から「ホーム画面に追加」
 3. 以降はオフラインでも判定可能
 
-## Pages 有効化
+## Pages 有効化（初回だけ手動が必要）
 
-どちらか一方:
+静的ファイルはすでに `main` ルートにあります。GitHub の制限で **Pages の初回 ON はリポジトリ設定画面での操作が必須**です（API / Actions トークンでは 403）。
 
-### A. GitHub Actions（推奨）
+### いちばん簡単（推奨）
 
-1. リポジトリ **Settings → Pages**
-2. **Source** を **GitHub Actions** にする
-3. `main` への push（または Actions の `Deploy Club Scout to GitHub Pages` を手動実行）でデプロイ
+1. https://github.com/youmzain-2003/cloud_model/settings/pages を開く
+2. **Build and deployment → Source** で **Deploy from a branch**
+3. Branch: **`main`** / Folder: **`/ (root)`** → **Save**
+4. 1〜2分後に https://youmzain-2003.github.io/cloud_model/ が 200 になる
 
-### B. Deploy from a branch
+### 代替: GitHub Actions
 
-1. **Settings → Pages**
-2. **Deploy from a branch** → Branch: `main` → Folder: `/ (root)` → Save
+1. 同上 Settings → Pages で Source を **GitHub Actions**
+2. Actions タブから `Deploy Club Scout to GitHub Pages` を Re-run（または空コミットで再 push）
 
 ## 判定の目安
 
