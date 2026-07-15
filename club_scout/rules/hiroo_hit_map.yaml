@@ -1,0 +1,112 @@
+# Club Scout — 広尾レース軸ヒット地図（MVP）
+# 馬券予想パイプラインとは無関係。随時手動更新可。
+# DB照合: banushi_code=553800 / 馬主名=広尾レース / Eng=Hiroo Race Co. Ltd.
+
+meta:
+  owner_name: 広尾レース
+  banushi_code: "553800"
+  catalog_url: https://www.hirootc.jp/sellhorses/
+  max_score: 22.0
+  note: "最適1頭は同予算プール内の相対ランキング。的中保証ではない。"
+  family_key: "ketto6（母母名）。候補の family_mare に母母名を入れるとDBランクが効く。"
+
+# DBランク配点（build_family_ranks.py の出力を使用）
+db_ranks:
+  family_overall_weight: 0.55
+  family_hiroo_weight: 0.45
+  family_default: 2.0
+  hiroo_unique_bonus:
+    S: 1.5
+    A: 1.0
+    B: 0.5
+    C: 0.2
+  cross_bonus:
+    S: 1.5
+    A: 1.0
+    B: 0.5
+    C: 0.2
+
+# 牝系ラベル（family_mare 未記入時のフォールバック）
+broodmare_family:
+  S: 6.0
+  A: 4.5
+  B: 3.0
+  C: 1.5
+  unknown: 2.0
+  default: 2.0
+
+# 厩舎フィット（kyosoba_master2 頭数ベースの初期値。後で勝率で差し替え可）
+# grade: S/A/B/C → 点数
+trainers:
+  矢作芳人: { grade: S, score: 5.0 }
+  友道康夫: { grade: S, score: 5.0 }
+  須貝尚介: { grade: S, score: 4.5 }
+  池江泰寿: { grade: S, score: 4.5 }
+  蛯名正義: { grade: A, score: 4.0 }
+  尾関知人: { grade: A, score: 4.0 }
+  高柳大輔: { grade: A, score: 3.8 }
+  四位洋文: { grade: A, score: 3.5 }
+  杉山晴紀: { grade: B, score: 3.0 }
+  武英智: { grade: B, score: 2.8 }
+  荒川義之: { grade: B, score: 2.5 }
+  黒岩陽一: { grade: B, score: 2.5 }
+  鈴木慎太郎: { grade: B, score: 2.5 }
+  奥村武: { grade: C, score: 2.0 }
+  中尾秀正: { grade: C, score: 2.0 }
+  default: { grade: C, score: 2.0 }
+
+# 父ボーナス（簡易。未登録は default）
+sires:
+  コントレイル: 4.0
+  キタサンブラック: 3.8
+  ロードカナロア: 3.8
+  Flightline: 3.5
+  Sea The Stars: 3.5
+  エピファネイア: 3.2
+  ナダル: 3.0
+  レイデオロ: 3.0
+  サートゥルナーリア: 2.8
+  パンサラッサ: 2.5
+  ゴールドシップ: 2.5
+  default: 2.0
+
+# 一口価格（万円）。安い〜中帯をやや加点、高額は慎重
+price_tiers_man_yen:
+  - { max: 1.0, score: 1.5 }      # 超軽量
+  - { max: 1.5, score: 1.0 }
+  - { max: 2.0, score: 0.5 }
+  - { max: 2.5, score: 0.0 }
+  - { max: 3.0, score: -0.5 }
+  - { max: 99.0, score: -1.0 }
+
+# 近況コピペのキーワード加減点（馬体枠 最大3点のベース2.0に加算）
+kinjou:
+  base: 2.0
+  max: 3.0
+  min: 0.0
+  positive:
+    - { keyword: 順調, delta: 0.4 }
+    - { keyword: 良化, delta: 0.3 }
+    - { keyword: 増体, delta: 0.2 }
+    - { keyword: 快調, delta: 0.3 }
+    - { keyword: 併せ馬, delta: 0.2 }
+  negative:
+    - { keyword: 休養, delta: -0.5 }
+    - { keyword: 骨折, delta: -1.5 }
+    - { keyword: 跛行, delta: -1.0 }
+    - { keyword: 気になる, delta: -0.3 }
+    - { keyword: 停滞, delta: -0.4 }
+    - { keyword: 減量, delta: -0.3 }
+  # 体重が文中にあれば、軽い停滞判定用（kg）。極端に軽すぎると減点
+  weight_light_alert_kg: 420
+  weight_light_delta: -0.3
+
+# 予算制約（月額・口数）
+budget:
+  default_monthly_yen: 10000
+  max_units_per_horse: 4
+
+# 見送り条件（該当で推奨から除外タグ）
+skip_if:
+  status_in: ["満口"]
+  price_over_man_yen: 4.0

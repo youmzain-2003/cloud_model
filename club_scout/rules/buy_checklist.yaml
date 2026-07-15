@@ -1,0 +1,153 @@
+# Club Scout — カタログ判定用 基準ポイント集
+# 見るページ: 募集一覧 / blood / report（任意）
+# 的中保証ではない。買う・見送の意思決定支援。
+
+meta:
+  version: "2026-07-15"
+  purpose: "カタログ見ただけで GO / HOLD / PASS を出す"
+  catalog_url: https://www.hirootc.jp/sellhorses/
+  required_fields:
+    - 募集コード
+    - 馬名
+    - 予定調教師
+    - 父
+    - 母名（→母母をDB解決）
+    - 一口価格
+    - 募集状況
+
+# 最終判定（ポイント合計）
+verdict:
+  GO:   { min: 12, label: "買う候補", meaning: "本線で検討。口数はrecommend_unitsに従う" }
+  HOLD: { min: 8,  label: "様子見",   meaning: "近況・残口・予算を見て再判定" }
+  PASS: { min: 0,  label: "見送り",   meaning: "今は手を出さない" }
+
+# 即PASS（1つでも該当で見送り）
+hard_pass:
+  - { field: status, in: ["満口"], reason: "満口" }
+  - { field: price_man_yen, gt: 4.0, reason: "一口4万円超は原則見送り" }
+  - {
+      field: kinjou_latest,
+      contains_any: ["骨折", "跛行", "手術", "予後不良"],
+      reason: "近況に重大リスク語",
+    }
+
+# カタログ瞬間チェック（人が見る順番）
+instant_checklist:
+  - step: 1
+    title: 募集状況
+    go: "募集中 / 残口わずか"
+    pass: "満口"
+  - step: 2
+    title: 母 → 母母（family_mare）
+    how: "bloodの母名をDB検索し、その馬の母（ketto2）が募集馬の母母"
+    go: "広尾独自 S/A、または全体牝系 S/A"
+    hold: "広尾独自 B/C、または全体 B"
+    pass: "標本不足U かつ 魅力材料なし"
+  - step: 3
+    title: 予定調教師（広尾実績）
+    go: "広尾×調教師 S/A"
+    hold: "B"
+    pass: "C/U のみで牝系も弱い"
+  - step: 4
+    title: クロス（牝系×厩舎）
+    go: "クロス S/A → 即加点の本命条件"
+    hold: "クロスなしでも牝系・厩舎が片方強い"
+  - step: 5
+    title: 父
+    go: "コントレイル / ロードカナロア / キタサンブラック / Flightline 等の上位枠"
+  - step: 6
+    title: 一口価格
+    go: "≦2.0万円"
+    hold: "2.0〜2.5"
+    careful: "≧2.5 は牝系SかクロスSが欲しい"
+  - step: 7
+    title: 近況（reportがあれば）
+    go: "順調・快調・問題なし"
+    pass: "骨折・跛行・手術・長期安静"
+    hold: "軽量・歩様注意・短期安静（解消済みならHOLD可）"
+
+# 加点テーブル（合計目安 0〜20）
+points:
+  family_overall:
+    S: 5
+    A: 4
+    B: 2
+    C: 1
+    U: 0
+    none: 0
+  hiroo_unique:
+    S: 3
+    A: 2
+    B: 1
+    C: 0
+    none: 0
+  # 母母より深い「看板牝系」（例: Stitching）を手で入れた場合
+  signature_line:
+    S: 2
+    A: 1
+    B: 0
+    C: 0
+    none: 0
+  trainer_hiroo:
+    S: 4
+    A: 3
+    B: 2
+    C: 1
+    U: 0
+    none: 1   # YAMLフォールバック想定の最低点
+  cross:
+    S: 4
+    A: 3
+    B: 1
+    C: 0
+    none: 0
+  sire_tier:
+    top: 2      # ルールYAML sires >= 3.5
+    mid: 1      # >= 2.8
+    low: 0
+  price_man_yen:
+    - { max: 1.5, pts: 2 }
+    - { max: 2.0, pts: 1 }
+    - { max: 2.5, pts: 0 }
+    - { max: 3.0, pts: -1 }
+    - { max: 99.0, pts: -2 }
+  kinjou:
+    positive_hit: 1      # 順調等
+    negative_mild: -1    # 停滞・減量・気になる・安静
+    negative_hard: -4    # hard_pass語以外の強リスクが残る場合用
+    light_weight: -1     # 420kg以下など
+    none: 0
+
+# カタログだけでGOしやすい組合せ（クロス集計の読み方）
+combo_rules:
+  - id: C1
+    name: 独自牝系×実績厩舎
+    when: "hiroo_unique in [S,A] AND trainer in [S,A]"
+    verdict_hint: GO
+  - id: C2
+    name: クロス本命
+    when: "cross in [S,A]"
+    verdict_hint: GO
+  - id: C3
+    name: 全体強牝系×上位父×手頃価格
+    when: "family_overall in [S,A] AND sire_tier=top AND price<=2.0"
+    verdict_hint: GO
+  - id: C4
+    name: 看板血統の一世代ズレ
+    when: "signature_line in [S,A] AND family_overall in [B,C]"
+    verdict_hint: HOLD
+    note: "母母は普通でも、母母母が広尾看板ならHOLD〜条件付きGO"
+  - id: C5
+    name: 高額はボーナス必須
+    when: "price>=2.5 AND cross not in [S,A] AND hiroo_unique not in [S,A]"
+    verdict_hint: PASS
+
+# 現場メモ用の短縮カード（印刷・スマホ参照）
+pocket_card:
+  - "①満口→PASS"
+  - "②母名→母母。広尾独自S/A or 全体S/A なら◎"
+  - "③厩舎が広尾S/A なら◎ / クロスS/Aなら即GO候補"
+  - "④父が上位＋一口≦2万で加点"
+  - "⑤近況に骨折・跛行・手術→PASS / 順調なら+1"
+  - "⑥合計12〜GO / 8〜HOLD / 未満PASS"
+  - "⑦同予算プール内で相対1位を本命にする"

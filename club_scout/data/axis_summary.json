@@ -1,0 +1,172 @@
+{
+  "generated_at": "2026-07-14T15:15:08.575373+00:00",
+  "banushi_code": "553800",
+  "owner": {
+    "banushi_code": "553800",
+    "banushi_hojinkaku_ari": "広尾レース　株式会社",
+    "banushi_hojinkaku_nashi": "広尾レース",
+    "banushi_eng": "Hiroo Race Co. Ltd.",
+    "chuo_gokei_1chaku_ruikei": "000290",
+    "chuo_gokei_2chaku_ruikei": "000296",
+    "chuo_gokei_3chaku_ruikei": "000247",
+    "honshokin_gokei_ruikei": "0054134650"
+  },
+  "kyosoba_count": 365,
+  "kyosoba_active": 32,
+  "master_cum_stats": {
+    "wins": 292,
+    "starts": 3464
+  },
+  "trainers_from_kyosoba": [
+    {
+      "chokyoshimei_ryakusho": "藤沢和雄",
+      "chokyoshi_code": "00386",
+      "n": 25
+    },
+    {
+      "chokyoshimei_ryakusho": "尾関知人",
+      "chokyoshi_code": "01103",
+      "n": 19
+    },
+    {
+      "chokyoshimei_ryakusho": "二ノ宮敬",
+      "chokyoshi_code": "00409",
+      "n": 17
+    },
+    {
+      "chokyoshimei_ryakusho": "森秀行",
+      "chokyoshi_code": "00427",
+      "n": 15
+    },
+    {
+      "chokyoshimei_ryakusho": "高市圭二",
+      "chokyoshi_code": "01014",
+      "n": 15
+    },
+    {
+      "chokyoshimei_ryakusho": "松永幹夫",
+      "chokyoshi_code": "01092",
+      "n": 14
+    },
+    {
+      "chokyoshimei_ryakusho": "小崎憲",
+      "chokyoshi_code": "01085",
+      "n": 13
+    },
+    {
+      "chokyoshimei_ryakusho": "矢作芳人",
+      "chokyoshi_code": "01075",
+      "n": 12
+    },
+    {
+      "chokyoshimei_ryakusho": "国枝栄",
+      "chokyoshi_code": "00399",
+      "n": 11
+    },
+    {
+      "chokyoshimei_ryakusho": "高柳大輔",
+      "chokyoshi_code": "01159",
+      "n": 10
+    },
+    {
+      "chokyoshimei_ryakusho": "角居勝彦",
+      "chokyoshi_code": "01053",
+      "n": 10
+    },
+    {
+      "chokyoshimei_ryakusho": "畠山重則",
+      "chokyoshi_code": "00339",
+      "n": 9
+    },
+    {
+      "chokyoshimei_ryakusho": "中舘英二",
+      "chokyoshi_code": "01153",
+      "n": 8
+    },
+    {
+      "chokyoshimei_ryakusho": "蛯名正義",
+      "chokyoshi_code": "01191",
+      "n": 8
+    },
+    {
+      "chokyoshimei_ryakusho": "鈴木慎太",
+      "chokyoshi_code": "01179",
+      "n": 7
+    },
+    {
+      "chokyoshimei_ryakusho": "高柳瑞樹",
+      "chokyoshi_code": "01118",
+      "n": 7
+    },
+    {
+      "chokyoshimei_ryakusho": "加藤征弘",
+      "chokyoshi_code": "01059",
+      "n": 7
+    },
+    {
+      "chokyoshimei_ryakusho": "坂本勝美",
+      "chokyoshi_code": "01034",
+      "n": 7
+    },
+    {
+      "chokyoshimei_ryakusho": "田中克典",
+      "chokyoshi_code": "01180",
+      "n": 7
+    },
+    {
+      "chokyoshimei_ryakusho": "藤原英昭",
+      "chokyoshi_code": "01055",
+      "n": 6
+    },
+    {
+      "chokyoshimei_ryakusho": "伊藤正徳",
+      "chokyoshi_code": "00383",
+      "n": 6
+    },
+    {
+      "chokyoshimei_ryakusho": "古賀末喜",
+      "chokyoshi_code": "00170",
+      "n": 5
+    },
+    {
+      "chokyoshimei_ryakusho": "林徹",
+      "chokyoshi_code": "01163",
+      "n": 5
+    },
+    {
+      "chokyoshimei_ryakusho": "鈴木伸尋",
+      "chokyoshi_code": "01026",
+      "n": 5
+    },
+    {
+      "chokyoshimei_ryakusho": "鹿戸雄一",
+      "chokyoshi_code": "01097",
+      "n": 5
+    },
+    {
+      "chokyoshimei_ryakusho": "小桧山悟",
+      "chokyoshi_code": "01005",
+      "n": 5
+    },
+    {
+      "chokyoshimei_ryakusho": "田村康仁",
+      "chokyoshi_code": "01027",
+      "n": 4
+    },
+    {
+      "chokyoshimei_ryakusho": "荒川義之",
+      "chokyoshi_code": "01095",
+      "n": 4
+    },
+    {
+      "chokyoshimei_ryakusho": "堀宣行",
+      "chokyoshi_code": "01070",
+      "n": 4
+    },
+    {
+      "chokyoshimei_ryakusho": "野中賢二",
+      "chokyoshi_code": "01098",
+      "n": 4
+    }
+  ]
+}
