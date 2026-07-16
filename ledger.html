@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e1914" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="description" content="簡単な収支メモ。初期残高・日付・項目名・収入支出から残額を計算します。" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <title>収支メモ — Club Scout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/app.css" />
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav">
+      <a href="./index.html">ホーム</a>
+      <a href="./sheet/index.html">判断シート</a>
+      <a href="./tool.html">ツール</a>
+      <a href="./ledger.html" class="on">収支</a>
+    </nav>
+    <p class="kicker">SIMPLE LEDGER</p>
+    <h1 class="brand">収支メモ</h1>
+    <p class="sub">初期残高と日付は必須。項目名をつけて収入・支出を記録し、残額を自動で出します。この端末に保存されます。</p>
+
+    <section class="ledger-summary" id="summary" aria-live="polite">
+      <div>
+        <span class="ledger-summary-label">初期残高</span>
+        <strong id="sumOpening">未設定</strong>
+      </div>
+      <div>
+        <span class="ledger-summary-label">収入合計</span>
+        <strong class="amt-in" id="sumIncome">¥0</strong>
+      </div>
+      <div>
+        <span class="ledger-summary-label">支出合計</span>
+        <strong class="amt-out" id="sumExpense">¥0</strong>
+      </div>
+      <div>
+        <span class="ledger-summary-label">残額</span>
+        <strong id="sumBalance">—</strong>
+      </div>
+    </section>
+
+    <section class="card" id="opening">
+      <h2>1. 初期残高</h2>
+      <form id="openingForm" novalidate>
+        <div class="grid2">
+          <label class="field">初期残高（円）*
+            <input id="openingBalance" name="openingBalance" type="number" inputmode="numeric" step="1" required placeholder="例: 50000" />
+          </label>
+          <label class="field">基準日*
+            <input id="openingDate" name="openingDate" type="date" required />
+          </label>
+        </div>
+        <button class="primary" type="submit" id="btnSaveOpening">初期残高を保存</button>
+      </form>
+      <p class="note" id="openingNote">未設定です。先に初期残高と基準日を入れてください。</p>
+    </section>
+
+    <section class="card" id="entry">
+      <h2>2. 記録を追加</h2>
+      <form id="entryForm" novalidate>
+        <div class="grid2">
+          <label class="field">日付*
+            <input id="entryDate" name="entryDate" type="date" required />
+          </label>
+          <label class="field">区分*
+            <select id="entryType" name="entryType">
+              <option value="expense" selected>支出</option>
+              <option value="income">収入</option>
+            </select>
+          </label>
+          <label class="field">項目名*
+            <input id="entryName" name="entryName" type="text" maxlength="80" required placeholder="例: 給料 / 食費" autocomplete="off" />
+          </label>
+          <label class="field">金額（円）*
+            <input id="entryAmount" name="entryAmount" type="number" inputmode="numeric" min="1" step="1" required placeholder="例: 1200" />
+          </label>
+        </div>
+        <label class="field">メモ（任意）
+          <input id="entryMemo" name="entryMemo" type="text" maxlength="120" placeholder="任意" autocomplete="off" />
+        </label>
+        <button class="primary" type="submit" id="btnAddEntry">追加する</button>
+      </form>
+      <p class="note" id="entryNote"></p>
+    </section>
+
+    <section class="card" id="list">
+      <h2>3. 一覧</h2>
+      <div class="ledger-toolbar">
+        <label class="field" style="margin:0;flex:1">絞り込み
+          <select id="filterType">
+            <option value="all">すべて</option>
+            <option value="income">収入のみ</option>
+            <option value="expense">支出のみ</option>
+          </select>
+        </label>
+        <button type="button" class="ghost" id="btnClearAll">全削除</button>
+      </div>
+      <div id="entryList" class="ledger-list muted">まだ記録がありません。</div>
+    </section>
+
+    <p class="foot">
+      データはこの端末のブラウザにのみ保存されます。簿記や確定申告用ではありません。<br />
+      戻る: <a href="./index.html">ホーム</a>
+    </p>
+  </div>
+
+  <script src="./assets/ledger.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>
