@@ -1,9 +1,10 @@
 /* Club Scout service worker — cache shell for offline use */
-const CACHE = "club-scout-v4-ux";
+const CACHE = "club-scout-v5-ledger";
 const ASSETS = [
   "./",
   "./index.html",
   "./tool.html",
+  "./ledger.html",
   "./mobile.html",
   "./manifest.webmanifest",
   "./icon.svg",
@@ -12,6 +13,7 @@ const ASSETS = [
   "./assets/club_data.js",
   "./assets/sheet.js",
   "./assets/tool.js",
+  "./assets/ledger.js",
   "./sheet/index.html",
   "./sheet/01-tiers.html",
   "./sheet/02-trainer.html",
