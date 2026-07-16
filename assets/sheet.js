@@ -233,47 +233,123 @@
 
     renderCombos() {
       const mapHint = { GO: "badge-go", HOLD: "badge-hold", PASS: "badge-pass" };
-      const cards = (D().meta.combo_rules || [])
+      const lists = D().combo_lists || {};
+      const rules = D().meta.combo_rules || [];
+      const blocks = rules
         .map((c) => {
           const cls = mapHint[c.verdict_hint] || "";
+          const L = lists[c.id] || {};
+          let body = "";
+          if (c.id === "C1") {
+            body = `
+              <h3>独自牝系側（${(L.unique_families || []).length}）</h3>
+              <ul class="list">${(L.unique_families || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)} ${gja(x.grade)}</li>`)
+                .join("")}</ul>
+              <h3>厩舎側（${(L.trainers || []).length}）</h3>
+              <ul class="list">${(L.trainers || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)} ${gja(x.grade)}</li>`)
+                .join("")}</ul>
+              <p class="note">上×下がそろったとき <strong>C1点灯</strong>。</p>`;
+          } else if (c.id === "C2") {
+            body = `
+              <h3>点灯するクロス組（データ上のS/A）</h3>
+              <table class="tbl"><thead><tr><th>厩舎</th><th>牝系</th><th>段階</th></tr></thead><tbody>
+              ${(L.pairs || [])
+                .map(
+                  (p) =>
+                    `<tr><td>${p.trainer}</td><td>${p.family}</td><td>${badge(p.grade)} ${gja(p.grade)}</td></tr>`
+                )
+                .join("")}
+              </tbody></table>
+              <p class="note">この表に無い組合せはクロスなし（C2は点灯しない）。</p>`;
+          } else if (c.id === "C3") {
+            body = `
+              <h3>全体牝系S/A</h3>
+              <ul class="list">${(L.families || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)}</li>`)
+                .join("")}</ul>
+              <h3>父・上位</h3>
+              <ul class="list">${(L.sires || [])
+                .map((x) => `<li>${x.name} — ${x.tier_ja}</li>`)
+                .join("")}</ul>
+              <p class="note">＋ 一口 ≦ 2.0 万円 で <strong>C3点灯</strong>。</p>`;
+          } else if (c.id === "C4") {
+            body = `
+              <h3>看板候補（深い層）</h3>
+              <ul class="list">${(L.signature_candidates || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)}</li>`)
+                .join("")}</ul>
+              <p class="note">看板がS/Aで、全体牝系がB/Cのとき点灯。</p>`;
+          } else if (c.id === "C5") {
+            body = `<p>一口 ≧ 2.5 かつ 独自もクロスも S/A でない → <strong>C5点灯（PASS寄り）</strong></p>`;
+          }
           return `<article class="card">
             <h2>${c.id} ${c.name}</h2>
             <p><span class="${cls}">傾き: ${c.verdict_hint}</span></p>
-            <p><strong>条件</strong><br>${c.when}</p>
+            <p><strong>条件式</strong><br><code style="font-size:.78rem;color:var(--muted)">${c.when}</code></p>
+            ${L.note ? `<p class="note">${L.note}</p>` : ""}
             ${c.note ? `<p class="note">${c.note}</p>` : ""}
+            ${body}
           </article>`;
         })
         .join("");
       document.getElementById("combos").innerHTML =
-        cards +
         `<section class="card">
-          <h2>読み方</h2>
+          <h2>コンボの見方</h2>
           <ul class="list">
-            <li>コンボは「ヒント」。C1〜C3が点灯したらGO寄り、C5が点灯したらPASS寄り。</li>
-            <li>最終は合計点（12/8）と即PASSが優先。</li>
+            <li>下の各カードが「どのリストの組合せで点灯するか」です。</li>
+            <li>C1〜C3点灯 → GO寄り / C5点灯 → PASS寄り。最終は合計点と即PASS優先。</li>
+            <li>補完ツールの「コンボ判定」でも、入力から点灯確認できます。</li>
           </ul>
-        </section>`;
+        </section>` + blocks;
     },
 
     renderWeight() {
       const w = D().weight;
       const profiles = w.profiles
-        .map(
-          (p) => `<article class="card">
+        .map((p) => {
+          const tRows = (p.trainers || [])
+            .map((n) => {
+              const b = (w.trainer_bands || []).find((x) => x.name === n);
+              return `<tr><td>${n}</td><td>${b ? badge(b.grade) : "-"}</td><td class="num">${p.ok_min}–${p.ok_max}</td></tr>`;
+            })
+            .join("");
+          const sRows = (p.sires || [])
+            .map((n) => {
+              const b = (w.sire_bands || []).find((x) => x.name === n);
+              return `<tr><td>${n}</td><td>${b ? badge(b.tier) : "-"}</td><td class="num">${p.ok_min}–${p.ok_max}</td></tr>`;
+            })
+            .join("");
+          return `<article class="card">
             <h2>${p.title}</h2>
             <p><strong>OK目安</strong> ${p.ok_min}〜${p.ok_max} kg</p>
             <p class="note">${p.note}</p>
+            <h3>厩舎（この帯に割当・全件）</h3>
             ${
               p.trainers.length
-                ? `<p>厩舎例: ${p.trainers.join(" / ")}</p>`
-                : "<p>厩舎例: （標準）</p>"
+                ? `<table class="tbl"><thead><tr><th>厩舎</th><th>等級</th><th>帯</th></tr></thead><tbody>${tRows}</tbody></table>`
+                : "<p class=\"muted\">なし</p>"
             }
+            <h3>父（この帯に割当・登録全件）</h3>
             ${
-              p.sires_hint.length
-                ? `<p class="note">父の型の例: ${p.sires_hint.join(" / ")}</p>`
-                : ""
+              p.sires.length
+                ? `<table class="tbl"><thead><tr><th>父</th><th>段階</th><th>帯</th></tr></thead><tbody>${sRows}</tbody></table>`
+                : "<p class=\"muted\">登録父はこの帯に未割当（標準帯へ）</p>"
             }
-          </article>`
+          </article>`;
+        })
+        .join("");
+      const allT = (w.trainer_bands || [])
+        .map(
+          (b) =>
+            `<tr class="row" data-q="${b.name}"><td>${b.name}</td><td>${badge(b.grade)}</td><td>${b.profile_title}</td><td class="num">${b.ok_min}–${b.ok_max}</td></tr>`
+        )
+        .join("");
+      const allS = (w.sire_bands || [])
+        .map(
+          (b) =>
+            `<tr class="row" data-q="${b.name}"><td>${b.name}</td><td>${badge(b.tier)}</td><td>${b.profile_title}</td><td class="num">${b.ok_min}–${b.ok_max}</td></tr>`
         )
         .join("");
       document.getElementById("weight").innerHTML = `
@@ -285,22 +361,36 @@
             <li>相対scorer: ${w.canonical.scorer_delta}</li>
           </ul>
           <p class="note">${w.canonical.note}</p>
+          <p class="note">${w.assignment_note || ""}</p>
         </section>
         <section class="card">
-          <h2>標準目安帯</h2>
-          <p>OK ${w.base_band.ok_min}〜${w.base_band.ok_max} kg ／ 下警戒 ≤${w.base_band.watch_low} ／ 上警戒 ≥${w.base_band.watch_high}</p>
-        </section>
-        <section class="card">
-          <h2>統合ルール（厩舎×父×牝系）</h2>
-          <ol class="list">
-            ${w.integration_rules.map((x) => `<li>${x}</li>`).join("")}
-          </ol>
+          <h2>統合ルール</h2>
+          <ol class="list">${w.integration_rules.map((x) => `<li>${x}</li>`).join("")}</ol>
         </section>
         ${profiles}
         <section class="card">
-          <h2>補完ツールでやること</h2>
-          <p>体重と厩舎・父を入れると、正本減点の有無＋プロファイル帯の判定を同時に出します。<a href="../tool.html#weight">ツールの体重判定へ</a></p>
+          <h2>厩舎×体重帯 全一覧</h2>
+          <div class="searchbox"><label class="field">絞り込み<input id="qw-t" placeholder="須貝" /></label></div>
+          <table class="tbl"><thead><tr><th>厩舎</th><th>等級</th><th>プロファイル</th><th>OK帯</th></tr></thead><tbody id="w-t-body">${allT}</tbody></table>
+        </section>
+        <section class="card">
+          <h2>父×体重帯 全一覧</h2>
+          <div class="searchbox"><label class="field">絞り込み<input id="qw-s" placeholder="カナロア" /></label></div>
+          <table class="tbl"><thead><tr><th>父</th><th>段階</th><th>プロファイル</th><th>OK帯</th></tr></thead><tbody id="w-s-body">${allS}</tbody></table>
         </section>`;
+      const bind = (id, sel) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener("input", () => {
+          const q = input.value.trim().toLowerCase();
+          document.querySelectorAll(sel).forEach((row) => {
+            const hay = (row.getAttribute("data-q") || "").toLowerCase();
+            row.style.display = !q || hay.includes(q) ? "" : "none";
+          });
+        });
+      };
+      bind("qw-t", "#w-t-body tr.row");
+      bind("qw-s", "#w-s-body tr.row");
     },
 
     renderPoints() {

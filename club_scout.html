@@ -132,9 +132,30 @@ button.primary {
 .foot { margin-top: 18px; color: #87948c; font-size: 0.74rem; line-height: 1.55; }
 .searchbox { position: sticky; top: 48px; z-index: 15; margin-bottom: 10px; }
 .hit { background: rgba(217,180,92,.08); }
-.badge-go { color: var(--go); font-weight: 700; }
-.badge-hold { color: var(--hold); font-weight: 700; }
-.badge-pass { color: var(--pass); font-weight: 700; }
+.suggest { position: relative; }
+.suggest-list {
+  display: none; position: absolute; left: 0; right: 0; top: calc(100% + 2px);
+  z-index: 30; max-height: 220px; overflow: auto;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: #14241c; box-shadow: 0 10px 24px rgba(0,0,0,.35);
+}
+.suggest-list.on { display: block; }
+.suggest-list button {
+  display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid rgba(255,255,255,.06);
+  background: transparent; color: var(--ink); padding: 10px 12px; font: inherit; cursor: pointer;
+}
+.suggest-list button:active, .suggest-list button:hover { background: rgba(217,180,92,.12); }
+.suggest-list .meta { display:block; color: var(--muted); font-size: .72rem; margin-top: 2px; }
+.warn-box {
+  margin-top: 8px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid rgba(226,168,74,.4); background: rgba(226,168,74,.1);
+  color: #f0d7a0; font-size: .84rem;
+}
+
+
+.badge-go{color:var(--go);font-weight:700}
+.badge-hold{color:var(--hold);font-weight:700}
+.badge-pass{color:var(--pass);font-weight:700}
 
 .tabs { display:flex; gap:6px; flex-wrap:wrap; margin: 0 0 12px; }
 .tabs button {
@@ -158,88 +179,105 @@ button.primary {
 <div class="wrap">
   <p class="kicker">SINGLE FILE / OFFLINE</p>
   <h1 class="brand">Club Scout</h1>
-  <p class="sub">このHTML単独で判断シートと補完ツールが動きます。Pages不要。ファイルを保存してブラウザで開いてください。</p>
+  <p class="sub">Pages不要。このHTMLを保存して開くだけ。一部一致候補・コンボ一覧・体重全割当対応。</p>
   <div class="tabs" id="mainTabs">
     <button type="button" data-tab="home" class="on">ホーム</button>
     <button type="button" data-tab="sheet">判断シート</button>
     <button type="button" data-tab="tool">補完ツール</button>
   </div>
-
   <section class="panel on" id="tab-home">
     <div class="card">
       <h2>使い方</h2>
       <ol class="list">
-        <li>この <code>club_scout.html</code> をスマホに保存</li>
-        <li>ファイルアプリなどからブラウザで開く</li>
-        <li>「判断シート」で基準確認、「補完ツール」で照会・採点</li>
+        <li>このファイルをスマホに保存してブラウザで開く</li>
+        <li>判断シートで基準・コンボ・体重一覧を確認</li>
+        <li>補完ツールで一部一致候補→採点・コンボ点灯</li>
       </ol>
-      <p class="note">意思決定支援であり的中保証ではありません。データは club_scout 正本（2026-07-15）由来。</p>
-    </div>
-    <div class="card">
-      <h2>収録内容</h2>
-      <ul class="list">
-        <li>厩舎 / 父 / 牝系 / クロス等級（日本語段階）</li>
-        <li>コンボ表・配点・即PASS</li>
-        <li>馬体重OK範囲（正本420＋統合ガイド）</li>
-        <li>名前照会・体重判定・カタログ即断</li>
-      </ul>
+      <p class="note">意思決定支援であり的中保証ではありません。</p>
     </div>
   </section>
-
   <section class="panel" id="tab-sheet">
     <div class="subnav" id="sheetNav"></div>
     <div id="sheetMount"></div>
   </section>
-
   <section class="panel" id="tab-tool">
-    <section class="card">
+    <section class="card" id="lookup">
       <h2>1. 名前照会</h2>
       <label class="field">キーワード（厩舎 / 父 / 牝系）
-        <input id="toolLookupQ" placeholder="例: 須貝 / カナロア / Stitching" />
+        <input id="lookupQ" placeholder="例: 須貝 / カナ / Stitch" autocomplete="off" />
       </label>
-      <div id="toolLookupOut" class="result muted">入力すると候補を表示</div>
+      <div id="lookupOut" class="result muted">数文字入れると候補を表示</div>
     </section>
-    <section class="card" id="tool-weight">
+
+    <section class="card" id="weight">
       <h2>2. 馬体重の統合判定</h2>
       <div class="grid2">
-        <label class="field">体重 (kg)<input id="toolWKg" type="number" inputmode="numeric" placeholder="417" /></label>
-        <label class="field">厩舎<input id="toolWTrainer" list="trainerList" placeholder="須貝尚介" /></label>
-        <label class="field">父<input id="toolWSire" list="sireList" placeholder="ロードカナロア" /></label>
-        <label class="field">牝系（母母・任意）<input id="toolWFamily" list="familyList" placeholder="Stitching" /></label>
+        <label class="field">体重 (kg)
+          <input id="wKg" type="number" inputmode="numeric" placeholder="417" />
+        </label>
+        <label class="field">厩舎（一部一致OK）
+          <input id="wTrainer" placeholder="須貝 など" autocomplete="off" />
+        </label>
+        <label class="field">父（一部一致OK）
+          <input id="wSire" placeholder="カナロア など" autocomplete="off" />
+        </label>
+        <label class="field">牝系（母母・任意）
+          <input id="wFamily" placeholder="Stitch など" autocomplete="off" />
+        </label>
       </div>
-      <button class="primary" type="button" id="toolBtnWeight">体重を判定</button>
-      <div id="toolWeightOut" class="result muted">未判定</div>
+      <button class="primary" type="button" id="btnWeight">体重を判定</button>
+      <div id="weightOut" class="result muted">未判定</div>
     </section>
-    <section class="card">
-      <h2>3. カタログ即断</h2>
+
+    <section class="card" id="decide">
+      <h2>3. カタログ即断＋コンボ点灯</h2>
+      <p class="note">厩舎・父・牝系は入力中に候補リストが出ます。未収録なら下の手動等級でフォロー。</p>
       <div class="grid2">
-        <label class="field">馬名（任意）<input id="dName" placeholder="ディメンシオン'24" /></label>
-        <label class="field">一口価格（万円）<input id="dPrice" type="number" inputmode="decimal" step="0.1" placeholder="2.2" /></label>
-        <label class="field">厩舎<input id="dTrainer" list="trainerList" placeholder="須貝尚介" /></label>
-        <label class="field">父<input id="dSire" list="sireList" placeholder="ロードカナロア" /></label>
-        <label class="field">牝系（母母）<input id="dFamily" list="familyList" /></label>
-        <label class="field">看板牝系（任意）<input id="dSig" list="familyList" placeholder="Stitching" /></label>
+        <label class="field">馬名（任意）
+          <input id="dName" placeholder="ディメンシオン'24" />
+        </label>
+        <label class="field">一口価格（万円）
+          <input id="dPrice" type="number" inputmode="decimal" step="0.1" placeholder="2.2" />
+        </label>
+        <label class="field">厩舎（一部一致→候補）
+          <input id="dTrainer" placeholder="須貝" autocomplete="off" />
+        </label>
+        <label class="field">父（一部一致→候補）
+          <input id="dSire" placeholder="カナロア" autocomplete="off" />
+        </label>
+        <label class="field">牝系（母母）
+          <input id="dFamily" placeholder="未収録なら手動等級" autocomplete="off" />
+        </label>
+        <label class="field">看板牝系（任意）
+          <input id="dSig" placeholder="Stitching" autocomplete="off" />
+        </label>
         <label class="field">全体牝系（上書き）
           <select id="dOverall">
             <option value="auto">自動（データ）</option>
-            <option value="S">最上級（S）</option><option value="A">上級（A）</option>
-            <option value="B">標準（B）</option><option value="C">控えめ（C）</option>
+            <option value="S">最上級（S）</option>
+            <option value="A">上級（A）</option>
+            <option value="B">標準（B）</option>
+            <option value="C">控えめ（C）</option>
             <option value="U">データ不足（U）</option>
           </select>
         </label>
         <label class="field">広尾独自（上書き）
           <select id="dUnique">
             <option value="auto">自動（データ）</option>
-            <option value="S">最上級（S）</option><option value="A">上級（A）</option>
-            <option value="B">標準（B）</option><option value="C">控えめ（C）</option>
+            <option value="S">最上級（S）</option>
+            <option value="A">上級（A）</option>
+            <option value="B">標準（B）</option>
+            <option value="C">控えめ（C）</option>
             <option value="none">なし</option>
           </select>
         </label>
         <label class="field">クロス（上書き）
           <select id="dCross">
             <option value="auto">自動（データ）</option>
-            <option value="S">最上級（S）</option><option value="A">上級（A）</option>
-            <option value="B">標準（B）</option><option value="C">控えめ（C）</option>
+            <option value="S">最上級（S）</option>
+            <option value="A">上級（A）</option>
+            <option value="B">標準（B）</option>
+            <option value="C">控えめ（C）</option>
             <option value="none">なし</option>
           </select>
         </label>
@@ -250,7 +288,9 @@ button.primary {
             <option value="mild">停滞・減量など（-1）</option>
           </select>
         </label>
-        <label class="field">体重 (kg・任意)<input id="dWeight" type="number" inputmode="numeric" placeholder="417" /></label>
+        <label class="field">体重 (kg・任意)
+          <input id="dWeight" type="number" inputmode="numeric" placeholder="417" />
+        </label>
         <label class="field">募集
           <select id="dStatus">
             <option value="募集中">募集中</option>
@@ -262,18 +302,25 @@ button.primary {
       <label class="field" style="display:flex;align-items:center;gap:8px;color:var(--ink)">
         <input type="checkbox" id="dInjury" /> 近況に骨折・跛行・手術・予後不良
       </label>
-      <button class="primary" type="button" id="btnDecide">判定する</button>
+      <button class="primary" type="button" id="btnDecide">判定する（点数＋コンボ）</button>
       <div id="decideOut" class="result muted">未判定</div>
+      <div id="comboOut" class="result muted" style="margin-top:8px">コンボ点灯はここに出ます</div>
     </section>
-  </section>
 
-  <p class="foot">意思決定支援であり、的中・利益・満口取得を保証しません。<br>データ版: <span id="ver"></span></p>
+    <p class="foot">
+      データ版: <span id="ver"></span><br />
+      意思決定支援であり、的中・利益・満口取得を保証しません。<br />
+      詳細表は <a href="#">判断シート</a> を参照。
+    </p>
+  
+  </section>
+  <p class="foot">意思決定支援であり的中保証ではありません。<br>データ版: <span id="ver"></span></p>
 </div>
 <datalist id="trainerList"></datalist>
 <datalist id="sireList"></datalist>
 <datalist id="familyList"></datalist>
 <script>
-window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_model smartphone sheet+tool", "ranks_generated_at": "2026-07-15T00:27:04+09:00", "definition": {"family_key": "ketto6（母母）", "hiroo_unique": "広尾頭数>=3 かつ 広尾比率>=0.35", "grade": "複合指標の上位15%=S / 40%=A / 75%=B / 他=C（標本不足=U）", "metrics": "平滑勝率 + log(頭あたり本賞金万円)"}, "disclaimer": "意思決定支援であり的中保証ではない。", "grade_ja": {"S": {"ja": "最上級", "short": "最上級（S）", "hint": "本線で強く加点"}, "A": {"ja": "上級", "short": "上級（A）", "hint": "有力。積極検討"}, "B": {"ja": "標準", "short": "標準（B）", "hint": "材料が揃えばHOLD〜"}, "C": {"ja": "控えめ", "short": "控えめ（C）", "hint": "他材料が弱いとPASS寄り"}, "U": {"ja": "データ不足", "short": "データ不足（U）", "hint": "標本少なく断定しない"}, "none": {"ja": "未設定", "short": "未設定", "hint": "入力なし"}}, "sire_ja": {"top": {"ja": "上位", "short": "上位（top）", "hint": "ルール値 3.5以上"}, "mid": {"ja": "中位", "short": "中位（mid）", "hint": "ルール値 2.8以上"}, "low": {"ja": "下位", "short": "下位（low）", "hint": "2.8未満・未登録寄り"}}, "buy_points": {"family_overall": {"S": 5, "A": 4, "B": 2, "C": 1, "U": 0, "none": 0}, "hiroo_unique": {"S": 3, "A": 2, "B": 1, "C": 0, "none": 0}, "signature_line": {"S": 2, "A": 1, "B": 0, "C": 0, "none": 0}, "trainer_hiroo": {"S": 4, "A": 3, "B": 2, "C": 1, "U": 0, "none": 1}, "cross": {"S": 4, "A": 3, "B": 1, "C": 0, "none": 0}, "sire_tier": {"top": 2, "mid": 1, "low": 0}, "price_man_yen": [{"max": 1.5, "pts": 2}, {"max": 2.0, "pts": 1}, {"max": 2.5, "pts": 0}, {"max": 3.0, "pts": -1}, {"max": 99.0, "pts": -2}], "kinjou": {"positive_hit": 1, "negative_mild": -1, "negative_hard": -4, "light_weight": -1, "none": 0}}, "verdict": {"GO": {"min": 12, "label": "買う候補", "meaning": "本線で検討。口数はrecommend_unitsに従う"}, "HOLD": {"min": 8, "label": "様子見", "meaning": "近況・残口・予算を見て再判定"}, "PASS": {"min": 0, "label": "見送り", "meaning": "今は手を出さない"}}, "hard_pass": [{"field": "status", "in": ["満口"], "reason": "満口"}, {"field": "price_man_yen", "gt": 4.0, "reason": "一口4万円超は原則見送り"}, {"field": "kinjou_latest", "contains_any": ["骨折", "跛行", "手術", "予後不良"], "reason": "近況に重大リスク語"}], "combo_rules": [{"id": "C1", "name": "独自牝系×実績厩舎", "when": "hiroo_unique in [S,A] AND trainer in [S,A]", "verdict_hint": "GO"}, {"id": "C2", "name": "クロス本命", "when": "cross in [S,A]", "verdict_hint": "GO"}, {"id": "C3", "name": "全体強牝系×上位父×手頃価格", "when": "family_overall in [S,A] AND sire_tier=top AND price<=2.0", "verdict_hint": "GO"}, {"id": "C4", "name": "看板血統の一世代ズレ", "when": "signature_line in [S,A] AND family_overall in [B,C]", "verdict_hint": "HOLD", "note": "母母は普通でも、母母母が広尾看板ならHOLD〜条件付きGO"}, {"id": "C5", "name": "高額はボーナス必須", "when": "price>=2.5 AND cross not in [S,A] AND hiroo_unique not in [S,A]", "verdict_hint": "PASS"}], "pocket_card": ["①満口→PASS", "②母名→母母。広尾独自S/A or 全体S/A なら◎", "③厩舎が広尾S/A なら◎ / クロスS/Aなら即GO候補", "④父が上位＋一口≦2万で加点", "⑤近況に骨折・跛行・手術→PASS / 順調なら+1", "⑥合計12〜GO / 8〜HOLD / 未満PASS", "⑦同予算プール内で相対1位を本命にする"], "instant_checklist": [{"step": 1, "title": "募集状況", "go": "募集中 / 残口わずか", "pass": "満口"}, {"step": 2, "title": "母 → 母母（family_mare）", "how": "bloodの母名をDB検索し、その馬の母（ketto2）が募集馬の母母", "go": "広尾独自 S/A、または全体牝系 S/A", "hold": "広尾独自 B/C、または全体 B", "pass": "標本不足U かつ 魅力材料なし"}, {"step": 3, "title": "予定調教師（広尾実績）", "go": "広尾×調教師 S/A", "hold": "B", "pass": "C/U のみで牝系も弱い"}, {"step": 4, "title": "クロス（牝系×厩舎）", "go": "クロス S/A → 即加点の本命条件", "hold": "クロスなしでも牝系・厩舎が片方強い"}, {"step": 5, "title": "父", "go": "コントレイル / ロードカナロア / キタサンブラック / Flightline 等の上位枠"}, {"step": 6, "title": "一口価格", "go": "≦2.0万円", "hold": "2.0〜2.5", "careful": "≧2.5 は牝系SかクロスSが欲しい"}, {"step": 7, "title": "近況（reportがあれば）", "go": "順調・快調・問題なし", "pass": "骨折・跛行・手術・長期安静", "hold": "軽量・歩様注意・短期安静（解消済みならHOLD可）"}], "catalog_url": "https://www.hirootc.jp/sellhorses/"}, "trainers": [{"name": "奥村武", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 4, "win_rate_sm": 0.1463, "n_horses": 3}, "yaml": {"grade": "C", "score": 2.0}, "n_horses": 3, "win_rate_sm": 0.1463}, {"name": "林徹", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 5, "win_rate_sm": 0.1163, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.1163}, {"name": "矢作芳人", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 2, "win_rate_sm": 0.1387, "n_horses": 12}, "yaml": {"grade": "S", "score": 5.0}, "n_horses": 12, "win_rate_sm": 0.1387}, {"name": "藤原英昭", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 1, "win_rate_sm": 0.1538, "n_horses": 6}, "yaml": null, "n_horses": 6, "win_rate_sm": 0.1538}, {"name": "藤沢和雄", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 3, "win_rate_sm": 0.1596, "n_horses": 25}, "yaml": null, "n_horses": 25, "win_rate_sm": 0.1596}, {"name": "高柳瑞樹", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 6, "win_rate_sm": 0.1311, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.1311}, {"name": "友道康夫", "effective_grade": "S", "effective_source": "yaml", "effective_score": 5.0, "db": null, "yaml": {"grade": "S", "score": 5.0}, "n_horses": null, "win_rate_sm": null}, {"name": "池江泰寿", "effective_grade": "S", "effective_source": "yaml", "effective_score": 4.5, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.08, "n_horses": 3}, "yaml": {"grade": "S", "score": 4.5}, "n_horses": 3, "win_rate_sm": 0.08}, {"name": "須貝尚介", "effective_grade": "S", "effective_source": "yaml", "effective_score": 4.5, "db": null, "yaml": {"grade": "S", "score": 4.5}, "n_horses": null, "win_rate_sm": null}, {"name": "加藤征弘", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 14, "win_rate_sm": 0.1034, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.1034}, {"name": "勢司和浩", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 7, "win_rate_sm": 0.125, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.125}, {"name": "吉田直弘", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 8, "win_rate_sm": 0.1077, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.1077}, {"name": "四位洋文", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 10, "win_rate_sm": 0.1212, "n_horses": 3}, "yaml": {"grade": "A", "score": 3.5}, "n_horses": 3, "win_rate_sm": 0.1212}, {"name": "国枝栄", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 12, "win_rate_sm": 0.1158, "n_horses": 11}, "yaml": null, "n_horses": 11, "win_rate_sm": 0.1158}, {"name": "森秀行", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 16, "win_rate_sm": 0.0822, "n_horses": 15}, "yaml": null, "n_horses": 15, "win_rate_sm": 0.0822}, {"name": "池上昌弘", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 15, "win_rate_sm": 0.0943, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0943}, {"name": "田中克典", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 11, "win_rate_sm": 0.0957, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.0957}, {"name": "高市圭二", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 13, "win_rate_sm": 0.1026, "n_horses": 15}, "yaml": null, "n_horses": 15, "win_rate_sm": 0.1026}, {"name": "高松邦男", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 9, "win_rate_sm": 0.0984, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0984}, {"name": "中舘英二", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 28, "win_rate_sm": 0.0548, "n_horses": 8}, "yaml": null, "n_horses": 8, "win_rate_sm": 0.0548}, {"name": "二ノ宮敬", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 21, "win_rate_sm": 0.0763, "n_horses": 17}, "yaml": null, "n_horses": 17, "win_rate_sm": 0.0763}, {"name": "伊藤正徳", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 20, "win_rate_sm": 0.0813, "n_horses": 6}, "yaml": null, "n_horses": 6, "win_rate_sm": 0.0813}, {"name": "堀宣行", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 17, "win_rate_sm": 0.1053, "n_horses": 4}, "yaml": null, "n_horses": 4, "win_rate_sm": 0.1053}, {"name": "小崎憲", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 18, "win_rate_sm": 0.0741, "n_horses": 13}, "yaml": null, "n_horses": 13, "win_rate_sm": 0.0741}, {"name": "尾関知人", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 19, "win_rate_sm": 0.0898, "n_horses": 19}, "yaml": {"grade": "A", "score": 4.0}, "n_horses": 19, "win_rate_sm": 0.0898}, {"name": "杉山晴紀", "effective_grade": "B", "effective_source": "yaml", "effective_score": 3.0, "db": null, "yaml": {"grade": "B", "score": 3.0}, "n_horses": null, "win_rate_sm": null}, {"name": "松永幹夫", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 29, "win_rate_sm": 0.0573, "n_horses": 14}, "yaml": null, "n_horses": 14, "win_rate_sm": 0.0573}, {"name": "荒川義之", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 26, "win_rate_sm": 0.0602, "n_horses": 4}, "yaml": {"grade": "B", "score": 2.5}, "n_horses": 4, "win_rate_sm": 0.0602}, {"name": "蛯名正義", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 25, "win_rate_sm": 0.0811, "n_horses": 8}, "yaml": {"grade": "A", "score": 4.0}, "n_horses": 8, "win_rate_sm": 0.0811}, {"name": "野中賢二", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 22, "win_rate_sm": 0.0741, "n_horses": 4}, "yaml": null, "n_horses": 4, "win_rate_sm": 0.0741}, {"name": "鈴木伸尋", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 24, "win_rate_sm": 0.0769, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.0769}, {"name": "鈴木慎太", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 27, "win_rate_sm": 0.0851, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.0851}, {"name": "鹿戸雄一", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 23, "win_rate_sm": 0.0759, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.0759}, {"name": "武英智", "effective_grade": "B", "effective_source": "yaml", "effective_score": 2.8, "db": null, "yaml": {"grade": "B", "score": 2.8}, "n_horses": null, "win_rate_sm": null}, {"name": "鈴木慎太郎", "effective_grade": "B", "effective_source": "yaml", "effective_score": 2.5, "db": null, "yaml": {"grade": "B", "score": 2.5}, "n_horses": null, "win_rate_sm": null}, {"name": "黒岩陽一", "effective_grade": "B", "effective_source": "yaml", "effective_score": 2.5, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0435, "n_horses": 4}, "yaml": {"grade": "B", "score": 2.5}, "n_horses": 4, "win_rate_sm": 0.0435}, {"name": "中尾秀正", "effective_grade": "C", "effective_source": "yaml", "effective_score": 2.0, "db": null, "yaml": {"grade": "C", "score": 2.0}, "n_horses": null, "win_rate_sm": null}, {"name": "伊藤竹男", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 39, "win_rate_sm": 0.0303, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0303}, {"name": "古賀末喜", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 36, "win_rate_sm": 0.0417, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.0417}, {"name": "坂本勝美", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 35, "win_rate_sm": 0.0455, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.0455}, {"name": "境直行", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 37, "win_rate_sm": 0.0294, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0294}, {"name": "小桧山悟", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 30, "win_rate_sm": 0.041, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.041}, {"name": "平田修", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 34, "win_rate_sm": 0.0455, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0455}, {"name": "田村康仁", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 33, "win_rate_sm": 0.0408, "n_horses": 4}, "yaml": null, "n_horses": 4, "win_rate_sm": 0.0408}, {"name": "畠山重則", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 38, "win_rate_sm": 0.0182, "n_horses": 9}, "yaml": null, "n_horses": 9, "win_rate_sm": 0.0182}, {"name": "角居勝彦", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 32, "win_rate_sm": 0.0619, "n_horses": 10}, "yaml": null, "n_horses": 10, "win_rate_sm": 0.0619}, {"name": "高柳大輔", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 31, "win_rate_sm": 0.0625, "n_horses": 10}, "yaml": {"grade": "A", "score": 3.8}, "n_horses": 10, "win_rate_sm": 0.0625}, {"name": "二本柳俊", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0588, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0588}, {"name": "加藤和宏", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0667, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0667}, {"name": "南田美知", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0714, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0714}, {"name": "奥村豊", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0556, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0556}, {"name": "山内研二", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.125, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.125}, {"name": "岩戸孝樹", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.04, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.04}, {"name": "後藤由之", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.05, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.05}, {"name": "根本康広", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.037, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.037}, {"name": "武藤善則", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0526, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0526}, {"name": "深山雅史", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0357, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0357}, {"name": "牧浦充徳", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0714, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0714}, {"name": "田中和夫", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.037, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.037}, {"name": "蛯名信広", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0323, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0323}, {"name": "谷原義明", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0833, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0833}], "sires": [{"name": "コントレイル", "score": 4.0, "tier": "top", "tier_ja": "上位（top）"}, {"name": "キタサンブラック", "score": 3.8, "tier": "top", "tier_ja": "上位（top）"}, {"name": "ロードカナロア", "score": 3.8, "tier": "top", "tier_ja": "上位（top）"}, {"name": "Flightline", "score": 3.5, "tier": "top", "tier_ja": "上位（top）"}, {"name": "Sea The Stars", "score": 3.5, "tier": "top", "tier_ja": "上位（top）"}, {"name": "エピファネイア", "score": 3.2, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "ナダル", "score": 3.0, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "レイデオロ", "score": 3.0, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "サートゥルナーリア", "score": 2.8, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "ゴールドシップ", "score": 2.5, "tier": "low", "tier_ja": "下位（low）"}, {"name": "パンサラッサ", "score": 2.5, "tier": "low", "tier_ja": "下位（low）"}], "sire_default": 2.0, "families": [{"name": "Above the Odds", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 5, "n_horses": 5, "win_rate_sm": 0.1343, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "Dollar Bird", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 3, "n_horses": 7, "win_rate_sm": 0.1475, "hiroo_unique": true, "hiroo_family_grade": "S", "hiroo_family_rank": 2, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "First One Holme", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 4, "n_horses": 8, "win_rate_sm": 0.1509, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Muffitys", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 1, "n_horses": 20, "win_rate_sm": 0.2434, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Stitching", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 2, "n_horses": 10, "win_rate_sm": 0.1429, "hiroo_unique": true, "hiroo_family_grade": "S", "hiroo_family_rank": 1, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Tidespring", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 7, "n_horses": 3, "win_rate_sm": 0.1333, "hiroo_unique": true, "hiroo_family_grade": "S", "hiroo_family_rank": 3, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "フラワースウイース", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 6, "n_horses": 47, "win_rate_sm": 0.1218, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "As You Desire Me", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 9, "n_horses": 3, "win_rate_sm": 0.1148, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Fairy Ballade", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 13, "n_horses": 12, "win_rate_sm": 0.1069, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Hyabella", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 18, "n_horses": 4, "win_rate_sm": 0.0889, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "I'm Out", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 10, "n_horses": 11, "win_rate_sm": 0.1005, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Juniper Berry", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 14, "n_horses": 14, "win_rate_sm": 0.0944, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 5, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Magic Circle", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 11, "n_horses": 6, "win_rate_sm": 0.0935, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 4, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Veronica Heron", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 17, "n_horses": 7, "win_rate_sm": 0.0896, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ボーンフェイマス", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 12, "n_horses": 27, "win_rate_sm": 0.1014, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "モンスーンウェディング", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 16, "n_horses": 7, "win_rate_sm": 0.1091, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ヤノセイラン", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 8, "n_horses": 12, "win_rate_sm": 0.119, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "リビーザリブラ", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 15, "n_horses": 24, "win_rate_sm": 0.0892, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "Buffed Orange", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 24, "n_horses": 5, "win_rate_sm": 0.0784, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 10, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Catalyst", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 29, "n_horses": 13, "win_rate_sm": 0.0698, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 12, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "Miss Fear Factor", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 33, "n_horses": 5, "win_rate_sm": 0.0714, "hiroo_unique": true, "hiroo_family_grade": "C", "hiroo_family_rank": 14, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Pastel Colour", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 25, "n_horses": 7, "win_rate_sm": 0.0723, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 11, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "Sinndiya", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 30, "n_horses": 5, "win_rate_sm": 0.0556, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 13, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "アスクローザ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 26, "n_horses": 39, "win_rate_sm": 0.0723, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "アンジユレスイート", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 28, "n_horses": 16, "win_rate_sm": 0.072, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ウェルシュステラ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 21, "n_horses": 20, "win_rate_sm": 0.0815, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 8, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "スイートマカロン", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 19, "n_horses": 5, "win_rate_sm": 0.0909, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 6, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "ダイナフロンテイア", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 31, "n_horses": 17, "win_rate_sm": 0.0682, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ハイアーラヴ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 20, "n_horses": 6, "win_rate_sm": 0.0952, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 7, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "パーフェクトサークル", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 27, "n_horses": 21, "win_rate_sm": 0.076, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "マザートウショウ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 35, "n_horses": 37, "win_rate_sm": 0.0588, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ミスペンバリー", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 32, "n_horses": 2, "win_rate_sm": 0.0714, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "ラークホイッスル", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 22, "n_horses": 22, "win_rate_sm": 0.0782, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "レディストロベリー", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 34, "n_horses": 16, "win_rate_sm": 0.0559, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "レフィナーダ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 23, "n_horses": 6, "win_rate_sm": 0.0816, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 9, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Intizaa", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 43, "n_horses": 9, "win_rate_sm": 0.0357, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Savannah Song", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 37, "n_horses": 25, "win_rate_sm": 0.0544, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Slip Ashore", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 45, "n_horses": 15, "win_rate_sm": 0.0316, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "カスタネツト", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 44, "n_horses": 10, "win_rate_sm": 0.0333, "hiroo_unique": true, "hiroo_family_grade": "C", "hiroo_family_rank": 16, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "シャンラン", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 40, "n_horses": 30, "win_rate_sm": 0.0502, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "スタイルリバー", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 41, "n_horses": 10, "win_rate_sm": 0.0455, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "タニノアベイ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 42, "n_horses": 10, "win_rate_sm": 0.0248, "hiroo_unique": true, "hiroo_family_grade": "C", "hiroo_family_rank": 15, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "ノースオブダンジグ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 36, "n_horses": 37, "win_rate_sm": 0.0521, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "ノーブルフランチエスカ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 46, "n_horses": 8, "win_rate_sm": 0.0141, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "ブレッシング", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 38, "n_horses": 40, "win_rate_sm": 0.0548, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "モザーティアナ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 39, "n_horses": 27, "win_rate_sm": 0.0569, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "Everlast", "overall_grade": "U", "overall_score": 2.0, "overall_rank": null, "n_horses": 2, "win_rate_sm": 0.0417, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "フェニーチェ", "overall_grade": "U", "overall_score": 2.0, "overall_rank": null, "n_horses": 2, "win_rate_sm": 0.0526, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}], "hiroo_unique_families": [{"family_name": "Stitching", "family_code": "1240020478", "hiroo_horses": 10, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 14, "starts": 93, "n_horses": 10, "win_rate": 0.1505, "win_rate_sm": 0.1429, "prize_man_per_horse": 5168.0, "composite_raw": 31.3866, "rank": 2, "grade": "S", "score": 6.0, "percentile": 0.9674, "hiroo_family_rank": 1, "hiroo_family_grade": "S"}, {"family_name": "Dollar Bird", "family_code": "1240027535", "hiroo_horses": 7, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 8, "starts": 49, "n_horses": 7, "win_rate": 0.1633, "win_rate_sm": 0.1475, "prize_man_per_horse": 3057.14, "composite_raw": 30.8052, "rank": 3, "grade": "S", "score": 6.0, "percentile": 0.9457, "hiroo_family_rank": 2, "hiroo_family_grade": "S"}, {"family_name": "Tidespring", "family_code": "1240031885", "hiroo_horses": 3, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 3, "starts": 18, "n_horses": 3, "win_rate": 0.1667, "win_rate_sm": 0.1333, "prize_man_per_horse": 1125.67, "composite_raw": 27.3874, "rank": 7, "grade": "S", "score": 6.0, "percentile": 0.8587, "hiroo_family_rank": 3, "hiroo_family_grade": "S"}, {"family_name": "Magic Circle", "family_code": "1240018506", "hiroo_horses": 6, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 12, "starts": 127, "n_horses": 6, "win_rate": 0.0945, "win_rate_sm": 0.0935, "prize_man_per_horse": 5114.67, "composite_raw": 26.4326, "rank": 11, "grade": "A", "score": 4.5, "percentile": 0.7717, "hiroo_family_rank": 4, "hiroo_family_grade": "A"}, {"family_name": "Juniper Berry", "family_code": "1240013736", "hiroo_horses": 5, "hiroo_share": 0.3571, "hiroo_unique": true, "wins": 16, "starts": 168, "n_horses": 14, "win_rate": 0.0952, "win_rate_sm": 0.0944, "prize_man_per_horse": 2487.86, "composite_raw": 25.0836, "rank": 14, "grade": "A", "score": 4.5, "percentile": 0.7065, "hiroo_family_rank": 5, "hiroo_family_grade": "A"}, {"family_name": "スイートマカロン", "family_code": "1220059185", "hiroo_horses": 5, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 4, "starts": 43, "n_horses": 5, "win_rate": 0.093, "win_rate_sm": 0.0909, "prize_man_per_horse": 1036.8, "composite_raw": 22.9806, "rank": 19, "grade": "B", "score": 3.0, "percentile": 0.5978, "hiroo_family_rank": 6, "hiroo_family_grade": "A"}, {"family_name": "ハイアーラヴ", "family_code": "1220059443", "hiroo_horses": 4, "hiroo_share": 0.6667, "hiroo_unique": true, "wins": 3, "starts": 30, "n_horses": 6, "win_rate": 0.1, "win_rate_sm": 0.0952, "prize_man_per_horse": 800.0, "composite_raw": 22.8955, "rank": 20, "grade": "B", "score": 3.0, "percentile": 0.5761, "hiroo_family_rank": 7, "hiroo_family_grade": "A"}, {"family_name": "ウェルシュステラ", "family_code": "1220053989", "hiroo_horses": 17, "hiroo_share": 0.85, "hiroo_unique": true, "wins": 14, "starts": 172, "n_horses": 20, "win_rate": 0.0814, "win_rate_sm": 0.0815, "prize_man_per_horse": 1500.6, "composite_raw": 22.7807, "rank": 21, "grade": "B", "score": 3.0, "percentile": 0.5543, "hiroo_family_rank": 8, "hiroo_family_grade": "A"}, {"family_name": "レフィナーダ", "family_code": "1220054936", "hiroo_horses": 4, "hiroo_share": 0.6667, "hiroo_unique": true, "wins": 3, "starts": 37, "n_horses": 6, "win_rate": 0.0811, "win_rate_sm": 0.0816, "prize_man_per_horse": 985.5, "composite_raw": 21.9516, "rank": 23, "grade": "B", "score": 3.0, "percentile": 0.5109, "hiroo_family_rank": 9, "hiroo_family_grade": "B"}, {"family_name": "Buffed Orange", "family_code": "1240017341", "hiroo_horses": 3, "hiroo_share": 0.6, "hiroo_unique": true, "wins": 3, "starts": 39, "n_horses": 5, "win_rate": 0.0769, "win_rate_sm": 0.0784, "prize_man_per_horse": 1031.0, "composite_raw": 21.7216, "rank": 24, "grade": "B", "score": 3.0, "percentile": 0.4891, "hiroo_family_rank": 10, "hiroo_family_grade": "B"}, {"family_name": "Pastel Colour", "family_code": "1240025193", "hiroo_horses": 7, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 5, "starts": 71, "n_horses": 7, "win_rate": 0.0704, "win_rate_sm": 0.0723, "prize_man_per_horse": 1157.0, "composite_raw": 21.3378, "rank": 25, "grade": "B", "score": 3.0, "percentile": 0.4674, "hiroo_family_rank": 11, "hiroo_family_grade": "B"}, {"family_name": "Catalyst", "family_code": "1240018350", "hiroo_horses": 8, "hiroo_share": 0.6154, "hiroo_unique": true, "wins": 8, "starts": 117, "n_horses": 13, "win_rate": 0.0684, "win_rate_sm": 0.0698, "prize_man_per_horse": 892.85, "composite_raw": 20.5678, "rank": 29, "grade": "B", "score": 3.0, "percentile": 0.3804, "hiroo_family_rank": 12, "hiroo_family_grade": "B"}, {"family_name": "Sinndiya", "family_code": "1240029956", "hiroo_horses": 5, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 3, "starts": 60, "n_horses": 5, "win_rate": 0.05, "win_rate_sm": 0.0556, "prize_man_per_horse": 1578.4, "composite_raw": 20.2852, "rank": 30, "grade": "B", "score": 3.0, "percentile": 0.3587, "hiroo_family_rank": 13, "hiroo_family_grade": "B"}, {"family_name": "Miss Fear Factor", "family_code": "1240027871", "hiroo_horses": 3, "hiroo_share": 0.6, "hiroo_unique": true, "wins": 1, "starts": 16, "n_horses": 5, "win_rate": 0.0625, "win_rate_sm": 0.0714, "prize_man_per_horse": 494.4, "composite_raw": 19.5536, "rank": 33, "grade": "B", "score": 3.0, "percentile": 0.2935, "hiroo_family_rank": 14, "hiroo_family_grade": "C"}, {"family_name": "タニノアベイ", "family_code": "1220007264", "hiroo_horses": 5, "hiroo_share": 0.5, "hiroo_unique": true, "wins": 4, "starts": 190, "n_horses": 10, "win_rate": 0.0211, "win_rate_sm": 0.0248, "prize_man_per_horse": 900.5, "composite_raw": 16.0834, "rank": 42, "grade": "C", "score": 1.5, "percentile": 0.0978, "hiroo_family_rank": 15, "hiroo_family_grade": "C"}, {"family_name": "カスタネツト", "family_code": "1220021399", "hiroo_horses": 5, "hiroo_share": 0.5, "hiroo_unique": true, "wins": 1, "starts": 48, "n_horses": 10, "win_rate": 0.0208, "win_rate_sm": 0.0333, "prize_man_per_horse": 230.9, "composite_raw": 14.2259, "rank": 44, "grade": "C", "score": 1.5, "percentile": 0.0543, "hiroo_family_rank": 16, "hiroo_family_grade": "C"}], "crosses": [{"key": "林徹|Dollar Bird", "trainer": "林徹", "family": "Dollar Bird", "grade": "S", "score": 6.0, "n_horses": 2, "win_rate_sm": 0.1778, "rank": 1}, {"key": "矢作芳人|Stitching", "trainer": "矢作芳人", "family": "Stitching", "grade": "S", "score": 6.0, "n_horses": 2, "win_rate_sm": 0.1579, "rank": 2}, {"key": "藤原英昭|Stitching", "trainer": "藤原英昭", "family": "Stitching", "grade": "S", "score": 6.0, "n_horses": 3, "win_rate_sm": 0.1714, "rank": 3}, {"key": "小崎憲|ボーンフェイマス", "trainer": "小崎憲", "family": "ボーンフェイマス", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.0909, "rank": 6}, {"key": "池上昌弘|フラワースウイース", "trainer": "池上昌弘", "family": "フラワースウイース", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1042, "rank": 7}, {"key": "矢作芳人|ウェルシュステラ", "trainer": "矢作芳人", "family": "ウェルシュステラ", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1463, "rank": 4}, {"key": "高柳瑞樹|Stitching", "trainer": "高柳瑞樹", "family": "Stitching", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1034, "rank": 8}, {"key": "高柳瑞樹|レフィナーダ", "trainer": "高柳瑞樹", "family": "レフィナーダ", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1538, "rank": 5}, {"key": "小桧山悟|タニノアベイ", "trainer": "小桧山悟", "family": "タニノアベイ", "grade": "B", "score": 3.0, "n_horses": 3, "win_rate_sm": 0.0337, "rank": 14}, {"key": "尾関知人|Pastel Colour", "trainer": "尾関知人", "family": "Pastel Colour", "grade": "B", "score": 3.0, "n_horses": 3, "win_rate_sm": 0.0889, "rank": 9}, {"key": "尾関知人|スイートマカロン", "trainer": "尾関知人", "family": "スイートマカロン", "grade": "B", "score": 3.0, "n_horses": 4, "win_rate_sm": 0.0667, "rank": 12}, {"key": "松永幹夫|Catalyst", "trainer": "松永幹夫", "family": "Catalyst", "grade": "B", "score": 3.0, "n_horses": 2, "win_rate_sm": 0.0816, "rank": 10}, {"key": "松永幹夫|ノースオブダンジグ", "trainer": "松永幹夫", "family": "ノースオブダンジグ", "grade": "B", "score": 3.0, "n_horses": 2, "win_rate_sm": 0.0417, "rank": 13}, {"key": "高柳大輔|ウェルシュステラ", "trainer": "高柳大輔", "family": "ウェルシュステラ", "grade": "B", "score": 3.0, "n_horses": 4, "win_rate_sm": 0.087, "rank": 11}, {"key": "小崎憲|Catalyst", "trainer": "小崎憲", "family": "Catalyst", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0435, "rank": 19}, {"key": "森秀行|パーフェクトサークル", "trainer": "森秀行", "family": "パーフェクトサークル", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0417, "rank": 17}, {"key": "畠山重則|カスタネツト", "trainer": "畠山重則", "family": "カスタネツト", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0455, "rank": 16}, {"key": "蛯名信広|ノーブルフランチエスカ", "trainer": "蛯名信広", "family": "ノーブルフランチエスカ", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0323, "rank": 15}, {"key": "高市圭二|Juniper Berry", "trainer": "高市圭二", "family": "Juniper Berry", "grade": "C", "score": 1.5, "n_horses": 3, "win_rate_sm": 0.0345, "rank": 18}], "weight": {"canonical": {"alert_kg": 420, "scorer_delta": -0.3, "checklist_pts": -1, "note": "正本ルールは一律。420kg以下で軽量アラート。"}, "base_band": {"ok_min": 430, "ok_max": 500, "watch_low": 420, "watch_high": 520, "label": "標準目安帯"}, "profiles": [{"id": "turf_mile_filly", "title": "芝マイル〜中距離・牝寄り", "trainers": ["須貝尚介", "友道康夫", "池江泰寿"], "sires_hint": ["ロードカナロア", "エピファネイア", "サートゥルナーリア"], "ok_min": 415, "ok_max": 480, "note": "細身・軽めでも適性が一致すれば運用上許容しやすい。ただし採点上は≤420で軽量アラートが付く。"}, {"id": "ceiling_power", "title": "天井型・パワー厩舎", "trainers": ["矢作芳人", "藤原英昭", "高柳瑞樹"], "sires_hint": ["キタサンブラック", "コントレイル", "ドゥラメンテ"], "ok_min": 440, "ok_max": 510, "note": "増体・パワーを評価しやすい帯。極端な軽量は適性不一致を疑う。"}, {"id": "dirt_or_heavy", "title": "ダート／パワー父寄り", "trainers": ["黒岩陽一", "荒川義之", "武英智"], "sires_hint": ["マインドユアビスケッツ", "イスラボナータ", "ホッコータルマエ"], "ok_min": 450, "ok_max": 530, "note": "軽い仕上がりは適性ズレ警戒。正本減点に加え運用でも要注意。"}, {"id": "default", "title": "標準（上記以外）", "trainers": [], "sires_hint": [], "ok_min": 430, "ok_max": 500, "note": "正本の警戒線420を下限ウォッチに、標準帯で見る。"}], "integration_rules": ["採点（点数）に効くのは正本の一律ルールのみ：体重≤420 → 軽量アラート（checklist −1 / scorer −0.3）。", "プロファイル帯は運用ガイド。厩舎・父・牝系の「型」が近いプロファイルを優先して参照する。", "複数プロファイルが競合する場合は「より狭いOK帯」と「軽い方の警戒」を採用（保守統合）。", "性・距離適性が厩舎得手と一致している場合、軽量でも即PASSにはしない（減点のみ）。", "骨折・跛行・手術・予後不良は体重帯と無関係に即PASS。"]}, "family_aliases": [{"alias": "ディメンシオン", "maps_to": null, "note": "ランクJSON未収録。看板Stitching系の深層として扱った実績あり（signature参照）。", "suggest_signature": "Stitching", "manual_unique": "S"}, {"alias": "ステラリード", "maps_to": null, "note": "ランクJSON未収録。運用上ウェルシュステラ系と並ぶ優先牝系。", "suggest_signature": null, "manual_unique": "S"}, {"alias": "ミスペンバリー", "maps_to": null, "note": "ランクJSON未収録。優先牝系S扱い（運用）。", "manual_unique": "S"}], "points_trainer": {"S": 4, "A": 3, "B": 2, "C": 1, "U": 0, "none": 1}, "points_family_overall": {"S": 5, "A": 4, "B": 2, "C": 1, "U": 0, "none": 0}, "points_hiroo_unique": {"S": 3, "A": 2, "B": 1, "C": 0, "none": 0}, "points_cross": {"S": 4, "A": 3, "B": 1, "C": 0, "none": 0}, "points_sire": {"top": 2, "mid": 1, "low": 0}, "points_signature": {"S": 2, "A": 1, "B": 0, "C": 0, "none": 0}, "points_price": [{"max": 1.5, "pts": 2}, {"max": 2.0, "pts": 1}, {"max": 2.5, "pts": 0}, {"max": 3.0, "pts": -1}, {"max": 99.0, "pts": -2}], "points_kinjou": {"positive_hit": 1, "negative_mild": -1, "negative_hard": -4, "light_weight": -1, "none": 0}};
+window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_model smartphone sheet+tool", "ranks_generated_at": "2026-07-15T00:27:04+09:00", "definition": {"family_key": "ketto6（母母）", "hiroo_unique": "広尾頭数>=3 かつ 広尾比率>=0.35", "grade": "複合指標の上位15%=S / 40%=A / 75%=B / 他=C（標本不足=U）", "metrics": "平滑勝率 + log(頭あたり本賞金万円)"}, "disclaimer": "意思決定支援であり的中保証ではない。", "grade_ja": {"S": {"ja": "最上級", "short": "最上級（S）", "hint": "本線で強く加点"}, "A": {"ja": "上級", "short": "上級（A）", "hint": "有力。積極検討"}, "B": {"ja": "標準", "short": "標準（B）", "hint": "材料が揃えばHOLD〜"}, "C": {"ja": "控えめ", "short": "控えめ（C）", "hint": "他材料が弱いとPASS寄り"}, "U": {"ja": "データ不足", "short": "データ不足（U）", "hint": "標本少なく断定しない"}, "none": {"ja": "未設定", "short": "未設定", "hint": "入力なし"}}, "sire_ja": {"top": {"ja": "上位", "short": "上位（top）", "hint": "ルール値 3.5以上"}, "mid": {"ja": "中位", "short": "中位（mid）", "hint": "ルール値 2.8以上"}, "low": {"ja": "下位", "short": "下位（low）", "hint": "2.8未満・未登録寄り"}}, "buy_points": {"family_overall": {"S": 5, "A": 4, "B": 2, "C": 1, "U": 0, "none": 0}, "hiroo_unique": {"S": 3, "A": 2, "B": 1, "C": 0, "none": 0}, "signature_line": {"S": 2, "A": 1, "B": 0, "C": 0, "none": 0}, "trainer_hiroo": {"S": 4, "A": 3, "B": 2, "C": 1, "U": 0, "none": 1}, "cross": {"S": 4, "A": 3, "B": 1, "C": 0, "none": 0}, "sire_tier": {"top": 2, "mid": 1, "low": 0}, "price_man_yen": [{"max": 1.5, "pts": 2}, {"max": 2.0, "pts": 1}, {"max": 2.5, "pts": 0}, {"max": 3.0, "pts": -1}, {"max": 99.0, "pts": -2}], "kinjou": {"positive_hit": 1, "negative_mild": -1, "negative_hard": -4, "light_weight": -1, "none": 0}}, "verdict": {"GO": {"min": 12, "label": "買う候補", "meaning": "本線で検討。口数はrecommend_unitsに従う"}, "HOLD": {"min": 8, "label": "様子見", "meaning": "近況・残口・予算を見て再判定"}, "PASS": {"min": 0, "label": "見送り", "meaning": "今は手を出さない"}}, "hard_pass": [{"field": "status", "in": ["満口"], "reason": "満口"}, {"field": "price_man_yen", "gt": 4.0, "reason": "一口4万円超は原則見送り"}, {"field": "kinjou_latest", "contains_any": ["骨折", "跛行", "手術", "予後不良"], "reason": "近況に重大リスク語"}], "combo_rules": [{"id": "C1", "name": "独自牝系×実績厩舎", "when": "hiroo_unique in [S,A] AND trainer in [S,A]", "verdict_hint": "GO"}, {"id": "C2", "name": "クロス本命", "when": "cross in [S,A]", "verdict_hint": "GO"}, {"id": "C3", "name": "全体強牝系×上位父×手頃価格", "when": "family_overall in [S,A] AND sire_tier=top AND price<=2.0", "verdict_hint": "GO"}, {"id": "C4", "name": "看板血統の一世代ズレ", "when": "signature_line in [S,A] AND family_overall in [B,C]", "verdict_hint": "HOLD", "note": "母母は普通でも、母母母が広尾看板ならHOLD〜条件付きGO"}, {"id": "C5", "name": "高額はボーナス必須", "when": "price>=2.5 AND cross not in [S,A] AND hiroo_unique not in [S,A]", "verdict_hint": "PASS"}], "pocket_card": ["①満口→PASS", "②母名→母母。広尾独自S/A or 全体S/A なら◎", "③厩舎が広尾S/A なら◎ / クロスS/Aなら即GO候補", "④父が上位＋一口≦2万で加点", "⑤近況に骨折・跛行・手術→PASS / 順調なら+1", "⑥合計12〜GO / 8〜HOLD / 未満PASS", "⑦同予算プール内で相対1位を本命にする"], "instant_checklist": [{"step": 1, "title": "募集状況", "go": "募集中 / 残口わずか", "pass": "満口"}, {"step": 2, "title": "母 → 母母（family_mare）", "how": "bloodの母名をDB検索し、その馬の母（ketto2）が募集馬の母母", "go": "広尾独自 S/A、または全体牝系 S/A", "hold": "広尾独自 B/C、または全体 B", "pass": "標本不足U かつ 魅力材料なし"}, {"step": 3, "title": "予定調教師（広尾実績）", "go": "広尾×調教師 S/A", "hold": "B", "pass": "C/U のみで牝系も弱い"}, {"step": 4, "title": "クロス（牝系×厩舎）", "go": "クロス S/A → 即加点の本命条件", "hold": "クロスなしでも牝系・厩舎が片方強い"}, {"step": 5, "title": "父", "go": "コントレイル / ロードカナロア / キタサンブラック / Flightline 等の上位枠"}, {"step": 6, "title": "一口価格", "go": "≦2.0万円", "hold": "2.0〜2.5", "careful": "≧2.5 は牝系SかクロスSが欲しい"}, {"step": 7, "title": "近況（reportがあれば）", "go": "順調・快調・問題なし", "pass": "骨折・跛行・手術・長期安静", "hold": "軽量・歩様注意・短期安静（解消済みならHOLD可）"}], "catalog_url": "https://www.hirootc.jp/sellhorses/"}, "trainers": [{"name": "奥村武", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 4, "win_rate_sm": 0.1463, "n_horses": 3}, "yaml": {"grade": "C", "score": 2.0}, "n_horses": 3, "win_rate_sm": 0.1463}, {"name": "林徹", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 5, "win_rate_sm": 0.1163, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.1163}, {"name": "矢作芳人", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 2, "win_rate_sm": 0.1387, "n_horses": 12}, "yaml": {"grade": "S", "score": 5.0}, "n_horses": 12, "win_rate_sm": 0.1387}, {"name": "藤原英昭", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 1, "win_rate_sm": 0.1538, "n_horses": 6}, "yaml": null, "n_horses": 6, "win_rate_sm": 0.1538}, {"name": "藤沢和雄", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 3, "win_rate_sm": 0.1596, "n_horses": 25}, "yaml": null, "n_horses": 25, "win_rate_sm": 0.1596}, {"name": "高柳瑞樹", "effective_grade": "S", "effective_source": "db_hiroo", "effective_score": 6.0, "db": {"grade": "S", "score": 6.0, "rank": 6, "win_rate_sm": 0.1311, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.1311}, {"name": "友道康夫", "effective_grade": "S", "effective_source": "yaml", "effective_score": 5.0, "db": null, "yaml": {"grade": "S", "score": 5.0}, "n_horses": null, "win_rate_sm": null}, {"name": "池江泰寿", "effective_grade": "S", "effective_source": "yaml", "effective_score": 4.5, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.08, "n_horses": 3}, "yaml": {"grade": "S", "score": 4.5}, "n_horses": 3, "win_rate_sm": 0.08}, {"name": "須貝尚介", "effective_grade": "S", "effective_source": "yaml", "effective_score": 4.5, "db": null, "yaml": {"grade": "S", "score": 4.5}, "n_horses": null, "win_rate_sm": null}, {"name": "加藤征弘", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 14, "win_rate_sm": 0.1034, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.1034}, {"name": "勢司和浩", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 7, "win_rate_sm": 0.125, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.125}, {"name": "吉田直弘", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 8, "win_rate_sm": 0.1077, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.1077}, {"name": "四位洋文", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 10, "win_rate_sm": 0.1212, "n_horses": 3}, "yaml": {"grade": "A", "score": 3.5}, "n_horses": 3, "win_rate_sm": 0.1212}, {"name": "国枝栄", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 12, "win_rate_sm": 0.1158, "n_horses": 11}, "yaml": null, "n_horses": 11, "win_rate_sm": 0.1158}, {"name": "森秀行", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 16, "win_rate_sm": 0.0822, "n_horses": 15}, "yaml": null, "n_horses": 15, "win_rate_sm": 0.0822}, {"name": "池上昌弘", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 15, "win_rate_sm": 0.0943, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0943}, {"name": "田中克典", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 11, "win_rate_sm": 0.0957, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.0957}, {"name": "高市圭二", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 13, "win_rate_sm": 0.1026, "n_horses": 15}, "yaml": null, "n_horses": 15, "win_rate_sm": 0.1026}, {"name": "高松邦男", "effective_grade": "A", "effective_source": "db_hiroo", "effective_score": 4.5, "db": {"grade": "A", "score": 4.5, "rank": 9, "win_rate_sm": 0.0984, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0984}, {"name": "中舘英二", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 28, "win_rate_sm": 0.0548, "n_horses": 8}, "yaml": null, "n_horses": 8, "win_rate_sm": 0.0548}, {"name": "二ノ宮敬", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 21, "win_rate_sm": 0.0763, "n_horses": 17}, "yaml": null, "n_horses": 17, "win_rate_sm": 0.0763}, {"name": "伊藤正徳", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 20, "win_rate_sm": 0.0813, "n_horses": 6}, "yaml": null, "n_horses": 6, "win_rate_sm": 0.0813}, {"name": "堀宣行", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 17, "win_rate_sm": 0.1053, "n_horses": 4}, "yaml": null, "n_horses": 4, "win_rate_sm": 0.1053}, {"name": "小崎憲", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 18, "win_rate_sm": 0.0741, "n_horses": 13}, "yaml": null, "n_horses": 13, "win_rate_sm": 0.0741}, {"name": "尾関知人", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 19, "win_rate_sm": 0.0898, "n_horses": 19}, "yaml": {"grade": "A", "score": 4.0}, "n_horses": 19, "win_rate_sm": 0.0898}, {"name": "杉山晴紀", "effective_grade": "B", "effective_source": "yaml", "effective_score": 3.0, "db": null, "yaml": {"grade": "B", "score": 3.0}, "n_horses": null, "win_rate_sm": null}, {"name": "松永幹夫", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 29, "win_rate_sm": 0.0573, "n_horses": 14}, "yaml": null, "n_horses": 14, "win_rate_sm": 0.0573}, {"name": "荒川義之", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 26, "win_rate_sm": 0.0602, "n_horses": 4}, "yaml": {"grade": "B", "score": 2.5}, "n_horses": 4, "win_rate_sm": 0.0602}, {"name": "蛯名正義", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 25, "win_rate_sm": 0.0811, "n_horses": 8}, "yaml": {"grade": "A", "score": 4.0}, "n_horses": 8, "win_rate_sm": 0.0811}, {"name": "野中賢二", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 22, "win_rate_sm": 0.0741, "n_horses": 4}, "yaml": null, "n_horses": 4, "win_rate_sm": 0.0741}, {"name": "鈴木伸尋", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 24, "win_rate_sm": 0.0769, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.0769}, {"name": "鈴木慎太", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 27, "win_rate_sm": 0.0851, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.0851}, {"name": "鹿戸雄一", "effective_grade": "B", "effective_source": "db_hiroo", "effective_score": 3.0, "db": {"grade": "B", "score": 3.0, "rank": 23, "win_rate_sm": 0.0759, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.0759}, {"name": "武英智", "effective_grade": "B", "effective_source": "yaml", "effective_score": 2.8, "db": null, "yaml": {"grade": "B", "score": 2.8}, "n_horses": null, "win_rate_sm": null}, {"name": "鈴木慎太郎", "effective_grade": "B", "effective_source": "yaml", "effective_score": 2.5, "db": null, "yaml": {"grade": "B", "score": 2.5}, "n_horses": null, "win_rate_sm": null}, {"name": "黒岩陽一", "effective_grade": "B", "effective_source": "yaml", "effective_score": 2.5, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0435, "n_horses": 4}, "yaml": {"grade": "B", "score": 2.5}, "n_horses": 4, "win_rate_sm": 0.0435}, {"name": "中尾秀正", "effective_grade": "C", "effective_source": "yaml", "effective_score": 2.0, "db": null, "yaml": {"grade": "C", "score": 2.0}, "n_horses": null, "win_rate_sm": null}, {"name": "伊藤竹男", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 39, "win_rate_sm": 0.0303, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0303}, {"name": "古賀末喜", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 36, "win_rate_sm": 0.0417, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.0417}, {"name": "坂本勝美", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 35, "win_rate_sm": 0.0455, "n_horses": 7}, "yaml": null, "n_horses": 7, "win_rate_sm": 0.0455}, {"name": "境直行", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 37, "win_rate_sm": 0.0294, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0294}, {"name": "小桧山悟", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 30, "win_rate_sm": 0.041, "n_horses": 5}, "yaml": null, "n_horses": 5, "win_rate_sm": 0.041}, {"name": "平田修", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 34, "win_rate_sm": 0.0455, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0455}, {"name": "田村康仁", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 33, "win_rate_sm": 0.0408, "n_horses": 4}, "yaml": null, "n_horses": 4, "win_rate_sm": 0.0408}, {"name": "畠山重則", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 38, "win_rate_sm": 0.0182, "n_horses": 9}, "yaml": null, "n_horses": 9, "win_rate_sm": 0.0182}, {"name": "角居勝彦", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 32, "win_rate_sm": 0.0619, "n_horses": 10}, "yaml": null, "n_horses": 10, "win_rate_sm": 0.0619}, {"name": "高柳大輔", "effective_grade": "C", "effective_source": "db_hiroo", "effective_score": 1.5, "db": {"grade": "C", "score": 1.5, "rank": 31, "win_rate_sm": 0.0625, "n_horses": 10}, "yaml": {"grade": "A", "score": 3.8}, "n_horses": 10, "win_rate_sm": 0.0625}, {"name": "二本柳俊", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0588, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0588}, {"name": "加藤和宏", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0667, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0667}, {"name": "南田美知", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0714, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0714}, {"name": "奥村豊", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0556, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0556}, {"name": "山内研二", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.125, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.125}, {"name": "岩戸孝樹", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.04, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.04}, {"name": "後藤由之", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.05, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.05}, {"name": "根本康広", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.037, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.037}, {"name": "武藤善則", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0526, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0526}, {"name": "深山雅史", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0357, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0357}, {"name": "牧浦充徳", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0714, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0714}, {"name": "田中和夫", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.037, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.037}, {"name": "蛯名信広", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0323, "n_horses": 3}, "yaml": null, "n_horses": 3, "win_rate_sm": 0.0323}, {"name": "谷原義明", "effective_grade": "U", "effective_source": "db_hiroo", "effective_score": 2.0, "db": {"grade": "U", "score": 2.0, "rank": null, "win_rate_sm": 0.0833, "n_horses": 2}, "yaml": null, "n_horses": 2, "win_rate_sm": 0.0833}], "sires": [{"name": "コントレイル", "score": 4.0, "tier": "top", "tier_ja": "上位（top）"}, {"name": "キタサンブラック", "score": 3.8, "tier": "top", "tier_ja": "上位（top）"}, {"name": "ロードカナロア", "score": 3.8, "tier": "top", "tier_ja": "上位（top）"}, {"name": "Flightline", "score": 3.5, "tier": "top", "tier_ja": "上位（top）"}, {"name": "Sea The Stars", "score": 3.5, "tier": "top", "tier_ja": "上位（top）"}, {"name": "エピファネイア", "score": 3.2, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "ナダル", "score": 3.0, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "レイデオロ", "score": 3.0, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "サートゥルナーリア", "score": 2.8, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "ゴールドシップ", "score": 2.5, "tier": "low", "tier_ja": "下位（low）"}, {"name": "パンサラッサ", "score": 2.5, "tier": "low", "tier_ja": "下位（low）"}], "sire_default": 2.0, "families": [{"name": "Above the Odds", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 5, "n_horses": 5, "win_rate_sm": 0.1343, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "Dollar Bird", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 3, "n_horses": 7, "win_rate_sm": 0.1475, "hiroo_unique": true, "hiroo_family_grade": "S", "hiroo_family_rank": 2, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "First One Holme", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 4, "n_horses": 8, "win_rate_sm": 0.1509, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Muffitys", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 1, "n_horses": 20, "win_rate_sm": 0.2434, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Stitching", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 2, "n_horses": 10, "win_rate_sm": 0.1429, "hiroo_unique": true, "hiroo_family_grade": "S", "hiroo_family_rank": 1, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Tidespring", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 7, "n_horses": 3, "win_rate_sm": 0.1333, "hiroo_unique": true, "hiroo_family_grade": "S", "hiroo_family_rank": 3, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "フラワースウイース", "overall_grade": "S", "overall_score": 6.0, "overall_rank": 6, "n_horses": 47, "win_rate_sm": 0.1218, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "As You Desire Me", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 9, "n_horses": 3, "win_rate_sm": 0.1148, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Fairy Ballade", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 13, "n_horses": 12, "win_rate_sm": 0.1069, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Hyabella", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 18, "n_horses": 4, "win_rate_sm": 0.0889, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "I'm Out", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 10, "n_horses": 11, "win_rate_sm": 0.1005, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Juniper Berry", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 14, "n_horses": 14, "win_rate_sm": 0.0944, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 5, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Magic Circle", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 11, "n_horses": 6, "win_rate_sm": 0.0935, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 4, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Veronica Heron", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 17, "n_horses": 7, "win_rate_sm": 0.0896, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ボーンフェイマス", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 12, "n_horses": 27, "win_rate_sm": 0.1014, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "モンスーンウェディング", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 16, "n_horses": 7, "win_rate_sm": 0.1091, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ヤノセイラン", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 8, "n_horses": 12, "win_rate_sm": 0.119, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "リビーザリブラ", "overall_grade": "A", "overall_score": 4.5, "overall_rank": 15, "n_horses": 24, "win_rate_sm": 0.0892, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "Buffed Orange", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 24, "n_horses": 5, "win_rate_sm": 0.0784, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 10, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Catalyst", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 29, "n_horses": 13, "win_rate_sm": 0.0698, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 12, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "Miss Fear Factor", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 33, "n_horses": 5, "win_rate_sm": 0.0714, "hiroo_unique": true, "hiroo_family_grade": "C", "hiroo_family_rank": 14, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Pastel Colour", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 25, "n_horses": 7, "win_rate_sm": 0.0723, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 11, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "Sinndiya", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 30, "n_horses": 5, "win_rate_sm": 0.0556, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 13, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "アスクローザ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 26, "n_horses": 39, "win_rate_sm": 0.0723, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "アンジユレスイート", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 28, "n_horses": 16, "win_rate_sm": 0.072, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ウェルシュステラ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 21, "n_horses": 20, "win_rate_sm": 0.0815, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 8, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "スイートマカロン", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 19, "n_horses": 5, "win_rate_sm": 0.0909, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 6, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "ダイナフロンテイア", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 31, "n_horses": 17, "win_rate_sm": 0.0682, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ハイアーラヴ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 20, "n_horses": 6, "win_rate_sm": 0.0952, "hiroo_unique": true, "hiroo_family_grade": "A", "hiroo_family_rank": 7, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "パーフェクトサークル", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 27, "n_horses": 21, "win_rate_sm": 0.076, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "マザートウショウ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 35, "n_horses": 37, "win_rate_sm": 0.0588, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "ミスペンバリー", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 32, "n_horses": 2, "win_rate_sm": 0.0714, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "ラークホイッスル", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 22, "n_horses": 22, "win_rate_sm": 0.0782, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "レディストロベリー", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 34, "n_horses": 16, "win_rate_sm": 0.0559, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "レフィナーダ", "overall_grade": "B", "overall_score": 3.0, "overall_rank": 23, "n_horses": 6, "win_rate_sm": 0.0816, "hiroo_unique": true, "hiroo_family_grade": "B", "hiroo_family_rank": 9, "hiroo_only_grade": "A", "hiroo_only_score": 4.5}, {"name": "Intizaa", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 43, "n_horses": 9, "win_rate_sm": 0.0357, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "Savannah Song", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 37, "n_horses": 25, "win_rate_sm": 0.0544, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "S", "hiroo_only_score": 6.0}, {"name": "Slip Ashore", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 45, "n_horses": 15, "win_rate_sm": 0.0316, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "カスタネツト", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 44, "n_horses": 10, "win_rate_sm": 0.0333, "hiroo_unique": true, "hiroo_family_grade": "C", "hiroo_family_rank": 16, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "シャンラン", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 40, "n_horses": 30, "win_rate_sm": 0.0502, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "スタイルリバー", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 41, "n_horses": 10, "win_rate_sm": 0.0455, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "タニノアベイ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 42, "n_horses": 10, "win_rate_sm": 0.0248, "hiroo_unique": true, "hiroo_family_grade": "C", "hiroo_family_rank": 15, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "ノースオブダンジグ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 36, "n_horses": 37, "win_rate_sm": 0.0521, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "ノーブルフランチエスカ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 46, "n_horses": 8, "win_rate_sm": 0.0141, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "ブレッシング", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 38, "n_horses": 40, "win_rate_sm": 0.0548, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "C", "hiroo_only_score": 1.5}, {"name": "モザーティアナ", "overall_grade": "C", "overall_score": 1.5, "overall_rank": 39, "n_horses": 27, "win_rate_sm": 0.0569, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "B", "hiroo_only_score": 3.0}, {"name": "Everlast", "overall_grade": "U", "overall_score": 2.0, "overall_rank": null, "n_horses": 2, "win_rate_sm": 0.0417, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}, {"name": "フェニーチェ", "overall_grade": "U", "overall_score": 2.0, "overall_rank": null, "n_horses": 2, "win_rate_sm": 0.0526, "hiroo_unique": false, "hiroo_family_grade": null, "hiroo_family_rank": null, "hiroo_only_grade": "U", "hiroo_only_score": 2.0}], "hiroo_unique_families": [{"family_name": "Stitching", "family_code": "1240020478", "hiroo_horses": 10, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 14, "starts": 93, "n_horses": 10, "win_rate": 0.1505, "win_rate_sm": 0.1429, "prize_man_per_horse": 5168.0, "composite_raw": 31.3866, "rank": 2, "grade": "S", "score": 6.0, "percentile": 0.9674, "hiroo_family_rank": 1, "hiroo_family_grade": "S"}, {"family_name": "Dollar Bird", "family_code": "1240027535", "hiroo_horses": 7, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 8, "starts": 49, "n_horses": 7, "win_rate": 0.1633, "win_rate_sm": 0.1475, "prize_man_per_horse": 3057.14, "composite_raw": 30.8052, "rank": 3, "grade": "S", "score": 6.0, "percentile": 0.9457, "hiroo_family_rank": 2, "hiroo_family_grade": "S"}, {"family_name": "Tidespring", "family_code": "1240031885", "hiroo_horses": 3, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 3, "starts": 18, "n_horses": 3, "win_rate": 0.1667, "win_rate_sm": 0.1333, "prize_man_per_horse": 1125.67, "composite_raw": 27.3874, "rank": 7, "grade": "S", "score": 6.0, "percentile": 0.8587, "hiroo_family_rank": 3, "hiroo_family_grade": "S"}, {"family_name": "Magic Circle", "family_code": "1240018506", "hiroo_horses": 6, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 12, "starts": 127, "n_horses": 6, "win_rate": 0.0945, "win_rate_sm": 0.0935, "prize_man_per_horse": 5114.67, "composite_raw": 26.4326, "rank": 11, "grade": "A", "score": 4.5, "percentile": 0.7717, "hiroo_family_rank": 4, "hiroo_family_grade": "A"}, {"family_name": "Juniper Berry", "family_code": "1240013736", "hiroo_horses": 5, "hiroo_share": 0.3571, "hiroo_unique": true, "wins": 16, "starts": 168, "n_horses": 14, "win_rate": 0.0952, "win_rate_sm": 0.0944, "prize_man_per_horse": 2487.86, "composite_raw": 25.0836, "rank": 14, "grade": "A", "score": 4.5, "percentile": 0.7065, "hiroo_family_rank": 5, "hiroo_family_grade": "A"}, {"family_name": "スイートマカロン", "family_code": "1220059185", "hiroo_horses": 5, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 4, "starts": 43, "n_horses": 5, "win_rate": 0.093, "win_rate_sm": 0.0909, "prize_man_per_horse": 1036.8, "composite_raw": 22.9806, "rank": 19, "grade": "B", "score": 3.0, "percentile": 0.5978, "hiroo_family_rank": 6, "hiroo_family_grade": "A"}, {"family_name": "ハイアーラヴ", "family_code": "1220059443", "hiroo_horses": 4, "hiroo_share": 0.6667, "hiroo_unique": true, "wins": 3, "starts": 30, "n_horses": 6, "win_rate": 0.1, "win_rate_sm": 0.0952, "prize_man_per_horse": 800.0, "composite_raw": 22.8955, "rank": 20, "grade": "B", "score": 3.0, "percentile": 0.5761, "hiroo_family_rank": 7, "hiroo_family_grade": "A"}, {"family_name": "ウェルシュステラ", "family_code": "1220053989", "hiroo_horses": 17, "hiroo_share": 0.85, "hiroo_unique": true, "wins": 14, "starts": 172, "n_horses": 20, "win_rate": 0.0814, "win_rate_sm": 0.0815, "prize_man_per_horse": 1500.6, "composite_raw": 22.7807, "rank": 21, "grade": "B", "score": 3.0, "percentile": 0.5543, "hiroo_family_rank": 8, "hiroo_family_grade": "A"}, {"family_name": "レフィナーダ", "family_code": "1220054936", "hiroo_horses": 4, "hiroo_share": 0.6667, "hiroo_unique": true, "wins": 3, "starts": 37, "n_horses": 6, "win_rate": 0.0811, "win_rate_sm": 0.0816, "prize_man_per_horse": 985.5, "composite_raw": 21.9516, "rank": 23, "grade": "B", "score": 3.0, "percentile": 0.5109, "hiroo_family_rank": 9, "hiroo_family_grade": "B"}, {"family_name": "Buffed Orange", "family_code": "1240017341", "hiroo_horses": 3, "hiroo_share": 0.6, "hiroo_unique": true, "wins": 3, "starts": 39, "n_horses": 5, "win_rate": 0.0769, "win_rate_sm": 0.0784, "prize_man_per_horse": 1031.0, "composite_raw": 21.7216, "rank": 24, "grade": "B", "score": 3.0, "percentile": 0.4891, "hiroo_family_rank": 10, "hiroo_family_grade": "B"}, {"family_name": "Pastel Colour", "family_code": "1240025193", "hiroo_horses": 7, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 5, "starts": 71, "n_horses": 7, "win_rate": 0.0704, "win_rate_sm": 0.0723, "prize_man_per_horse": 1157.0, "composite_raw": 21.3378, "rank": 25, "grade": "B", "score": 3.0, "percentile": 0.4674, "hiroo_family_rank": 11, "hiroo_family_grade": "B"}, {"family_name": "Catalyst", "family_code": "1240018350", "hiroo_horses": 8, "hiroo_share": 0.6154, "hiroo_unique": true, "wins": 8, "starts": 117, "n_horses": 13, "win_rate": 0.0684, "win_rate_sm": 0.0698, "prize_man_per_horse": 892.85, "composite_raw": 20.5678, "rank": 29, "grade": "B", "score": 3.0, "percentile": 0.3804, "hiroo_family_rank": 12, "hiroo_family_grade": "B"}, {"family_name": "Sinndiya", "family_code": "1240029956", "hiroo_horses": 5, "hiroo_share": 1.0, "hiroo_unique": true, "wins": 3, "starts": 60, "n_horses": 5, "win_rate": 0.05, "win_rate_sm": 0.0556, "prize_man_per_horse": 1578.4, "composite_raw": 20.2852, "rank": 30, "grade": "B", "score": 3.0, "percentile": 0.3587, "hiroo_family_rank": 13, "hiroo_family_grade": "B"}, {"family_name": "Miss Fear Factor", "family_code": "1240027871", "hiroo_horses": 3, "hiroo_share": 0.6, "hiroo_unique": true, "wins": 1, "starts": 16, "n_horses": 5, "win_rate": 0.0625, "win_rate_sm": 0.0714, "prize_man_per_horse": 494.4, "composite_raw": 19.5536, "rank": 33, "grade": "B", "score": 3.0, "percentile": 0.2935, "hiroo_family_rank": 14, "hiroo_family_grade": "C"}, {"family_name": "タニノアベイ", "family_code": "1220007264", "hiroo_horses": 5, "hiroo_share": 0.5, "hiroo_unique": true, "wins": 4, "starts": 190, "n_horses": 10, "win_rate": 0.0211, "win_rate_sm": 0.0248, "prize_man_per_horse": 900.5, "composite_raw": 16.0834, "rank": 42, "grade": "C", "score": 1.5, "percentile": 0.0978, "hiroo_family_rank": 15, "hiroo_family_grade": "C"}, {"family_name": "カスタネツト", "family_code": "1220021399", "hiroo_horses": 5, "hiroo_share": 0.5, "hiroo_unique": true, "wins": 1, "starts": 48, "n_horses": 10, "win_rate": 0.0208, "win_rate_sm": 0.0333, "prize_man_per_horse": 230.9, "composite_raw": 14.2259, "rank": 44, "grade": "C", "score": 1.5, "percentile": 0.0543, "hiroo_family_rank": 16, "hiroo_family_grade": "C"}], "crosses": [{"key": "林徹|Dollar Bird", "trainer": "林徹", "family": "Dollar Bird", "grade": "S", "score": 6.0, "n_horses": 2, "win_rate_sm": 0.1778, "rank": 1}, {"key": "矢作芳人|Stitching", "trainer": "矢作芳人", "family": "Stitching", "grade": "S", "score": 6.0, "n_horses": 2, "win_rate_sm": 0.1579, "rank": 2}, {"key": "藤原英昭|Stitching", "trainer": "藤原英昭", "family": "Stitching", "grade": "S", "score": 6.0, "n_horses": 3, "win_rate_sm": 0.1714, "rank": 3}, {"key": "小崎憲|ボーンフェイマス", "trainer": "小崎憲", "family": "ボーンフェイマス", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.0909, "rank": 6}, {"key": "池上昌弘|フラワースウイース", "trainer": "池上昌弘", "family": "フラワースウイース", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1042, "rank": 7}, {"key": "矢作芳人|ウェルシュステラ", "trainer": "矢作芳人", "family": "ウェルシュステラ", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1463, "rank": 4}, {"key": "高柳瑞樹|Stitching", "trainer": "高柳瑞樹", "family": "Stitching", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1034, "rank": 8}, {"key": "高柳瑞樹|レフィナーダ", "trainer": "高柳瑞樹", "family": "レフィナーダ", "grade": "A", "score": 4.5, "n_horses": 2, "win_rate_sm": 0.1538, "rank": 5}, {"key": "小桧山悟|タニノアベイ", "trainer": "小桧山悟", "family": "タニノアベイ", "grade": "B", "score": 3.0, "n_horses": 3, "win_rate_sm": 0.0337, "rank": 14}, {"key": "尾関知人|Pastel Colour", "trainer": "尾関知人", "family": "Pastel Colour", "grade": "B", "score": 3.0, "n_horses": 3, "win_rate_sm": 0.0889, "rank": 9}, {"key": "尾関知人|スイートマカロン", "trainer": "尾関知人", "family": "スイートマカロン", "grade": "B", "score": 3.0, "n_horses": 4, "win_rate_sm": 0.0667, "rank": 12}, {"key": "松永幹夫|Catalyst", "trainer": "松永幹夫", "family": "Catalyst", "grade": "B", "score": 3.0, "n_horses": 2, "win_rate_sm": 0.0816, "rank": 10}, {"key": "松永幹夫|ノースオブダンジグ", "trainer": "松永幹夫", "family": "ノースオブダンジグ", "grade": "B", "score": 3.0, "n_horses": 2, "win_rate_sm": 0.0417, "rank": 13}, {"key": "高柳大輔|ウェルシュステラ", "trainer": "高柳大輔", "family": "ウェルシュステラ", "grade": "B", "score": 3.0, "n_horses": 4, "win_rate_sm": 0.087, "rank": 11}, {"key": "小崎憲|Catalyst", "trainer": "小崎憲", "family": "Catalyst", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0435, "rank": 19}, {"key": "森秀行|パーフェクトサークル", "trainer": "森秀行", "family": "パーフェクトサークル", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0417, "rank": 17}, {"key": "畠山重則|カスタネツト", "trainer": "畠山重則", "family": "カスタネツト", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0455, "rank": 16}, {"key": "蛯名信広|ノーブルフランチエスカ", "trainer": "蛯名信広", "family": "ノーブルフランチエスカ", "grade": "C", "score": 1.5, "n_horses": 2, "win_rate_sm": 0.0323, "rank": 15}, {"key": "高市圭二|Juniper Berry", "trainer": "高市圭二", "family": "Juniper Berry", "grade": "C", "score": 1.5, "n_horses": 3, "win_rate_sm": 0.0345, "rank": 18}], "weight": {"canonical": {"alert_kg": 420, "scorer_delta": -0.3, "checklist_pts": -1, "note": "正本ルールは一律。420kg以下で軽量アラート。"}, "base_band": {"ok_min": 430, "ok_max": 500, "watch_low": 420, "watch_high": 520, "label": "標準目安帯"}, "profiles": [{"id": "turf_mile_filly", "title": "芝マイル〜中距離・牝寄り", "trainers": ["加藤征弘", "勢司和浩", "友道康夫", "吉田直弘", "四位洋文", "国枝栄", "堀宣行", "池上昌弘", "池江泰寿", "田中克典", "藤沢和雄", "須貝尚介", "高市圭二", "高松邦男"], "sires_hint": ["Sea The Stars", "エピファネイア", "サートゥルナーリア", "パンサラッサ", "レイデオロ", "ロードカナロア"], "ok_min": 415, "ok_max": 480, "note": "細身・軽めでも適性が一致すれば運用上許容しやすい。ただし採点上は≤420で軽量アラートが付く。", "sires": ["Sea The Stars", "エピファネイア", "サートゥルナーリア", "パンサラッサ", "レイデオロ", "ロードカナロア"]}, {"id": "ceiling_power", "title": "天井型・パワー厩舎", "trainers": ["尾関知人", "杉山晴紀", "松永幹夫", "林徹", "森秀行", "矢作芳人", "藤原英昭", "蛯名正義", "高柳大輔", "高柳瑞樹"], "sires_hint": ["Flightline", "キタサンブラック", "コントレイル"], "ok_min": 440, "ok_max": 510, "note": "増体・パワーを評価しやすい帯。極端な軽量は適性不一致を疑う。", "sires": ["Flightline", "キタサンブラック", "コントレイル"]}, {"id": "dirt_or_heavy", "title": "ダート／パワー父寄り", "trainers": ["中尾秀正", "中舘英二", "二ノ宮敬", "伊藤正徳", "奥村武", "小崎憲", "小桧山悟", "武英智", "畠山重則", "荒川義之", "蛯名信広", "野中賢二", "鈴木伸尋", "鈴木慎太", "鈴木慎太郎", "鹿戸雄一", "黒岩陽一"], "sires_hint": ["ゴールドシップ", "ナダル"], "ok_min": 450, "ok_max": 530, "note": "軽い仕上がりは適性ズレ警戒。正本減点に加え運用でも要注意。", "sires": ["ゴールドシップ", "ナダル"]}, {"id": "default", "title": "標準（上記以外）", "trainers": ["二本柳俊", "伊藤竹男", "加藤和宏", "南田美知", "古賀末喜", "坂本勝美", "境直行", "奥村豊", "山内研二", "岩戸孝樹", "平田修", "後藤由之", "根本康広", "武藤善則", "深山雅史", "牧浦充徳", "田中和夫", "田村康仁", "角居勝彦", "谷原義明"], "sires_hint": [], "ok_min": 430, "ok_max": 500, "note": "正本の警戒線420を下限ウォッチに、標準帯で見る。", "sires": []}], "integration_rules": ["採点（点数）に効くのは正本の一律ルールのみ：体重≤420 → 軽量アラート（checklist −1 / scorer −0.3）。", "プロファイル帯は運用ガイド。厩舎・父・牝系の「型」が近いプロファイルを優先して参照する。", "複数プロファイルが競合する場合は「より狭いOK帯」と「軽い方の警戒」を採用（保守統合）。", "性・距離適性が厩舎得手と一致している場合、軽量でも即PASSにはしない（減点のみ）。", "骨折・跛行・手術・予後不良は体重帯と無関係に即PASS。"], "trainer_bands": [{"name": "尾関知人", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "B"}, {"name": "杉山晴紀", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "B"}, {"name": "松永幹夫", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "B"}, {"name": "林徹", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "S"}, {"name": "森秀行", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "A"}, {"name": "矢作芳人", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "S"}, {"name": "藤原英昭", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "S"}, {"name": "蛯名正義", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "B"}, {"name": "高柳大輔", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "C"}, {"name": "高柳瑞樹", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "grade": "S"}, {"name": "二本柳俊", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "伊藤竹男", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "C"}, {"name": "加藤和宏", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "南田美知", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "古賀末喜", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "C"}, {"name": "坂本勝美", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "C"}, {"name": "境直行", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "C"}, {"name": "奥村豊", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "山内研二", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "岩戸孝樹", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "平田修", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "C"}, {"name": "後藤由之", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "根本康広", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "武藤善則", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "深山雅史", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "牧浦充徳", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "田中和夫", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "田村康仁", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "C"}, {"name": "角居勝彦", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "C"}, {"name": "谷原義明", "profile_id": "default", "profile_title": "標準（上記以外）", "ok_min": 430, "ok_max": 500, "grade": "U"}, {"name": "中尾秀正", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "C"}, {"name": "中舘英二", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "二ノ宮敬", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "伊藤正徳", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "奥村武", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "S"}, {"name": "小崎憲", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "小桧山悟", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "C"}, {"name": "武英智", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "畠山重則", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "C"}, {"name": "荒川義之", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "蛯名信広", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "U"}, {"name": "野中賢二", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "鈴木伸尋", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "鈴木慎太", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "鈴木慎太郎", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "鹿戸雄一", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "黒岩陽一", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "grade": "B"}, {"name": "加藤征弘", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "勢司和浩", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "友道康夫", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "S"}, {"name": "吉田直弘", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "四位洋文", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "国枝栄", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "堀宣行", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "B"}, {"name": "池上昌弘", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "池江泰寿", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "S"}, {"name": "田中克典", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "藤沢和雄", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "S"}, {"name": "須貝尚介", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "S"}, {"name": "高市圭二", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}, {"name": "高松邦男", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "grade": "A"}], "sire_bands": [{"name": "Flightline", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "tier": "top", "tier_ja": "上位（top）"}, {"name": "キタサンブラック", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "tier": "top", "tier_ja": "上位（top）"}, {"name": "コントレイル", "profile_id": "ceiling_power", "profile_title": "天井型・パワー厩舎", "ok_min": 440, "ok_max": 510, "tier": "top", "tier_ja": "上位（top）"}, {"name": "ゴールドシップ", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "tier": "low", "tier_ja": "下位（low）"}, {"name": "ナダル", "profile_id": "dirt_or_heavy", "profile_title": "ダート／パワー父寄り", "ok_min": 450, "ok_max": 530, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "Sea The Stars", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "tier": "top", "tier_ja": "上位（top）"}, {"name": "エピファネイア", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "サートゥルナーリア", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "パンサラッサ", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "tier": "low", "tier_ja": "下位（low）"}, {"name": "レイデオロ", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "tier": "mid", "tier_ja": "中位（mid）"}, {"name": "ロードカナロア", "profile_id": "turf_mile_filly", "profile_title": "芝マイル〜中距離・牝寄り", "ok_min": 415, "ok_max": 480, "tier": "top", "tier_ja": "上位（top）"}], "assignment_note": "正本に厩舎・父別の公式体重帯はない。採点は一律420kg。下表は全登録厩舎・父を運用プロファイルへ割当した一覧（例示ではない）。"}, "family_aliases": [{"alias": "ディメンシオン", "maps_to": null, "note": "ランクJSON未収録。看板Stitching系の深層として扱った実績あり（signature参照）。", "suggest_signature": "Stitching", "manual_unique": "S"}, {"alias": "ステラリード", "maps_to": null, "note": "ランクJSON未収録。運用上ウェルシュステラ系と並ぶ優先牝系。", "suggest_signature": null, "manual_unique": "S"}, {"alias": "ミスペンバリー", "maps_to": null, "note": "ランクJSON未収録。優先牝系S扱い（運用）。", "manual_unique": "S"}], "points_trainer": {"S": 4, "A": 3, "B": 2, "C": 1, "U": 0, "none": 1}, "points_family_overall": {"S": 5, "A": 4, "B": 2, "C": 1, "U": 0, "none": 0}, "points_hiroo_unique": {"S": 3, "A": 2, "B": 1, "C": 0, "none": 0}, "points_cross": {"S": 4, "A": 3, "B": 1, "C": 0, "none": 0}, "points_sire": {"top": 2, "mid": 1, "low": 0}, "points_signature": {"S": 2, "A": 1, "B": 0, "C": 0, "none": 0}, "points_price": [{"max": 1.5, "pts": 2}, {"max": 2.0, "pts": 1}, {"max": 2.5, "pts": 0}, {"max": 3.0, "pts": -1}, {"max": 99.0, "pts": -2}], "points_kinjou": {"positive_hit": 1, "negative_mild": -1, "negative_hard": -4, "light_weight": -1, "none": 0}, "combo_lists": {"C1": {"title": "独自牝系S/A × 厩舎S/A", "hint": "GO寄り", "unique_families": [{"name": "Dollar Bird", "grade": "S"}, {"name": "Stitching", "grade": "S"}, {"name": "Tidespring", "grade": "S"}, {"name": "Juniper Berry", "grade": "A"}, {"name": "Magic Circle", "grade": "A"}, {"name": "ウェルシュステラ", "grade": "A"}, {"name": "スイートマカロン", "grade": "A"}, {"name": "ハイアーラヴ", "grade": "A"}, {"name": "ディメンシオン（運用）", "grade": "S"}, {"name": "ステラリード（運用）", "grade": "S"}, {"name": "ミスペンバリー（運用）", "grade": "S"}], "trainers": [{"name": "奥村武", "grade": "S"}, {"name": "林徹", "grade": "S"}, {"name": "矢作芳人", "grade": "S"}, {"name": "藤原英昭", "grade": "S"}, {"name": "藤沢和雄", "grade": "S"}, {"name": "高柳瑞樹", "grade": "S"}, {"name": "友道康夫", "grade": "S"}, {"name": "池江泰寿", "grade": "S"}, {"name": "須貝尚介", "grade": "S"}, {"name": "加藤征弘", "grade": "A"}, {"name": "勢司和浩", "grade": "A"}, {"name": "吉田直弘", "grade": "A"}, {"name": "四位洋文", "grade": "A"}, {"name": "国枝栄", "grade": "A"}, {"name": "森秀行", "grade": "A"}, {"name": "池上昌弘", "grade": "A"}, {"name": "田中克典", "grade": "A"}, {"name": "高市圭二", "grade": "A"}, {"name": "高松邦男", "grade": "A"}], "note": "両方そろったとき点灯。下のリスト同士の組合せが候補。"}, "C2": {"title": "クロス本命（クロスS/A）", "hint": "GO寄り", "pairs": [{"trainer": "林徹", "family": "Dollar Bird", "grade": "S"}, {"trainer": "矢作芳人", "family": "Stitching", "grade": "S"}, {"trainer": "藤原英昭", "family": "Stitching", "grade": "S"}, {"trainer": "小崎憲", "family": "ボーンフェイマス", "grade": "A"}, {"trainer": "池上昌弘", "family": "フラワースウイース", "grade": "A"}, {"trainer": "矢作芳人", "family": "ウェルシュステラ", "grade": "A"}, {"trainer": "高柳瑞樹", "family": "Stitching", "grade": "A"}, {"trainer": "高柳瑞樹", "family": "レフィナーダ", "grade": "A"}], "note": "データにあるクロスS/A組のみ。表に無い組はクロスなし。"}, "C3": {"title": "全体牝系S/A × 父上位 × 一口≦2.0", "hint": "GO寄り", "families": [{"name": "Above the Odds", "grade": "S"}, {"name": "Dollar Bird", "grade": "S"}, {"name": "First One Holme", "grade": "S"}, {"name": "Muffitys", "grade": "S"}, {"name": "Stitching", "grade": "S"}, {"name": "Tidespring", "grade": "S"}, {"name": "フラワースウイース", "grade": "S"}, {"name": "As You Desire Me", "grade": "A"}, {"name": "Fairy Ballade", "grade": "A"}, {"name": "Hyabella", "grade": "A"}, {"name": "I'm Out", "grade": "A"}, {"name": "Juniper Berry", "grade": "A"}, {"name": "Magic Circle", "grade": "A"}, {"name": "Veronica Heron", "grade": "A"}, {"name": "ボーンフェイマス", "grade": "A"}, {"name": "モンスーンウェディング", "grade": "A"}, {"name": "ヤノセイラン", "grade": "A"}, {"name": "リビーザリブラ", "grade": "A"}], "sires": [{"name": "コントレイル", "tier_ja": "上位（top）"}, {"name": "キタサンブラック", "tier_ja": "上位（top）"}, {"name": "ロードカナロア", "tier_ja": "上位（top）"}, {"name": "Flightline", "tier_ja": "上位（top）"}, {"name": "Sea The Stars", "tier_ja": "上位（top）"}], "note": "3条件すべて満たすと点灯。"}, "C4": {"title": "看板S/A かつ 全体がB/C（一段深い）", "hint": "HOLD〜条件付き", "signature_candidates": [{"name": "Dollar Bird", "grade": "S"}, {"name": "Stitching", "grade": "S"}, {"name": "Tidespring", "grade": "S"}, {"name": "Juniper Berry", "grade": "A"}, {"name": "Magic Circle", "grade": "A"}, {"name": "ウェルシュステラ", "grade": "A"}, {"name": "スイートマカロン", "grade": "A"}, {"name": "ハイアーラヴ", "grade": "A"}], "note": "母母が普通でも看板が深いとき。"}, "C5": {"title": "一口≧2.5 かつ 独自/クロスがS/Aでない", "hint": "PASS寄り", "note": "高額なのにボーナス不足の警告コンボ。"}}};
 
 /* Club Scout sheet renderers — reads window.CLUB_DATA */
 (function () {
@@ -510,47 +557,123 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
 
     renderCombos() {
       const mapHint = { GO: "badge-go", HOLD: "badge-hold", PASS: "badge-pass" };
-      const cards = (D().meta.combo_rules || [])
+      const lists = D().combo_lists || {};
+      const rules = D().meta.combo_rules || [];
+      const blocks = rules
         .map((c) => {
           const cls = mapHint[c.verdict_hint] || "";
+          const L = lists[c.id] || {};
+          let body = "";
+          if (c.id === "C1") {
+            body = `
+              <h3>独自牝系側（${(L.unique_families || []).length}）</h3>
+              <ul class="list">${(L.unique_families || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)} ${gja(x.grade)}</li>`)
+                .join("")}</ul>
+              <h3>厩舎側（${(L.trainers || []).length}）</h3>
+              <ul class="list">${(L.trainers || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)} ${gja(x.grade)}</li>`)
+                .join("")}</ul>
+              <p class="note">上×下がそろったとき <strong>C1点灯</strong>。</p>`;
+          } else if (c.id === "C2") {
+            body = `
+              <h3>点灯するクロス組（データ上のS/A）</h3>
+              <table class="tbl"><thead><tr><th>厩舎</th><th>牝系</th><th>段階</th></tr></thead><tbody>
+              ${(L.pairs || [])
+                .map(
+                  (p) =>
+                    `<tr><td>${p.trainer}</td><td>${p.family}</td><td>${badge(p.grade)} ${gja(p.grade)}</td></tr>`
+                )
+                .join("")}
+              </tbody></table>
+              <p class="note">この表に無い組合せはクロスなし（C2は点灯しない）。</p>`;
+          } else if (c.id === "C3") {
+            body = `
+              <h3>全体牝系S/A</h3>
+              <ul class="list">${(L.families || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)}</li>`)
+                .join("")}</ul>
+              <h3>父・上位</h3>
+              <ul class="list">${(L.sires || [])
+                .map((x) => `<li>${x.name} — ${x.tier_ja}</li>`)
+                .join("")}</ul>
+              <p class="note">＋ 一口 ≦ 2.0 万円 で <strong>C3点灯</strong>。</p>`;
+          } else if (c.id === "C4") {
+            body = `
+              <h3>看板候補（深い層）</h3>
+              <ul class="list">${(L.signature_candidates || [])
+                .map((x) => `<li>${x.name} — ${badge(x.grade)}</li>`)
+                .join("")}</ul>
+              <p class="note">看板がS/Aで、全体牝系がB/Cのとき点灯。</p>`;
+          } else if (c.id === "C5") {
+            body = `<p>一口 ≧ 2.5 かつ 独自もクロスも S/A でない → <strong>C5点灯（PASS寄り）</strong></p>`;
+          }
           return `<article class="card">
             <h2>${c.id} ${c.name}</h2>
             <p><span class="${cls}">傾き: ${c.verdict_hint}</span></p>
-            <p><strong>条件</strong><br>${c.when}</p>
+            <p><strong>条件式</strong><br><code style="font-size:.78rem;color:var(--muted)">${c.when}</code></p>
+            ${L.note ? `<p class="note">${L.note}</p>` : ""}
             ${c.note ? `<p class="note">${c.note}</p>` : ""}
+            ${body}
           </article>`;
         })
         .join("");
       document.getElementById("combos").innerHTML =
-        cards +
         `<section class="card">
-          <h2>読み方</h2>
+          <h2>コンボの見方</h2>
           <ul class="list">
-            <li>コンボは「ヒント」。C1〜C3が点灯したらGO寄り、C5が点灯したらPASS寄り。</li>
-            <li>最終は合計点（12/8）と即PASSが優先。</li>
+            <li>下の各カードが「どのリストの組合せで点灯するか」です。</li>
+            <li>C1〜C3点灯 → GO寄り / C5点灯 → PASS寄り。最終は合計点と即PASS優先。</li>
+            <li>補完ツールの「コンボ判定」でも、入力から点灯確認できます。</li>
           </ul>
-        </section>`;
+        </section>` + blocks;
     },
 
     renderWeight() {
       const w = D().weight;
       const profiles = w.profiles
-        .map(
-          (p) => `<article class="card">
+        .map((p) => {
+          const tRows = (p.trainers || [])
+            .map((n) => {
+              const b = (w.trainer_bands || []).find((x) => x.name === n);
+              return `<tr><td>${n}</td><td>${b ? badge(b.grade) : "-"}</td><td class="num">${p.ok_min}–${p.ok_max}</td></tr>`;
+            })
+            .join("");
+          const sRows = (p.sires || [])
+            .map((n) => {
+              const b = (w.sire_bands || []).find((x) => x.name === n);
+              return `<tr><td>${n}</td><td>${b ? badge(b.tier) : "-"}</td><td class="num">${p.ok_min}–${p.ok_max}</td></tr>`;
+            })
+            .join("");
+          return `<article class="card">
             <h2>${p.title}</h2>
             <p><strong>OK目安</strong> ${p.ok_min}〜${p.ok_max} kg</p>
             <p class="note">${p.note}</p>
+            <h3>厩舎（この帯に割当・全件）</h3>
             ${
               p.trainers.length
-                ? `<p>厩舎例: ${p.trainers.join(" / ")}</p>`
-                : "<p>厩舎例: （標準）</p>"
+                ? `<table class="tbl"><thead><tr><th>厩舎</th><th>等級</th><th>帯</th></tr></thead><tbody>${tRows}</tbody></table>`
+                : "<p class=\"muted\">なし</p>"
             }
+            <h3>父（この帯に割当・登録全件）</h3>
             ${
-              p.sires_hint.length
-                ? `<p class="note">父の型の例: ${p.sires_hint.join(" / ")}</p>`
-                : ""
+              p.sires.length
+                ? `<table class="tbl"><thead><tr><th>父</th><th>段階</th><th>帯</th></tr></thead><tbody>${sRows}</tbody></table>`
+                : "<p class=\"muted\">登録父はこの帯に未割当（標準帯へ）</p>"
             }
-          </article>`
+          </article>`;
+        })
+        .join("");
+      const allT = (w.trainer_bands || [])
+        .map(
+          (b) =>
+            `<tr class="row" data-q="${b.name}"><td>${b.name}</td><td>${badge(b.grade)}</td><td>${b.profile_title}</td><td class="num">${b.ok_min}–${b.ok_max}</td></tr>`
+        )
+        .join("");
+      const allS = (w.sire_bands || [])
+        .map(
+          (b) =>
+            `<tr class="row" data-q="${b.name}"><td>${b.name}</td><td>${badge(b.tier)}</td><td>${b.profile_title}</td><td class="num">${b.ok_min}–${b.ok_max}</td></tr>`
         )
         .join("");
       document.getElementById("weight").innerHTML = `
@@ -562,22 +685,36 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
             <li>相対scorer: ${w.canonical.scorer_delta}</li>
           </ul>
           <p class="note">${w.canonical.note}</p>
+          <p class="note">${w.assignment_note || ""}</p>
         </section>
         <section class="card">
-          <h2>標準目安帯</h2>
-          <p>OK ${w.base_band.ok_min}〜${w.base_band.ok_max} kg ／ 下警戒 ≤${w.base_band.watch_low} ／ 上警戒 ≥${w.base_band.watch_high}</p>
-        </section>
-        <section class="card">
-          <h2>統合ルール（厩舎×父×牝系）</h2>
-          <ol class="list">
-            ${w.integration_rules.map((x) => `<li>${x}</li>`).join("")}
-          </ol>
+          <h2>統合ルール</h2>
+          <ol class="list">${w.integration_rules.map((x) => `<li>${x}</li>`).join("")}</ol>
         </section>
         ${profiles}
         <section class="card">
-          <h2>補完ツールでやること</h2>
-          <p>体重と厩舎・父を入れると、正本減点の有無＋プロファイル帯の判定を同時に出します。<a href="#" id="gotoToolWeight">ツールの体重判定へ</a></p>
+          <h2>厩舎×体重帯 全一覧</h2>
+          <div class="searchbox"><label class="field">絞り込み<input id="qw-t" placeholder="須貝" /></label></div>
+          <table class="tbl"><thead><tr><th>厩舎</th><th>等級</th><th>プロファイル</th><th>OK帯</th></tr></thead><tbody id="w-t-body">${allT}</tbody></table>
+        </section>
+        <section class="card">
+          <h2>父×体重帯 全一覧</h2>
+          <div class="searchbox"><label class="field">絞り込み<input id="qw-s" placeholder="カナロア" /></label></div>
+          <table class="tbl"><thead><tr><th>父</th><th>段階</th><th>プロファイル</th><th>OK帯</th></tr></thead><tbody id="w-s-body">${allS}</tbody></table>
         </section>`;
+      const bind = (id, sel) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener("input", () => {
+          const q = input.value.trim().toLowerCase();
+          document.querySelectorAll(sel).forEach((row) => {
+            const hay = (row.getAttribute("data-q") || "").toLowerCase();
+            row.style.display = !q || hay.includes(q) ? "" : "none";
+          });
+        });
+      };
+      bind("qw-t", "#w-t-body tr.row");
+      bind("qw-s", "#w-s-body tr.row");
     },
 
     renderPoints() {
@@ -644,8 +781,7 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
   const nav = document.getElementById('sheetNav');
   const mount = document.getElementById('sheetMount');
   mount.innerHTML = pages.map(([id],i)=>`<div class="sheet-page${i===0?' on':''}" id="sp-${id}"></div>`).join('');
-  nav.innerHTML = pages.map(([id,label],i)=>`<button type="button" data-sp="${id}" class="${i===0?'on':''}">${label}</button>`).join('');
-
+  nav.innerHTML = pages.map(([id,label],i)=>`<button type="button" data-sp="${id}" class="${i===0?' on':''}">${label}</button>`).join('');
   function showTab(name){
     document.querySelectorAll('#mainTabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===name));
     document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id==='tab-'+name));
@@ -658,8 +794,6 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b===btn));
     mount.querySelectorAll('.sheet-page').forEach(p=>p.classList.toggle('on', p.id==='sp-'+btn.dataset.sp));
   });
-
-  // render into isolated holders so ids don't clash with tool
   function host(pageId, innerIds, htmlTop='') {
     const box = document.getElementById('sp-'+pageId);
     box.innerHTML = htmlTop + innerIds.map(id=>`<div id="${id}"></div>`).join('');
@@ -670,60 +804,77 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
   SheetApp.renderTrainers();
   host('sires', ['sires'], '<p class="kicker">SIRE</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">父グレード</h2>');
   SheetApp.renderSires();
-  host('families', ['families'], '<p class="kicker">FAMILY</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">牝系グレード</h2><div class="searchbox"><label class="field">絞り込み<input id="q2" placeholder="Stitching"></label></div>');
-  // temporary swap q id for families filter: patch by cloning bind
-  const qHold = document.getElementById('q');
-  if (qHold) qHold.id = 'q-trainers';
-  const q2 = document.getElementById('q2'); if (q2) q2.id = 'q';
+  host('families', ['families'], '<p class="kicker">FAMILY</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">牝系グレード</h2><div class="searchbox"><label class="field">絞り込み<input id="q-fam" placeholder="Stitching"></label></div>');
+  const qSave = document.getElementById('q'); if (qSave) qSave.id='q-tr';
+  const qf = document.getElementById('q-fam'); if (qf) qf.id='q';
   SheetApp.renderFamilies();
-  if (q2) { document.getElementById('q').id = 'q-families'; }
-  if (qHold) qHold.id = 'q';
-  host('crosses', ['crosses'], '<p class="kicker">CROSS</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">クロス組み合わせ</h2><div class="searchbox"><label class="field">絞り込み<input id="q3" placeholder="矢作"></label></div>');
-  const q3=document.getElementById('q3'); if(q3) q3.id='q';
+  if (document.getElementById('q')) document.getElementById('q').id='q-families';
+  host('crosses', ['crosses'], '<p class="kicker">CROSS</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">クロス組み合わせ</h2><div class="searchbox"><label class="field">絞り込み<input id="q-cx" placeholder="矢作"></label></div>');
+  const qx=document.getElementById('q-cx'); if(qx) qx.id='q';
   SheetApp.renderCrosses();
   if (document.getElementById('q') && document.getElementById('q').placeholder==='矢作') document.getElementById('q').id='q-crosses';
-  // restore trainers q
-  const qt=document.getElementById('q-trainers'); if(qt) qt.id='q';
+  const qtr=document.getElementById('q-tr'); if(qtr) qtr.id='q';
   host('combos', ['combos'], '<p class="kicker">COMBO</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">各コンボ表</h2>');
   SheetApp.renderCombos();
   host('weight', ['weight'], '<p class="kicker">WEIGHT</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">馬体重OK範囲</h2>');
   SheetApp.renderWeight();
-  // move sheet weight content away from id=weight to avoid tool confusion later: rename
-  const sw = document.querySelector('#sp-weight #weight');
-  if (sw) { sw.id = 'sheet-weight-body'; }
+  const sw = document.querySelector('#sp-weight #weight'); if (sw) sw.id = 'sheet-weight-body';
   host('points', ['points'], '<p class="kicker">POINTS</p><h2 class="brand" style="font-size:1.4rem;margin:0 0 8px">配点・即PASS</h2>');
   SheetApp.renderPoints();
-
   document.getElementById('ver').textContent = (CLUB_DATA.meta.version||'') + ' / ' + (CLUB_DATA.meta.ranks_generated_at||'');
   document.addEventListener('click', (e)=>{
     const a = e.target.closest('#gotoToolWeight');
     if (!a) return;
     e.preventDefault();
     showTab('tool');
-    document.getElementById('tool-weight').scrollIntoView({behavior:'smooth'});
+    const tw = document.getElementById('weight');
+    if (tw) tw.scrollIntoView({behavior:'smooth'});
   });
 })();
-/* Club Scout companion tool */
+/* Club Scout companion tool — suggest + unknown follow-up */
 (function () {
   const D = window.CLUB_DATA;
+  if (!D) return;
   const gj = D.meta.grade_ja;
   const sj = D.meta.sire_ja;
   const labelG = (g) => (g && gj[g] ? gj[g].short : g || "未設定");
   const labelS = (t) => (t && sj[t] ? sj[t].short : t || "下位（low）");
+  const norm = (s) =>
+    String(s || "")
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[ァ-ン]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+
+  function el(id) {
+    return document.getElementById(id);
+  }
 
   function fillLists() {
-    const t = document.getElementById("trainerList");
-    const s = document.getElementById("sireList");
-    const f = document.getElementById("familyList");
-    t.innerHTML = D.trainers.map((x) => `<option value="${x.name}">`).join("");
-    s.innerHTML = D.sires.map((x) => `<option value="${x.name}">`).join("");
-    const famNames = [
-      ...D.families.map((x) => x.name),
-      ...D.family_aliases.map((x) => x.alias),
-    ];
-    f.innerHTML = famNames.map((n) => `<option value="${n}">`).join("");
-    document.getElementById("ver").textContent =
-      `${D.meta.version || ""} / ranks ${D.meta.ranks_generated_at || ""}`;
+    const t = el("trainerList");
+    const s = el("sireList");
+    const f = el("familyList");
+    if (t) t.innerHTML = D.trainers.map((x) => `<option value="${x.name}">`).join("");
+    if (s) s.innerHTML = D.sires.map((x) => `<option value="${x.name}">`).join("");
+    if (f) {
+      const famNames = [...D.families.map((x) => x.name), ...D.family_aliases.map((x) => x.alias)];
+      f.innerHTML = famNames.map((n) => `<option value="${n}">`).join("");
+    }
+    if (el("ver")) {
+      el("ver").textContent = `${D.meta.version || ""} / ranks ${D.meta.ranks_generated_at || ""}`;
+    }
+  }
+
+  function scoreMatch(q, name) {
+    const nq = norm(q);
+    const nn = norm(name);
+    if (!nq) return 0;
+    if (nn === nq) return 100;
+    if (nn.startsWith(nq)) return 80;
+    if (nn.includes(nq)) return 60;
+    // char overlap for partial JP
+    let hit = 0;
+    for (const ch of nq) if (nn.includes(ch)) hit++;
+    return hit >= Math.min(2, nq.length) ? 20 + hit : 0;
   }
 
   function findTrainer(name) {
@@ -731,7 +882,7 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     if (!n) return null;
     return (
       D.trainers.find((t) => t.name === n) ||
-      D.trainers.find((t) => n.includes(t.name) || t.name.includes(n)) ||
+      D.trainers.find((t) => scoreMatch(n, t.name) >= 60) ||
       null
     );
   }
@@ -739,19 +890,26 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     const n = (name || "").trim();
     if (!n) return null;
     let hit = D.sires.find((s) => s.name === n);
-    if (hit) return hit;
-    hit = D.sires.find((s) => n.includes(s.name) || s.name.includes(n));
-    if (hit) return hit;
-    return { name: n, score: D.sire_default, tier: D.sire_default >= 2.8 ? "mid" : "low", tier_ja: labelS(D.sire_default >= 2.8 ? "mid" : "low"), unlisted: true };
+    if (hit) return { ...hit, unlisted: false };
+    hit = D.sires.find((s) => scoreMatch(n, s.name) >= 60);
+    if (hit) return { ...hit, unlisted: false };
+    return {
+      name: n,
+      score: D.sire_default,
+      tier: D.sire_default >= 2.8 ? "mid" : "low",
+      tier_ja: labelS(D.sire_default >= 2.8 ? "mid" : "low"),
+      unlisted: true,
+    };
   }
   function findFamily(name) {
     const n = (name || "").trim();
-    if (!n) return null;
-    const alias = D.family_aliases.find((a) => a.alias === n || n.includes(a.alias));
+    if (!n) return { hit: null, alias: null, missing: false };
+    const alias = D.family_aliases.find((a) => scoreMatch(n, a.alias) >= 60 || a.alias === n);
     const hit =
       D.families.find((f) => f.name === n) ||
-      D.families.find((f) => n.includes(f.name) || f.name.includes(n));
-    return { hit, alias };
+      D.families.find((f) => scoreMatch(n, f.name) >= 60) ||
+      null;
+    return { hit, alias, missing: !hit && !alias && !!n };
   }
   function findCross(trainer, family) {
     if (!trainer || !family) return null;
@@ -759,98 +917,213 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     if (exact) return exact;
     return (
       D.crosses.find(
-        (c) =>
-          (trainer.includes(c.trainer) || c.trainer.includes(trainer)) &&
-          (family.includes(c.family) || c.family.includes(family))
+        (c) => scoreMatch(trainer, c.trainer) >= 60 && scoreMatch(family, c.family) >= 60
       ) || null
     );
   }
 
   function pickProfiles(trainer, sire) {
-    const picked = [];
-    for (const p of D.weight.profiles) {
-      if (p.id === "default") continue;
-      const tHit = p.trainers.some((t) => trainer && (trainer.includes(t) || t.includes(trainer)));
-      const sHit = p.sires_hint.some((s) => sire && (sire.includes(s) || s.includes(sire)));
-      if (tHit || sHit) picked.push({ ...p, tHit, sHit });
-    }
-    if (!picked.length) picked.push(D.weight.profiles.find((p) => p.id === "default"));
-    // conservative merge: narrowest band
+    const tb = (D.weight.trainer_bands || []).find((x) => scoreMatch(trainer, x.name) >= 60);
+    const sb = (D.weight.sire_bands || []).find((x) => scoreMatch(sire, x.name) >= 60);
+    const ids = new Set();
+    if (tb) ids.add(tb.profile_id);
+    if (sb) ids.add(sb.profile_id);
+    let picked = D.weight.profiles.filter((p) => ids.has(p.id));
+    if (!picked.length) picked = [D.weight.profiles.find((p) => p.id === "default")];
     const okMin = Math.max(...picked.map((p) => p.ok_min));
     const okMax = Math.min(...picked.map((p) => p.ok_max));
-    return { picked, okMin, okMax };
+    return { picked, okMin, okMax, tb, sb };
+  }
+
+  /** Attach partial-match suggestion UI under an input */
+  function attachSuggest(input, getItems, onPick) {
+    if (!input || input.dataset.suggestBound) return;
+    input.dataset.suggestBound = "1";
+    const wrap = document.createElement("div");
+    wrap.className = "suggest";
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+    const list = document.createElement("div");
+    list.className = "suggest-list";
+    wrap.appendChild(list);
+
+    const render = () => {
+      const q = input.value.trim();
+      const items = getItems(q).slice(0, 10);
+      if (!q || !items.length) {
+        list.classList.remove("on");
+        list.innerHTML = "";
+        return;
+      }
+      list.innerHTML = items
+        .map(
+          (it) =>
+            `<button type="button" data-v="${it.value.replace(/"/g, "&quot;")}">
+              ${it.label}<span class="meta">${it.meta || ""}</span>
+            </button>`
+        )
+        .join("");
+      list.classList.add("on");
+    };
+
+    input.addEventListener("input", render);
+    input.addEventListener("focus", render);
+    list.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-v]");
+      if (!btn) return;
+      input.value = btn.getAttribute("data-v");
+      list.classList.remove("on");
+      if (onPick) onPick(input.value);
+      input.dispatchEvent(new Event("change"));
+    });
+    document.addEventListener("click", (e) => {
+      if (!wrap.contains(e.target)) list.classList.remove("on");
+    });
+  }
+
+  function trainerItems(q) {
+    return D.trainers
+      .map((t) => ({
+        value: t.name,
+        label: t.name,
+        meta: `${labelG(t.effective_grade)} / 加点+${D.points_trainer[t.effective_grade] ?? 0}`,
+        score: scoreMatch(q, t.name),
+      }))
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score);
+  }
+  function sireItems(q) {
+    return D.sires
+      .map((s) => ({
+        value: s.name,
+        label: s.name,
+        meta: `${s.tier_ja} / +${D.points_sire[s.tier]}`,
+        score: scoreMatch(q, s.name),
+      }))
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score);
+  }
+  function familyItems(q) {
+    const base = D.families.map((f) => ({
+      value: f.name,
+      label: f.name,
+      meta: `全体${labelG(f.overall_grade)}${f.hiroo_unique ? " / 独自" + labelG(f.hiroo_family_grade) : ""}`,
+      score: scoreMatch(q, f.name),
+    }));
+    const al = D.family_aliases.map((a) => ({
+      value: a.alias,
+      label: a.alias + "（運用）",
+      meta: a.note,
+      score: scoreMatch(q, a.alias),
+    }));
+    return [...base, ...al]
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score);
+  }
+
+  function followupHtml({ trainer, sire, family, famObj, trainerObj, sireObj, cross }) {
+    const notes = [];
+    if (trainer && !trainerObj) {
+      notes.push(
+        `厩舎「${trainer}」は過去データ未収録。等級を手動で選ぶか、近い候補を候補リストから選んでください（未照合時はデータ不足扱い）。`
+      );
+    }
+    if (sireObj && sireObj.unlisted) {
+      notes.push(
+        `父「${sire}」は登録表になし → 既定値（${sireObj.tier_ja}）で採点。上位だと思えば手動で意識し、価格帯とセットで判断を。`
+      );
+    }
+    if (family && famObj && famObj.missing) {
+      notes.push(
+        `牝系「${family}」はランクJSON未収録。全体/独自を手動上書きしてください。看板が分かれば看板欄へ（例: Stitching）。`
+      );
+    }
+    if (famObj && famObj.alias && !famObj.hit) {
+      notes.push(`運用別名ヒット: ${famObj.alias.alias} — ${famObj.alias.note}`);
+    }
+    if (trainer && family && !cross) {
+      notes.push("この厩舎×牝系のクロス実績はデータにありません（クロス加点なし）。C1/C3で補えるか確認。");
+    }
+    if (!notes.length) return "";
+    return `<div class="warn-box"><strong>未収録・フォロー</strong><ul class="list">${notes
+      .map((n) => `<li>${n}</li>`)
+      .join("")}</ul></div>`;
   }
 
   // lookup
-  document.getElementById("toolLookupQ").addEventListener("input", () => {
-    const q = document.getElementById("toolLookupQ").value.trim().toLowerCase();
-    const out = document.getElementById("toolLookupOut");
-    if (!q) {
-      out.textContent = "入力すると候補を表示";
-      out.classList.add("muted");
-      return;
-    }
-    const tr = D.trainers.filter((t) => t.name.toLowerCase().includes(q)).slice(0, 8);
-    const si = D.sires.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 8);
-    const fa = D.families.filter((f) => f.name.toLowerCase().includes(q)).slice(0, 8);
-    const cx = D.crosses
-      .filter((c) => `${c.trainer} ${c.family}`.toLowerCase().includes(q))
-      .slice(0, 8);
-    const al = D.family_aliases.filter((a) => a.alias.toLowerCase().includes(q));
-    out.classList.remove("muted");
-    out.innerHTML = `
-      <h3>厩舎</h3>
-      ${tr.length ? tr.map((t) => `<div>${t.name} — ${labelG(t.effective_grade)}（加点候補 ${D.points_trainer[t.effective_grade] ?? 0}）</div>`).join("") : "<div class='muted'>なし</div>"}
-      <h3>父</h3>
-      ${si.length ? si.map((s) => `<div>${s.name} — ${s.tier_ja}（+${D.points_sire[s.tier]}）</div>`).join("") : "<div class='muted'>なし</div>"}
-      <h3>牝系</h3>
-      ${fa.length ? fa.map((f) => `<div>${f.name} — 全体${labelG(f.overall_grade)}${f.hiroo_unique ? " / 独自" + labelG(f.hiroo_family_grade) : ""}</div>`).join("") : "<div class='muted'>なし</div>"}
-      ${al.length ? `<h3>運用別名</h3>${al.map((a) => `<div>${a.alias}: ${a.note}</div>`).join("")}` : ""}
-      <h3>クロス</h3>
-      ${cx.length ? cx.map((c) => `<div>${c.trainer} × ${c.family} — ${labelG(c.grade)}</div>`).join("") : "<div class='muted'>なし</div>"}
-    `;
-  });
+  if (el("lookupQ")) {
+    el("lookupQ").addEventListener("input", () => {
+      const q = el("lookupQ").value.trim();
+      const out = el("lookupOut");
+      if (!q) {
+        out.textContent = "入力すると候補を表示";
+        out.classList.add("muted");
+        return;
+      }
+      const tr = trainerItems(q).slice(0, 8);
+      const si = sireItems(q).slice(0, 8);
+      const fa = familyItems(q).slice(0, 8);
+      const cx = D.crosses
+        .filter((c) => scoreMatch(q, c.trainer) || scoreMatch(q, c.family))
+        .slice(0, 8);
+      out.classList.remove("muted");
+      out.innerHTML = `
+        <h3>厩舎候補</h3>
+        ${tr.length ? tr.map((t) => `<div>${t.label} — <span class="muted">${t.meta}</span></div>`).join("") : "<div class='muted'>候補なし（手入力＋手動等級でフォロー）</div>"}
+        <h3>父候補</h3>
+        ${si.length ? si.map((s) => `<div>${s.label} — <span class="muted">${s.meta}</span></div>`).join("") : "<div class='muted'>候補なし（未登録は下位寄り既定）</div>"}
+        <h3>牝系候補</h3>
+        ${fa.length ? fa.map((f) => `<div>${f.label} — <span class="muted">${f.meta}</span></div>`).join("") : "<div class='muted'>候補なし（手動等級を推奨）</div>"}
+        <h3>クロス</h3>
+        ${cx.length ? cx.map((c) => `<div>${c.trainer} × ${c.family} — ${labelG(c.grade)}</div>`).join("") : "<div class='muted'>なし</div>"}
+      `;
+    });
+  }
 
-  document.getElementById("toolBtnWeight").addEventListener("click", () => {
-    const kg = Number(document.getElementById("toolWKg").value);
-    const trainer = document.getElementById("toolWTrainer").value.trim();
-    const sire = document.getElementById("toolWSire").value.trim();
-    const family = document.getElementById("toolWFamily").value.trim();
-    const out = document.getElementById("toolWeightOut");
-    if (!kg) {
-      out.textContent = "体重を入力してください";
-      return;
-    }
-    const alertKg = D.weight.canonical.alert_kg;
-    const light = kg <= alertKg;
-    const { picked, okMin, okMax } = pickProfiles(trainer, sire);
-    let band = "OK帯";
-    if (kg < okMin) band = "下限注意";
-    if (kg > okMax) band = "上限注意";
-    if (kg <= D.weight.base_band.watch_low || kg >= D.weight.base_band.watch_high) {
-      if (band === "OK帯") band = "警戒線付近";
-    }
-    const t = findTrainer(trainer);
-    const s = findSire(sire);
-    const f = findFamily(family);
-    out.classList.remove("muted");
-    out.innerHTML = `
-      <p><strong>体重 ${kg} kg</strong> — 統合帯判定: <strong>${band}</strong></p>
-      <p>統合OK目安: ${okMin}〜${okMax} kg（競合時は狭い帯を採用）</p>
-      <p>正本採点: ${light ? `<span class="badge-pass">軽量アラート発動（≤${alertKg}） checklist ${D.weight.canonical.checklist_pts}</span>` : `<span class="badge-go">軽量アラートなし</span>`}</p>
-      <p class="note">適用プロファイル: ${picked.map((p) => p.title).join(" ／ ")}</p>
-      <p class="note">厩舎: ${t ? labelG(t.effective_grade) : "未照合"} ／ 父: ${s ? labelS(s.tier) : "-"} ／ 牝系: ${
-        f.hit ? labelG(f.hit.overall_grade) : f.alias ? "運用別名あり" : "未照合"
-      }</p>
-      <p class="note">※プロファイル帯は運用ガイド。点数に効くのは正本の ${alertKg}kg 線のみ。</p>
-    `;
-  });
+  if (el("btnWeight")) {
+    el("btnWeight").addEventListener("click", () => {
+      const kg = Number(el("wKg").value);
+      const trainer = el("wTrainer").value.trim();
+      const sire = el("wSire").value.trim();
+      const family = el("wFamily").value.trim();
+      const out = el("weightOut");
+      if (!kg) {
+        out.textContent = "体重を入力してください";
+        return;
+      }
+      const alertKg = D.weight.canonical.alert_kg;
+      const light = kg <= alertKg;
+      const { picked, okMin, okMax, tb, sb } = pickProfiles(trainer, sire);
+      let band = "OK帯";
+      if (kg < okMin) band = "下限注意";
+      if (kg > okMax) band = "上限注意";
+      if (kg <= D.weight.base_band.watch_low || kg >= D.weight.base_band.watch_high) {
+        if (band === "OK帯") band = "警戒線付近";
+      }
+      const t = findTrainer(trainer);
+      const s = findSire(sire);
+      const f = findFamily(family);
+      out.classList.remove("muted");
+      out.innerHTML = `
+        <p><strong>体重 ${kg} kg</strong> — 統合帯判定: <strong>${band}</strong></p>
+        <p>統合OK目安: ${okMin}〜${okMax} kg（競合時は狭い帯）</p>
+        <p>正本採点: ${
+          light
+            ? `<span class="badge-pass">軽量アラート（≤${alertKg}） ${D.weight.canonical.checklist_pts}</span>`
+            : `<span class="badge-go">軽量アラートなし</span>`
+        }</p>
+        <p class="note">厩舎帯: ${tb ? `${tb.name} → ${tb.profile_title} ${tb.ok_min}–${tb.ok_max}` : "未割当→標準"} ／ 父帯: ${
+          sb ? `${sb.name} → ${sb.profile_title} ${sb.ok_min}–${sb.ok_max}` : "未割当→標準"
+        }</p>
+        ${followupHtml({ trainer, sire, family, famObj: f, trainerObj: t, sireObj: s, cross: findCross(trainer, family) })}
+      `;
+    });
+  }
 
   function gradePts(table, g) {
     if (!g || g === "none") return Number(table.none ?? 0);
     return Number(table[g] ?? table.none ?? 0);
   }
-
   function pricePts(price) {
     for (const tier of D.points_price) {
       if (price <= Number(tier.max)) return Number(tier.pts);
@@ -858,18 +1131,19 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     return -2;
   }
 
-  document.getElementById("btnDecide").addEventListener("click", () => {
-    const name = document.getElementById("dName").value.trim();
-    const price = Number(document.getElementById("dPrice").value || 0);
-    const trainerName = document.getElementById("dTrainer").value.trim();
-    const sireName = document.getElementById("dSire").value.trim();
-    const familyName = document.getElementById("dFamily").value.trim();
-    const sigName = document.getElementById("dSig").value.trim();
-    const status = document.getElementById("dStatus").value;
-    const kinjou = document.getElementById("dKinjou").value;
-    const weight = document.getElementById("dWeight").value;
-    const injury = document.getElementById("dInjury").checked;
-    const out = document.getElementById("decideOut");
+  function runDecide() {
+    if (!el("btnDecide")) return;
+    const name = el("dName").value.trim();
+    const price = Number(el("dPrice").value || 0);
+    const trainerName = el("dTrainer").value.trim();
+    const sireName = el("dSire").value.trim();
+    const familyName = el("dFamily").value.trim();
+    const sigName = el("dSig").value.trim();
+    const status = el("dStatus").value;
+    const kinjou = el("dKinjou").value;
+    const weight = el("dWeight").value;
+    const injury = el("dInjury").checked;
+    const out = el("decideOut");
 
     let hard = null;
     if (status === "満口") hard = "満口";
@@ -882,9 +1156,9 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     const sig = findFamily(sigName);
     const crossAuto = findCross(trainerName, fam.hit ? fam.hit.name : familyName);
 
-    let overall = document.getElementById("dOverall").value;
-    let unique = document.getElementById("dUnique").value;
-    let cross = document.getElementById("dCross").value;
+    let overall = el("dOverall").value;
+    let unique = el("dUnique").value;
+    let cross = el("dCross").value;
     let signature = "none";
 
     if (overall === "auto") {
@@ -897,9 +1171,7 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
       else if (fam.alias && fam.alias.manual_unique) unique = fam.alias.manual_unique;
       else unique = "none";
     }
-    if (cross === "auto") {
-      cross = crossAuto ? crossAuto.grade : "none";
-    }
+    if (cross === "auto") cross = crossAuto ? crossAuto.grade : "none";
     if (sig.hit) {
       signature = sig.hit.hiroo_unique
         ? sig.hit.hiroo_family_grade || sig.hit.overall_grade || "none"
@@ -921,9 +1193,9 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     add("牝系全体", gradePts(D.points_family_overall, overall), labelG(overall));
     add("広尾独自", gradePts(D.points_hiroo_unique, unique === "none" ? "none" : unique), labelG(unique));
     add("看板牝系", gradePts(D.points_signature, signature), labelG(signature));
-    add("広尾×調教師", gradePts(D.points_trainer, trainerG), labelG(trainerG));
+    add("広尾×調教師", gradePts(D.points_trainer, trainerG), labelG(trainerG) + (t ? "" : "・未収録"));
     add("クロス", gradePts(D.points_cross, cross === "none" ? "none" : cross), labelG(cross));
-    add("父", Number(D.points_sire[sireTier] ?? 0), labelS(sireTier));
+    add("父", Number(D.points_sire[sireTier] ?? 0), labelS(sireTier) + (s && s.unlisted ? "・未登録" : ""));
     add("価格", pricePts(price), `${price || 0}万円`);
 
     let kpts = 0;
@@ -944,18 +1216,20 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
     add("近況・体重", kpts, knote);
 
     const combos = [];
-    if (["S", "A"].includes(unique) && ["S", "A"].includes(trainerG)) combos.push("C1 独自牝系×実績厩舎 → GO寄り");
-    if (["S", "A"].includes(cross)) combos.push("C2 クロス本命 → GO寄り");
-    if (["S", "A"].includes(overall) && sireTier === "top" && price <= 2.0) combos.push("C3 強牝系×上位父×手頃 → GO寄り");
-    if (["S", "A"].includes(signature) && ["B", "C", "none", "U"].includes(overall)) combos.push("C4 看板が一段深い → HOLD〜条件付き");
-    if (price >= 2.5 && !["S", "A"].includes(cross) && !["S", "A"].includes(unique)) combos.push("C5 高額なのに独自/クロス弱い → PASS寄り");
+    if (["S", "A"].includes(unique) && ["S", "A"].includes(trainerG))
+      combos.push({ id: "C1", text: "C1 独自牝系×実績厩舎 → GO寄り" });
+    if (["S", "A"].includes(cross)) combos.push({ id: "C2", text: "C2 クロス本命 → GO寄り" });
+    if (["S", "A"].includes(overall) && sireTier === "top" && price <= 2.0)
+      combos.push({ id: "C3", text: "C3 強牝系×上位父×手頃 → GO寄り" });
+    if (["S", "A"].includes(signature) && ["B", "C", "none", "U"].includes(overall))
+      combos.push({ id: "C4", text: "C4 看板が一段深い → HOLD〜条件付き" });
+    if (price >= 2.5 && !["S", "A"].includes(cross) && !["S", "A"].includes(unique))
+      combos.push({ id: "C5", text: "C5 高額なのに独自/クロス弱い → PASS寄り" });
 
     let verdict = "PASS";
     if (!hard) {
       if (points >= 12) verdict = "GO";
       else if (points >= 8) verdict = "HOLD";
-    } else {
-      verdict = "PASS";
     }
     const cls = verdict === "GO" ? "badge-go" : verdict === "HOLD" ? "badge-hold" : "badge-pass";
     out.classList.remove("muted");
@@ -965,16 +1239,72 @@ window.CLUB_DATA = {"meta": {"version": "2026-07-15", "generated_for": "cloud_mo
       ${name ? ` — ${name}` : ""}</p>
       ${hard ? `<p class="badge-pass">即PASS: ${hard}</p>` : ""}
       <ul class="list">
-        ${detail.map((d) => `<li>${d.item}: <strong>${d.pts >= 0 ? "+" : ""}${d.pts}</strong> <span class="muted">(${d.note})</span></li>`).join("")}
+        ${detail
+          .map(
+            (d) =>
+              `<li>${d.item}: <strong>${d.pts >= 0 ? "+" : ""}${d.pts}</strong> <span class="muted">(${d.note})</span></li>`
+          )
+          .join("")}
       </ul>
-      ${combos.length ? `<p><strong>コンボ</strong><br>${combos.join("<br>")}</p>` : "<p class='muted'>コンボ点灯なし</p>"}
-      <p class="note">クロス自動: ${crossAuto ? `${crossAuto.trainer}×${crossAuto.family} = ${labelG(crossAuto.grade)}` : "データなし"}</p>
+      <p><strong>点灯コンボ</strong></p>
+      ${
+        combos.length
+          ? `<ul class="list">${combos.map((c) => `<li><strong>${c.id}</strong> ${c.text.replace(/^C\d\s*/, "")}</li>`).join("")}</ul>`
+          : "<p class='muted'>なし</p>"
+      }
+      <p class="note">クロス自動: ${
+        crossAuto ? `${crossAuto.trainer}×${crossAuto.family} = ${labelG(crossAuto.grade)}` : "データなし"
+      }</p>
+      ${followupHtml({
+        trainer: trainerName,
+        sire: sireName,
+        family: familyName,
+        famObj: fam,
+        trainerObj: t,
+        sireObj: s,
+        cross: crossAuto,
+      })}
     `;
+
+    // sync combo panel if present
+    if (el("comboOut")) {
+      el("comboOut").classList.remove("muted");
+      el("comboOut").innerHTML = combos.length
+        ? combos.map((c) => `<div><strong>${c.id}</strong> — ${c.text}</div>`).join("")
+        : "点灯なし（条件未達 or 未収録で等級が弱い）";
+    }
+  }
+
+  if (el("btnDecide")) el("btnDecide").addEventListener("click", runDecide);
+
+  // combo-only checker
+  if (el("btnCombo")) {
+    el("btnCombo").addEventListener("click", () => {
+      // reuse decide fields if filled; else combo-specific
+      if (el("dTrainer") && el("dTrainer").value) {
+        runDecide();
+        return;
+      }
+    });
+  }
+
+  // wire suggests
+  [
+    ["wTrainer", trainerItems],
+    ["dTrainer", trainerItems],
+    ["wSire", sireItems],
+    ["dSire", sireItems],
+    ["wFamily", familyItems],
+    ["dFamily", familyItems],
+    ["dSig", familyItems],
+  ].forEach(([id, fn]) => {
+    const input = el(id);
+    if (input) attachSuggest(input, fn);
   });
 
   fillLists();
-  if (location.hash === "#tool-weight") {
-    document.getElementById("tool-weight").scrollIntoView();
+  if (location.hash === "#weight" && el("weight")) {
+    el("weight").scrollIntoView();
   }
 })();
 

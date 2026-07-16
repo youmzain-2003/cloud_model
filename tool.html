@@ -22,14 +22,14 @@
     </nav>
     <p class="kicker">COMPANION TOOL</p>
     <h1 class="brand">補完ツール</h1>
-    <p class="sub">シートを見ながら、厩舎・父・牝系・クロス・体重・点数をその場で照会・試算します（オフライン可）。</p>
+    <p class="sub">一部一致で候補が出ます。データに無い名前は警告付きで手動等級フォローできます。</p>
 
     <section class="card" id="lookup">
       <h2>1. 名前照会</h2>
       <label class="field">キーワード（厩舎 / 父 / 牝系）
-        <input id="lookupQ" placeholder="例: 須貝 / カナロア / Stitching" />
+        <input id="lookupQ" placeholder="例: 須貝 / カナ / Stitch" autocomplete="off" />
       </label>
-      <div id="lookupOut" class="result muted">入力すると候補を表示</div>
+      <div id="lookupOut" class="result muted">数文字入れると候補を表示</div>
     </section>
 
     <section class="card" id="weight">
@@ -38,14 +38,14 @@
         <label class="field">体重 (kg)
           <input id="wKg" type="number" inputmode="numeric" placeholder="417" />
         </label>
-        <label class="field">厩舎
-          <input id="wTrainer" list="trainerList" placeholder="須貝尚介" />
+        <label class="field">厩舎（一部一致OK）
+          <input id="wTrainer" placeholder="須貝 など" autocomplete="off" />
         </label>
-        <label class="field">父
-          <input id="wSire" list="sireList" placeholder="ロードカナロア" />
+        <label class="field">父（一部一致OK）
+          <input id="wSire" placeholder="カナロア など" autocomplete="off" />
         </label>
         <label class="field">牝系（母母・任意）
-          <input id="wFamily" list="familyList" placeholder="Stitching" />
+          <input id="wFamily" placeholder="Stitch など" autocomplete="off" />
         </label>
       </div>
       <button class="primary" type="button" id="btnWeight">体重を判定</button>
@@ -53,7 +53,8 @@
     </section>
 
     <section class="card" id="decide">
-      <h2>3. カタログ即断（checklist採点）</h2>
+      <h2>3. カタログ即断＋コンボ点灯</h2>
+      <p class="note">厩舎・父・牝系は入力中に候補リストが出ます。未収録なら下の手動等級でフォロー。</p>
       <div class="grid2">
         <label class="field">馬名（任意）
           <input id="dName" placeholder="ディメンシオン'24" />
@@ -61,17 +62,17 @@
         <label class="field">一口価格（万円）
           <input id="dPrice" type="number" inputmode="decimal" step="0.1" placeholder="2.2" />
         </label>
-        <label class="field">厩舎
-          <input id="dTrainer" list="trainerList" placeholder="須貝尚介" />
+        <label class="field">厩舎（一部一致→候補）
+          <input id="dTrainer" placeholder="須貝" autocomplete="off" />
         </label>
-        <label class="field">父
-          <input id="dSire" list="sireList" placeholder="ロードカナロア" />
+        <label class="field">父（一部一致→候補）
+          <input id="dSire" placeholder="カナロア" autocomplete="off" />
         </label>
         <label class="field">牝系（母母）
-          <input id="dFamily" list="familyList" placeholder="手動なら下で等級指定" />
+          <input id="dFamily" placeholder="未収録なら手動等級" autocomplete="off" />
         </label>
         <label class="field">看板牝系（任意）
-          <input id="dSig" list="familyList" placeholder="Stitching" />
+          <input id="dSig" placeholder="Stitching" autocomplete="off" />
         </label>
         <label class="field">全体牝系（上書き）
           <select id="dOverall">
@@ -124,8 +125,9 @@
       <label class="field" style="display:flex;align-items:center;gap:8px;color:var(--ink)">
         <input type="checkbox" id="dInjury" /> 近況に骨折・跛行・手術・予後不良
       </label>
-      <button class="primary" type="button" id="btnDecide">判定する</button>
+      <button class="primary" type="button" id="btnDecide">判定する（点数＋コンボ）</button>
       <div id="decideOut" class="result muted">未判定</div>
+      <div id="comboOut" class="result muted" style="margin-top:8px">コンボ点灯はここに出ます</div>
     </section>
 
     <p class="foot">
