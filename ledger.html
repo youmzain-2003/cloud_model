@@ -26,32 +26,18 @@
     <h1 class="brand">収支メモ</h1>
     <p class="sub">初期残高と日付は必須。項目名をつけて収入・支出を記録し、残額を自動で出します。この端末に保存されます。</p>
 
-    <section class="card" id="opening">
-      <h2>1. 初期残高</h2>
-      <div class="grid2">
-        <label class="field">初期残高（円）*
-          <input id="openingBalance" type="number" inputmode="numeric" step="1" required placeholder="例: 50000" />
-        </label>
-        <label class="field">基準日*
-          <input id="openingDate" type="date" required />
-        </label>
-      </div>
-      <button class="primary" type="button" id="btnSaveOpening">初期残高を保存</button>
-      <p class="note" id="openingNote">未設定です。先に初期残高と基準日を入れてください。</p>
-    </section>
-
     <section class="ledger-summary" id="summary" aria-live="polite">
       <div>
         <span class="ledger-summary-label">初期残高</span>
-        <strong id="sumOpening">—</strong>
+        <strong id="sumOpening">未設定</strong>
       </div>
       <div>
         <span class="ledger-summary-label">収入合計</span>
-        <strong class="amt-in" id="sumIncome">—</strong>
+        <strong class="amt-in" id="sumIncome">¥0</strong>
       </div>
       <div>
         <span class="ledger-summary-label">支出合計</span>
-        <strong class="amt-out" id="sumExpense">—</strong>
+        <strong class="amt-out" id="sumExpense">¥0</strong>
       </div>
       <div>
         <span class="ledger-summary-label">残額</span>
@@ -59,29 +45,47 @@
       </div>
     </section>
 
+    <section class="card" id="opening">
+      <h2>1. 初期残高</h2>
+      <form id="openingForm" novalidate>
+        <div class="grid2">
+          <label class="field">初期残高（円）*
+            <input id="openingBalance" name="openingBalance" type="number" inputmode="numeric" step="1" required placeholder="例: 50000" />
+          </label>
+          <label class="field">基準日*
+            <input id="openingDate" name="openingDate" type="date" required />
+          </label>
+        </div>
+        <button class="primary" type="submit" id="btnSaveOpening">初期残高を保存</button>
+      </form>
+      <p class="note" id="openingNote">未設定です。先に初期残高と基準日を入れてください。</p>
+    </section>
+
     <section class="card" id="entry">
       <h2>2. 記録を追加</h2>
-      <div class="grid2">
-        <label class="field">日付*
-          <input id="entryDate" type="date" required />
+      <form id="entryForm" novalidate>
+        <div class="grid2">
+          <label class="field">日付*
+            <input id="entryDate" name="entryDate" type="date" required />
+          </label>
+          <label class="field">区分*
+            <select id="entryType" name="entryType">
+              <option value="expense" selected>支出</option>
+              <option value="income">収入</option>
+            </select>
+          </label>
+          <label class="field">項目名*
+            <input id="entryName" name="entryName" type="text" maxlength="80" required placeholder="例: 給料 / 食費" autocomplete="off" />
+          </label>
+          <label class="field">金額（円）*
+            <input id="entryAmount" name="entryAmount" type="number" inputmode="numeric" min="1" step="1" required placeholder="例: 1200" />
+          </label>
+        </div>
+        <label class="field">メモ（任意）
+          <input id="entryMemo" name="entryMemo" type="text" maxlength="120" placeholder="任意" autocomplete="off" />
         </label>
-        <label class="field">区分*
-          <select id="entryType">
-            <option value="income">収入</option>
-            <option value="expense">支出</option>
-          </select>
-        </label>
-        <label class="field">項目名*
-          <input id="entryName" type="text" maxlength="80" required placeholder="例: 給料 / 食費" autocomplete="off" />
-        </label>
-        <label class="field">金額（円）*
-          <input id="entryAmount" type="number" inputmode="numeric" min="1" step="1" required placeholder="例: 1200" />
-        </label>
-      </div>
-      <label class="field">メモ（任意）
-        <input id="entryMemo" type="text" maxlength="120" placeholder="任意" autocomplete="off" />
-      </label>
-      <button class="primary" type="button" id="btnAddEntry">追加する</button>
+        <button class="primary" type="submit" id="btnAddEntry">追加する</button>
+      </form>
       <p class="note" id="entryNote"></p>
     </section>
 

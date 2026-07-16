@@ -1,25 +1,31 @@
 (() => {
   const STORAGE_KEY = "club-scout-ledger-v1";
 
+  function $(id) {
+    const el = document.getElementById(id);
+    if (!el) throw new Error("missing element: #" + id);
+    return el;
+  }
+
   const els = {
-    openingBalance: document.getElementById("openingBalance"),
-    openingDate: document.getElementById("openingDate"),
-    btnSaveOpening: document.getElementById("btnSaveOpening"),
-    openingNote: document.getElementById("openingNote"),
-    sumOpening: document.getElementById("sumOpening"),
-    sumIncome: document.getElementById("sumIncome"),
-    sumExpense: document.getElementById("sumExpense"),
-    sumBalance: document.getElementById("sumBalance"),
-    entryDate: document.getElementById("entryDate"),
-    entryType: document.getElementById("entryType"),
-    entryName: document.getElementById("entryName"),
-    entryAmount: document.getElementById("entryAmount"),
-    entryMemo: document.getElementById("entryMemo"),
-    btnAddEntry: document.getElementById("btnAddEntry"),
-    entryNote: document.getElementById("entryNote"),
-    filterType: document.getElementById("filterType"),
-    btnClearAll: document.getElementById("btnClearAll"),
-    entryList: document.getElementById("entryList"),
+    openingForm: $("openingForm"),
+    openingBalance: $("openingBalance"),
+    openingDate: $("openingDate"),
+    openingNote: $("openingNote"),
+    sumOpening: $("sumOpening"),
+    sumIncome: $("sumIncome"),
+    sumExpense: $("sumExpense"),
+    sumBalance: $("sumBalance"),
+    entryForm: $("entryForm"),
+    entryDate: $("entryDate"),
+    entryType: $("entryType"),
+    entryName: $("entryName"),
+    entryAmount: $("entryAmount"),
+    entryMemo: $("entryMemo"),
+    entryNote: $("entryNote"),
+    filterType: $("filterType"),
+    btnClearAll: $("btnClearAll"),
+    entryList: $("entryList"),
   };
 
   function todayISO() {
@@ -28,6 +34,13 @@
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
+  }
+
+  function parseAmount(raw) {
+    if (raw == null) return NaN;
+    const s = String(raw).trim().replace(/,/g, "").replace(/[￥¥]/g, "");
+    if (s === "") return NaN;
+    return Number(s);
   }
 
   function loadState() {
@@ -39,13 +52,20 @@
         opening: parsed.opening && typeof parsed.opening === "object" ? parsed.opening : null,
         entries: Array.isArray(parsed.entries) ? parsed.entries : [],
       };
-    } catch {
+    } catch (err) {
+      console.warn("ledger load failed", err);
       return { opening: null, entries: [] };
     }
   }
 
-  function saveState(state) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  function saveState(next) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return true;
+    } catch (err) {
+      console.warn("ledger save failed", err);
+      return false;
+    }
   }
 
   function formatYen(n) {
@@ -66,6 +86,14 @@
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   }
 
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
   let state = loadState();
 
   function ensureDefaults() {
@@ -82,17 +110,17 @@
     let income = 0;
     let expense = 0;
     for (const e of state.entries) {
-      if (e.type === "income") income += e.amount;
-      else expense += e.amount;
+      if (e.type === "income") income += Number(e.amount) || 0;
+      else expense += Number(e.amount) || 0;
     }
     const opening = state.opening ? Number(state.opening.amount) : null;
-    const balance = opening == null ? null : opening + income - expense;
+    const balance = opening == null || !Number.isFinite(opening) ? null : opening + income - expense;
     return { opening, income, expense, balance };
   }
 
   function renderSummary() {
     const t = totals();
-    els.sumOpening.textContent = t.opening == null ? "未設定" : formatYen(t.opening);
+    els.sumOpening.textContent = t.opening == null || !Number.isFinite(t.opening) ? "未設定" : formatYen(t.opening);
     els.sumIncome.textContent = formatYen(t.income);
     els.sumExpense.textContent = formatYen(t.expense);
     els.sumBalance.textContent = t.balance == null ? "—" : formatYen(t.balance);
@@ -142,7 +170,7 @@
       row.innerHTML = `
         <div class="ledger-row-main">
           <div class="ledger-row-top">
-            <span class="ledger-date">${e.date}</span>
+            <span class="ledger-date">${escapeHtml(e.date)}</span>
             <span class="ledger-type ${e.type}">${typeLabel}</span>
           </div>
           <div class="ledger-name">${escapeHtml(e.name)}</div>
@@ -150,19 +178,11 @@
         </div>
         <div class="ledger-row-side">
           <div class="ledger-amount ${amtClass}">${formatSignedYen(e.amount, e.type)}</div>
-          <button type="button" class="ghost danger" data-del="${e.id}">削除</button>
+          <button type="button" class="ghost danger" data-del="${escapeHtml(e.id)}">削除</button>
         </div>
       `;
       els.entryList.appendChild(row);
     }
-  }
-
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
   }
 
   function render() {
@@ -175,45 +195,65 @@
     els.entryNote.classList.toggle("warn", !!isError);
   }
 
-  els.btnSaveOpening.addEventListener("click", () => {
-    const amount = Number(els.openingBalance.value);
-    const date = els.openingDate.value;
+  function saveOpeningFromInputs() {
+    const amount = parseAmount(els.openingBalance.value);
+    const date = (els.openingDate.value || "").trim();
     if (!date) {
       els.openingNote.textContent = "基準日は必須です。";
       els.openingNote.classList.add("warn");
-      return;
+      return false;
     }
     if (!Number.isFinite(amount)) {
-      els.openingNote.textContent = "初期残高（数値）は必須です。";
+      els.openingNote.textContent = "初期残高（数値）は必須です。空欄は不可です。";
       els.openingNote.classList.add("warn");
-      return;
+      return false;
     }
     state.opening = { amount: Math.round(amount), date };
-    saveState(state);
+    if (!saveState(state)) {
+      els.openingNote.textContent = "保存に失敗しました（プライベートモード等でストレージが使えない可能性があります）。";
+      els.openingNote.classList.add("warn");
+      return false;
+    }
     render();
+    return true;
+  }
+
+  els.openingForm.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    saveOpeningFromInputs();
   });
 
-  els.btnAddEntry.addEventListener("click", () => {
+  els.entryForm.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+
     if (!state.opening) {
-      setEntryNote("先に初期残高と基準日を保存してください。", true);
-      return;
+      // 初期残高欄に値が入っていれば、追加時にまとめて保存する
+      if (!saveOpeningFromInputs()) {
+        setEntryNote("先に初期残高と基準日を入れてください。", true);
+        els.openingBalance.focus();
+        return;
+      }
     }
-    const date = els.entryDate.value;
+
+    const date = (els.entryDate.value || "").trim();
     const name = (els.entryName.value || "").trim();
-    const amount = Number(els.entryAmount.value);
+    const amount = parseAmount(els.entryAmount.value);
     const type = els.entryType.value === "income" ? "income" : "expense";
     const memo = (els.entryMemo.value || "").trim();
 
     if (!date) {
       setEntryNote("日付は必須です。", true);
+      els.entryDate.focus();
       return;
     }
     if (!name) {
       setEntryNote("項目名は必須です。", true);
+      els.entryName.focus();
       return;
     }
     if (!Number.isFinite(amount) || amount <= 0) {
       setEntryNote("金額は1円以上の数値で入力してください。", true);
+      els.entryAmount.focus();
       return;
     }
 
@@ -226,20 +266,25 @@
       memo,
       createdAt: Date.now(),
     });
-    saveState(state);
+    if (!saveState(state)) {
+      setEntryNote("保存に失敗しました。", true);
+      state.entries.pop();
+      return;
+    }
     els.entryName.value = "";
     els.entryAmount.value = "";
     els.entryMemo.value = "";
     els.entryDate.value = todayISO();
     setEntryNote("追加しました。", false);
     render();
+    els.entryName.focus();
   });
 
   els.entryList.addEventListener("click", (ev) => {
     const btn = ev.target.closest("[data-del]");
     if (!btn) return;
     const id = btn.getAttribute("data-del");
-    if (!confirm("この記録を削除しますか？")) return;
+    if (!window.confirm("この記録を削除しますか？")) return;
     state.entries = state.entries.filter((e) => e.id !== id);
     saveState(state);
     render();
@@ -249,12 +294,18 @@
 
   els.btnClearAll.addEventListener("click", () => {
     if (!state.entries.length) return;
-    if (!confirm("すべての記録を削除しますか？（初期残高は残ります）")) return;
+    if (!window.confirm("すべての記録を削除しますか？（初期残高は残ります）")) return;
     state.entries = [];
     saveState(state);
     render();
   });
 
-  ensureDefaults();
-  render();
+  try {
+    ensureDefaults();
+    render();
+  } catch (err) {
+    console.error(err);
+    els.entryNote.textContent = "初期化に失敗しました: " + (err && err.message ? err.message : err);
+    els.entryNote.classList.add("warn");
+  }
 })();
