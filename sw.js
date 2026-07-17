@@ -1,5 +1,5 @@
 /* Club Scout service worker — cache shell for offline use */
-const CACHE = "club-scout-v6-ledger";
+const CACHE = "club-scout-v7-ledger-inline";
 const ASSETS = [
   "./",
   "./index.html",

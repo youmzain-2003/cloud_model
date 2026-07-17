@@ -13,6 +13,80 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/app.css" />
+  <style>
+    /* ledger 単体でも最低限動くよう、必要CSSを同梱 */
+    .ledger-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 0 0 12px;
+      padding: 12px;
+      border: 1px solid rgba(214, 176, 96, 0.3);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(217,180,92,.1), transparent 55%), rgba(0,0,0,.28);
+    }
+    .ledger-summary-label { display: block; font-size: 0.7rem; color: #a7b4ac; margin-bottom: 2px; }
+    .ledger-summary strong {
+      display: block; font-variant-numeric: tabular-nums;
+      font-size: clamp(0.85rem, 3.4vw, 1.05rem); word-break: break-all;
+    }
+    .amt-in { color: #3cbf7e; }
+    .amt-out { color: #e88a8a; }
+    .amt-pos { color: #d9b45c; }
+    .amt-neg { color: #d45d5d; }
+    .note.warn { color: #f0d7a0; }
+    .note.ok { color: #7dcea0; font-weight: 600; }
+    .ledger-flash {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(60,191,126,.45);
+      background: rgba(60,191,126,.12);
+      color: #b8f0d0;
+      font-size: 0.88rem;
+      display: none;
+    }
+    .ledger-flash.on { display: block; }
+    .ledger-flash.err {
+      border-color: rgba(212,93,93,.45);
+      background: rgba(212,93,93,.12);
+      color: #f0b0b0;
+    }
+    .ledger-toolbar { display: flex; gap: 8px; align-items: end; margin-bottom: 10px; }
+    button.ghost {
+      border: 1px solid rgba(214,176,96,.3);
+      background: rgba(0,0,0,.25);
+      color: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font: inherit;
+    }
+    button.ghost.danger { color: #f0b0b0; border-color: rgba(212,93,93,.45); }
+    button.primary { cursor: pointer; }
+    .ledger-list { display: grid; gap: 8px; }
+    .ledger-row {
+      display: flex; gap: 10px; justify-content: space-between; align-items: flex-start;
+      padding: 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 12px;
+      background: rgba(0,0,0,.22);
+    }
+    .ledger-row.new { outline: 1px solid rgba(60,191,126,.55); }
+    .ledger-row-main { min-width: 0; flex: 1; }
+    .ledger-row-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 2px; }
+    .ledger-date { font-size: 0.74rem; color: #a7b4ac; font-variant-numeric: tabular-nums; }
+    .ledger-type {
+      font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+      border: 1px solid transparent;
+    }
+    .ledger-type.income { color: #3cbf7e; background: rgba(60,191,126,.12); border-color: rgba(60,191,126,.35); }
+    .ledger-type.expense { color: #e88a8a; background: rgba(212,93,93,.12); border-color: rgba(212,93,93,.35); }
+    .ledger-name { font-weight: 600; font-size: 0.95rem; }
+    .ledger-memo { color: #a7b4ac; font-size: 0.78rem; margin-top: 2px; }
+    .ledger-row-side { text-align: right; display: grid; gap: 6px; justify-items: end; }
+    .ledger-amount { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+    @media (max-width: 560px) { .ledger-summary { grid-template-columns: 1fr 1fr; } }
+  </style>
 </head>
 <body>
   <div class="wrap">
@@ -25,6 +99,8 @@
     <p class="kicker">SIMPLE LEDGER</p>
     <h1 class="brand">収支メモ</h1>
     <p class="sub">初期残高と日付は必須。項目名をつけて収入・支出を記録し、残額を自動で出します。この端末に保存されます。</p>
+
+    <div id="flash" class="ledger-flash" role="status" aria-live="polite"></div>
 
     <section class="ledger-summary" id="summary" aria-live="polite">
       <div>
@@ -47,50 +123,46 @@
 
     <section class="card" id="opening">
       <h2>1. 初期残高</h2>
-      <form id="openingForm" novalidate>
-        <div class="grid2">
-          <label class="field">初期残高（円）*
-            <input id="openingBalance" name="openingBalance" type="number" inputmode="numeric" step="1" required placeholder="例: 50000" />
-          </label>
-          <label class="field">基準日*
-            <input id="openingDate" name="openingDate" type="date" required />
-          </label>
-        </div>
-        <button class="primary" type="submit" id="btnSaveOpening">初期残高を保存</button>
-      </form>
+      <div class="grid2">
+        <label class="field">初期残高（円）*
+          <input id="openingBalance" type="text" inputmode="numeric" autocomplete="off" placeholder="例: 50000" />
+        </label>
+        <label class="field">基準日*
+          <input id="openingDate" type="date" />
+        </label>
+      </div>
+      <button class="primary" type="button" id="btnSaveOpening">初期残高を保存</button>
       <p class="note" id="openingNote">未設定です。先に初期残高と基準日を入れてください。</p>
     </section>
 
     <section class="card" id="entry">
       <h2>2. 記録を追加</h2>
-      <form id="entryForm" novalidate>
-        <div class="grid2">
-          <label class="field">日付*
-            <input id="entryDate" name="entryDate" type="date" required />
-          </label>
-          <label class="field">区分*
-            <select id="entryType" name="entryType">
-              <option value="expense" selected>支出</option>
-              <option value="income">収入</option>
-            </select>
-          </label>
-          <label class="field">項目名*
-            <input id="entryName" name="entryName" type="text" maxlength="80" required placeholder="例: 給料 / 食費" autocomplete="off" />
-          </label>
-          <label class="field">金額（円）*
-            <input id="entryAmount" name="entryAmount" type="number" inputmode="numeric" min="1" step="1" required placeholder="例: 1200" />
-          </label>
-        </div>
-        <label class="field">メモ（任意）
-          <input id="entryMemo" name="entryMemo" type="text" maxlength="120" placeholder="任意" autocomplete="off" />
+      <div class="grid2">
+        <label class="field">日付*
+          <input id="entryDate" type="date" />
         </label>
-        <button class="primary" type="submit" id="btnAddEntry">追加する</button>
-      </form>
+        <label class="field">区分*
+          <select id="entryType">
+            <option value="expense" selected>支出</option>
+            <option value="income">収入</option>
+          </select>
+        </label>
+        <label class="field">項目名*
+          <input id="entryName" type="text" maxlength="80" placeholder="例: 給料 / 食費" autocomplete="off" />
+        </label>
+        <label class="field">金額（円）*
+          <input id="entryAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="例: 1200" />
+        </label>
+      </div>
+      <label class="field">メモ（任意）
+        <input id="entryMemo" type="text" maxlength="120" placeholder="任意" autocomplete="off" />
+      </label>
+      <button class="primary" type="button" id="btnAddEntry">追加する</button>
       <p class="note" id="entryNote"></p>
     </section>
 
     <section class="card" id="list">
-      <h2>3. 一覧</h2>
+      <h2>3. 一覧 <span id="entryCount" class="muted" style="font-size:.8rem;font-weight:500"></span></h2>
       <div class="ledger-toolbar">
         <label class="field" style="margin:0;flex:1">絞り込み
           <select id="filterType">
@@ -110,10 +182,426 @@
     </p>
   </div>
 
-  <script src="./assets/ledger.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var STORAGE_KEY = "club-scout-ledger-v1";
+    var lastAddedId = null;
+
+    function $(id) {
+      var el = document.getElementById(id);
+      if (!el) throw new Error("missing #" + id);
+      return el;
+    }
+
+    var els = {
+      flash: $("flash"),
+      openingBalance: $("openingBalance"),
+      openingDate: $("openingDate"),
+      btnSaveOpening: $("btnSaveOpening"),
+      openingNote: $("openingNote"),
+      sumOpening: $("sumOpening"),
+      sumIncome: $("sumIncome"),
+      sumExpense: $("sumExpense"),
+      sumBalance: $("sumBalance"),
+      entryDate: $("entryDate"),
+      entryType: $("entryType"),
+      entryName: $("entryName"),
+      entryAmount: $("entryAmount"),
+      entryMemo: $("entryMemo"),
+      btnAddEntry: $("btnAddEntry"),
+      entryNote: $("entryNote"),
+      filterType: $("filterType"),
+      btnClearAll: $("btnClearAll"),
+      entryList: $("entryList"),
+      entryCount: $("entryCount"),
+    };
+
+    function todayISO() {
+      var d = new Date();
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1);
+      var day = String(d.getDate());
+      if (m.length < 2) m = "0" + m;
+      if (day.length < 2) day = "0" + day;
+      return y + "-" + m + "-" + day;
+    }
+
+    function normalizeDigits(raw) {
+      return String(raw == null ? "" : raw)
+        .replace(/[０-９]/g, function (ch) {
+          return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+        })
+        .replace(/,/g, "")
+        .replace(/[￥¥円\s]/g, "")
+        .trim();
+    }
+
+    function parseAmount(raw) {
+      var s = normalizeDigits(raw);
+      if (!s) return NaN;
+      var n = Number(s);
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { opening: null, entries: [] };
+        var parsed = JSON.parse(raw);
+        return {
+          opening: parsed && parsed.opening && typeof parsed.opening === "object" ? parsed.opening : null,
+          entries: parsed && Array.isArray(parsed.entries) ? parsed.entries : [],
+        };
+      } catch (err) {
+        return { opening: null, entries: [] };
+      }
+    }
+
+    function saveState(next) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        var check = localStorage.getItem(STORAGE_KEY);
+        return !!check;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function formatYen(n) {
+      if (!Number.isFinite(n)) return "—";
+      try {
+        return new Intl.NumberFormat("ja-JP", {
+          style: "currency",
+          currency: "JPY",
+          maximumFractionDigits: 0,
+        }).format(Math.round(n));
+      } catch (e) {
+        return "¥" + String(Math.round(n));
+      }
+    }
+
+    function formatSignedYen(n, type) {
+      var body = formatYen(n).replace(/[￥¥]/g, "");
+      return (type === "income" ? "+" : "−") + body;
+    }
+
+    function uid() {
+      return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function showFlash(msg, isError) {
+      els.flash.textContent = msg;
+      els.flash.className = "ledger-flash on" + (isError ? " err" : "");
+    }
+
+    var state = loadState();
+
+    function ensureDefaults() {
+      if (!els.entryDate.value) els.entryDate.value = todayISO();
+      if (state.opening) {
+        els.openingBalance.value = String(state.opening.amount);
+        els.openingDate.value = state.opening.date;
+      } else if (!els.openingDate.value) {
+        els.openingDate.value = todayISO();
+      }
+    }
+
+    function totals() {
+      var income = 0;
+      var expense = 0;
+      for (var i = 0; i < state.entries.length; i++) {
+        var e = state.entries[i];
+        var amt = Number(e.amount) || 0;
+        if (e.type === "income") income += amt;
+        else expense += amt;
+      }
+      var opening = state.opening ? Number(state.opening.amount) : null;
+      var balance = opening == null || !Number.isFinite(opening) ? null : opening + income - expense;
+      return { opening: opening, income: income, expense: expense, balance: balance };
+    }
+
+    function renderSummary() {
+      var t = totals();
+      els.sumOpening.textContent =
+        t.opening == null || !Number.isFinite(t.opening) ? "未設定" : formatYen(t.opening);
+      els.sumIncome.textContent = formatYen(t.income);
+      els.sumExpense.textContent = formatYen(t.expense);
+      els.sumBalance.textContent = t.balance == null ? "—" : formatYen(t.balance);
+      els.sumBalance.classList.toggle("amt-neg", t.balance != null && t.balance < 0);
+      els.sumBalance.classList.toggle("amt-pos", t.balance != null && t.balance >= 0);
+
+      if (state.opening) {
+        els.openingNote.textContent =
+          "保存済み: " + state.opening.date + " 時点で " + formatYen(state.opening.amount);
+        els.openingNote.className = "note ok";
+      } else {
+        els.openingNote.textContent = "未設定です。先に初期残高と基準日を入れてください。";
+        els.openingNote.className = "note warn";
+      }
+      els.entryCount.textContent =
+        state.entries.length > 0 ? "（" + state.entries.length + "件）" : "";
+    }
+
+    function sortedEntries() {
+      var filter = els.filterType.value;
+      return state.entries
+        .filter(function (e) {
+          return filter === "all" || e.type === filter;
+        })
+        .slice()
+        .sort(function (a, b) {
+          if (a.date !== b.date) return b.date < a.date ? -1 : 1;
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+    }
+
+    function renderList() {
+      var rows = sortedEntries();
+      if (!rows.length) {
+        els.entryList.className = "ledger-list muted";
+        els.entryList.textContent = state.entries.length
+          ? "この絞り込みでは表示する記録がありません。"
+          : "まだ記録がありません。";
+        return;
+      }
+
+      els.entryList.className = "ledger-list";
+      var html = "";
+      for (var i = 0; i < rows.length; i++) {
+        var e = rows[i];
+        var typeLabel = e.type === "income" ? "収入" : "支出";
+        var amtClass = e.type === "income" ? "amt-in" : "amt-out";
+        var isNew = e.id === lastAddedId ? " new" : "";
+        html +=
+          '<article class="ledger-row' +
+          isNew +
+          '" data-id="' +
+          escapeHtml(e.id) +
+          '">' +
+          '<div class="ledger-row-main">' +
+          '<div class="ledger-row-top">' +
+          '<span class="ledger-date">' +
+          escapeHtml(e.date) +
+          "</span>" +
+          '<span class="ledger-type ' +
+          e.type +
+          '">' +
+          typeLabel +
+          "</span>" +
+          "</div>" +
+          '<div class="ledger-name">' +
+          escapeHtml(e.name) +
+          "</div>" +
+          (e.memo ? '<div class="ledger-memo">' + escapeHtml(e.memo) + "</div>" : "") +
+          "</div>" +
+          '<div class="ledger-row-side">' +
+          '<div class="ledger-amount ' +
+          amtClass +
+          '">' +
+          formatSignedYen(e.amount, e.type) +
+          "</div>" +
+          '<button type="button" class="ghost danger" data-del="' +
+          escapeHtml(e.id) +
+          '">削除</button>' +
+          "</div></article>";
+      }
+      els.entryList.innerHTML = html;
+    }
+
+    function render() {
+      renderSummary();
+      renderList();
+    }
+
+    function setEntryNote(msg, isError) {
+      els.entryNote.textContent = msg || "";
+      els.entryNote.className = "note" + (msg ? (isError ? " warn" : " ok") : "");
+    }
+
+    function saveOpeningFromInputs() {
+      var amount = parseAmount(els.openingBalance.value);
+      var date = (els.openingDate.value || "").trim();
+      if (!date) {
+        els.openingNote.textContent = "基準日は必須です。";
+        els.openingNote.className = "note warn";
+        showFlash("基準日を入れてください。", true);
+        return false;
+      }
+      if (!Number.isFinite(amount)) {
+        els.openingNote.textContent = "初期残高（数値）は必須です。";
+        els.openingNote.className = "note warn";
+        showFlash("初期残高に数字を入れてください。", true);
+        return false;
+      }
+      state.opening = { amount: Math.round(amount), date: date };
+      if (!saveState(state)) {
+        showFlash("保存に失敗しました。プライベートブラウズでは使えないことがあります。", true);
+        return false;
+      }
+      render();
+      showFlash(
+        "初期残高を保存しました: " + formatYen(state.opening.amount) + "（残額に反映済み）"
+      );
+      return true;
+    }
+
+    function addEntry() {
+      if (!state.opening) {
+        if (!saveOpeningFromInputs()) {
+          setEntryNote("先に初期残高と基準日を入れてください。", true);
+          els.openingBalance.focus();
+          return;
+        }
+      }
+
+      var date = (els.entryDate.value || "").trim();
+      var name = (els.entryName.value || "").trim();
+      var amount = parseAmount(els.entryAmount.value);
+      var type = els.entryType.value === "income" ? "income" : "expense";
+      var memo = (els.entryMemo.value || "").trim();
+
+      if (!date) {
+        setEntryNote("日付は必須です。", true);
+        showFlash("日付を入れてください。", true);
+        els.entryDate.focus();
+        return;
+      }
+      if (!name) {
+        setEntryNote("項目名は必須です。", true);
+        showFlash("項目名を入れてください。", true);
+        els.entryName.focus();
+        return;
+      }
+      if (!Number.isFinite(amount) || amount <= 0) {
+        setEntryNote("金額は1円以上の数字で入力してください。", true);
+        showFlash("金額は1円以上の数字で入力してください。", true);
+        els.entryAmount.focus();
+        return;
+      }
+
+      var item = {
+        id: uid(),
+        date: date,
+        name: name,
+        type: type,
+        amount: Math.round(amount),
+        memo: memo,
+        createdAt: Date.now(),
+      };
+      state.entries.push(item);
+      if (!saveState(state)) {
+        state.entries.pop();
+        setEntryNote("保存に失敗しました。", true);
+        showFlash("保存に失敗しました。", true);
+        return;
+      }
+
+      lastAddedId = item.id;
+      els.entryName.value = "";
+      els.entryAmount.value = "";
+      els.entryMemo.value = "";
+      els.entryDate.value = todayISO();
+      setEntryNote("追加しました。残額を更新しました。", false);
+      render();
+
+      var t = totals();
+      showFlash(
+        (type === "income" ? "収入" : "支出") +
+          "「" +
+          name +
+          "」" +
+          formatYen(item.amount) +
+          " を追加。残額 " +
+          formatYen(t.balance)
+      );
+
+      try {
+        var row = els.entryList.querySelector('[data-id="' + item.id + '"]');
+        if (row && row.scrollIntoView) row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } catch (e) {}
+      els.entryName.focus();
+    }
+
+    els.btnSaveOpening.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      saveOpeningFromInputs();
+    });
+
+    els.btnAddEntry.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      addEntry();
+    });
+
+    // Enter でも追加（テキスト欄）
+    [els.entryName, els.entryAmount, els.entryMemo].forEach(function (input) {
+      input.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter") {
+          ev.preventDefault();
+          addEntry();
+        }
+      });
+    });
+    [els.openingBalance].forEach(function (input) {
+      input.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter") {
+          ev.preventDefault();
+          saveOpeningFromInputs();
+        }
+      });
+    });
+
+    els.entryList.addEventListener("click", function (ev) {
+      var t = ev.target;
+      while (t && t !== els.entryList && !(t.getAttribute && t.getAttribute("data-del"))) {
+        t = t.parentNode;
+      }
+      if (!t || t === els.entryList) return;
+      var id = t.getAttribute("data-del");
+      if (!window.confirm("この記録を削除しますか？")) return;
+      state.entries = state.entries.filter(function (e) {
+        return e.id !== id;
+      });
+      saveState(state);
+      lastAddedId = null;
+      render();
+      showFlash("削除しました。残額を更新しました。");
+    });
+
+    els.filterType.addEventListener("change", render);
+
+    els.btnClearAll.addEventListener("click", function () {
+      if (!state.entries.length) return;
+      if (!window.confirm("すべての記録を削除しますか？（初期残高は残ります）")) return;
+      state.entries = [];
+      saveState(state);
+      lastAddedId = null;
+      render();
+      showFlash("記録をすべて削除しました。");
+    });
+
+    try {
+      ensureDefaults();
+      render();
+      showFlash("準備完了。初期残高を入れて保存し、記録を追加してください。");
+    } catch (err) {
+      showFlash("初期化に失敗: " + (err && err.message ? err.message : err), true);
+    }
+  })();
+  </script>
   <script>
     if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js").catch(function () {});
+      });
     }
   </script>
 </body>
