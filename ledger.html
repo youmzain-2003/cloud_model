@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0e1914" />
+  <meta name="theme-color" content="#e8f1ec" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="description" content="簡単な収支メモ。初期残高・日付・項目名・収入支出から残額を計算します。" />
   <link rel="manifest" href="./manifest.webmanifest" />
@@ -12,80 +12,260 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/app.css" />
   <style>
-    /* ledger 単体でも最低限動くよう、必要CSSを同梱 */
+    /* 単体ファイルでも読める高コントラスト配色（外部CSS不要） */
+    :root {
+      --ink: #14201a;
+      --muted: #3d5248;
+      --line: #9bb5a6;
+      --paper: #f3f7f4;
+      --panel: #ffffff;
+      --brand: #1f6b45;
+      --brand-deep: #145234;
+      --gold: #8a6508;
+      --income: #0b6b3a;
+      --income-bg: #dff5e8;
+      --income-line: #8fd4ae;
+      --expense: #b42318;
+      --expense-bg: #fde8e6;
+      --expense-line: #f0a39c;
+      --warn-bg: #fff4d6;
+      --warn-ink: #6b4e00;
+      --ok-bg: #e5f7ec;
+      --ok-ink: #0f5c34;
+      --err-bg: #fdeceb;
+      --err-ink: #8f1d14;
+      --shadow: 0 1px 0 rgba(20, 32, 26, 0.04), 0 8px 22px rgba(20, 32, 26, 0.06);
+      --font-d: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+      --font-b: "IBM Plex Sans JP", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-b);
+      color: var(--ink);
+      line-height: 1.55;
+      background:
+        radial-gradient(900px 420px at 0% -10%, rgba(31, 107, 69, 0.12), transparent 55%),
+        radial-gradient(700px 360px at 100% 0%, rgba(138, 101, 8, 0.10), transparent 50%),
+        linear-gradient(180deg, #e8f1ec 0%, var(--paper) 40%, #eef3f0 100%);
+      background-attachment: fixed;
+    }
+    a { color: var(--brand-deep); font-weight: 600; }
+    a:hover { text-decoration: underline; }
+    .wrap { width: min(760px, 100%); margin: 0 auto; padding: 14px 14px 56px; }
+    .topnav {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; gap: 6px; flex-wrap: wrap;
+      padding: 8px 0 10px;
+      background: linear-gradient(180deg, rgba(232,241,236,.97), rgba(232,241,236,.9) 70%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    .topnav a {
+      font-size: 0.78rem; font-weight: 700; color: var(--ink);
+      border: 1px solid var(--line); border-radius: 999px;
+      padding: 7px 12px; background: var(--panel);
+      text-decoration: none;
+    }
+    .topnav a.on {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+    .kicker {
+      margin: 4px 0 0;
+      font-size: 0.72rem;
+      letter-spacing: .14em;
+      font-weight: 700;
+      color: var(--brand);
+    }
+    .brand {
+      font-family: var(--font-d);
+      font-size: clamp(1.7rem, 6.2vw, 2.2rem);
+      margin: 4px 0 6px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      color: var(--brand-deep);
+    }
+    .sub { color: var(--muted); margin: 0 0 14px; font-size: 0.9rem; }
+    .card {
+      border: 1px solid #c7d7ce;
+      border-radius: 14px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: 14px 14px 12px;
+      margin: 0 0 12px;
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-family: var(--font-d);
+      font-size: 1.08rem;
+      color: var(--brand-deep);
+      letter-spacing: .02em;
+    }
+    .note { color: var(--muted); font-size: 0.84rem; margin: 10px 0 0; font-weight: 500; }
+    .note.warn {
+      color: var(--warn-ink);
+      background: var(--warn-bg);
+      border: 1px solid #e6c76a;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+    .note.ok {
+      color: var(--ok-ink);
+      background: var(--ok-bg);
+      border: 1px solid #8fd4ae;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-weight: 700;
+    }
+    label.field {
+      display: grid; gap: 5px;
+      font-size: 0.8rem; color: var(--muted); font-weight: 700;
+      margin-bottom: 10px;
+    }
+    input, select, textarea, button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1.5px solid #9eb5a8;
+      background: #fff;
+      color: var(--ink);
+      padding: 11px 12px;
+    }
+    input::placeholder { color: #6f877b; opacity: 1; }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid rgba(31, 107, 69, 0.35);
+      border-color: var(--brand);
+    }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
+    button.primary {
+      border: 0;
+      background: linear-gradient(135deg, #1f6b45, #248655);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      padding: 13px 12px;
+      box-shadow: 0 2px 0 #145234;
+    }
+    button.primary:active { transform: translateY(1px); }
+    button.ghost {
+      border: 1.5px solid #9eb5a8;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 11px 12px;
+      font-weight: 700;
+    }
+    button.ghost.danger {
+      color: var(--expense);
+      border-color: #e0a19a;
+      background: #fff8f7;
+    }
+    .foot { margin-top: 18px; color: var(--muted); font-size: 0.78rem; line-height: 1.55; }
+    .muted { color: var(--muted); }
+
     .ledger-summary {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin: 0 0 12px;
-      padding: 12px;
-      border: 1px solid rgba(214, 176, 96, 0.3);
+    }
+    .ledger-summary > div {
+      background: var(--panel);
+      border: 1.5px solid #c7d7ce;
       border-radius: 14px;
-      background: linear-gradient(135deg, rgba(217,180,92,.1), transparent 55%), rgba(0,0,0,.28);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      min-width: 0;
     }
-    .ledger-summary-label { display: block; font-size: 0.7rem; color: #a7b4ac; margin-bottom: 2px; }
+    .ledger-summary > div.tile-balance {
+      border-color: #d2b15a;
+      background: linear-gradient(160deg, #fff9e9, #fff);
+    }
+    .ledger-summary-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 4px;
+      letter-spacing: .02em;
+    }
     .ledger-summary strong {
-      display: block; font-variant-numeric: tabular-nums;
-      font-size: clamp(0.85rem, 3.4vw, 1.05rem); word-break: break-all;
+      display: block;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(1.05rem, 4.2vw, 1.25rem);
+      color: var(--ink);
+      word-break: break-all;
+      font-weight: 800;
     }
-    .amt-in { color: #3cbf7e; }
-    .amt-out { color: #e88a8a; }
-    .amt-pos { color: #d9b45c; }
-    .amt-neg { color: #d45d5d; }
-    .note.warn { color: #f0d7a0; }
-    .note.ok { color: #7dcea0; font-weight: 600; }
+    .amt-in { color: var(--income) !important; }
+    .amt-out { color: var(--expense) !important; }
+    .amt-pos { color: var(--gold) !important; }
+    .amt-neg { color: var(--expense) !important; }
+
     .ledger-flash {
       margin: 0 0 12px;
-      padding: 10px 12px;
+      padding: 11px 12px;
       border-radius: 12px;
-      border: 1px solid rgba(60,191,126,.45);
-      background: rgba(60,191,126,.12);
-      color: #b8f0d0;
-      font-size: 0.88rem;
+      border: 1.5px solid var(--income-line);
+      background: var(--ok-bg);
+      color: var(--ok-ink);
+      font-size: 0.9rem;
+      font-weight: 700;
       display: none;
     }
     .ledger-flash.on { display: block; }
     .ledger-flash.err {
-      border-color: rgba(212,93,93,.45);
-      background: rgba(212,93,93,.12);
-      color: #f0b0b0;
+      border-color: #e0a19a;
+      background: var(--err-bg);
+      color: var(--err-ink);
     }
     .ledger-toolbar { display: flex; gap: 8px; align-items: end; margin-bottom: 10px; }
-    button.ghost {
-      border: 1px solid rgba(214,176,96,.3);
-      background: rgba(0,0,0,.25);
-      color: inherit;
-      cursor: pointer;
-      white-space: nowrap;
-      padding: 10px 12px;
-      border-radius: 10px;
-      font: inherit;
-    }
-    button.ghost.danger { color: #f0b0b0; border-color: rgba(212,93,93,.45); }
-    button.primary { cursor: pointer; }
     .ledger-list { display: grid; gap: 8px; }
     .ledger-row {
       display: flex; gap: 10px; justify-content: space-between; align-items: flex-start;
-      padding: 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 12px;
-      background: rgba(0,0,0,.22);
+      padding: 12px;
+      border: 1.5px solid #c7d7ce;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow);
     }
-    .ledger-row.new { outline: 1px solid rgba(60,191,126,.55); }
+    .ledger-row.new { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(31,107,69,.18); }
     .ledger-row-main { min-width: 0; flex: 1; }
-    .ledger-row-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 2px; }
-    .ledger-date { font-size: 0.74rem; color: #a7b4ac; font-variant-numeric: tabular-nums; }
+    .ledger-row-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
+    .ledger-date {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
     .ledger-type {
-      font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 999px;
       border: 1px solid transparent;
     }
-    .ledger-type.income { color: #3cbf7e; background: rgba(60,191,126,.12); border-color: rgba(60,191,126,.35); }
-    .ledger-type.expense { color: #e88a8a; background: rgba(212,93,93,.12); border-color: rgba(212,93,93,.35); }
-    .ledger-name { font-weight: 600; font-size: 0.95rem; }
-    .ledger-memo { color: #a7b4ac; font-size: 0.78rem; margin-top: 2px; }
+    .ledger-type.income {
+      color: var(--income);
+      background: var(--income-bg);
+      border-color: #8fd4ae;
+    }
+    .ledger-type.expense {
+      color: var(--expense);
+      background: var(--expense-bg);
+      border-color: var(--expense-line);
+    }
+    .ledger-name { font-weight: 800; font-size: 1rem; color: var(--ink); }
+    .ledger-memo { color: var(--muted); font-size: 0.8rem; margin-top: 3px; font-weight: 500; }
     .ledger-row-side { text-align: right; display: grid; gap: 6px; justify-items: end; }
-    .ledger-amount { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
-    @media (max-width: 560px) { .ledger-summary { grid-template-columns: 1fr 1fr; } }
+    .ledger-amount {
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.05rem;
+    }
+    #entryCount { color: var(--muted); font-size: .8rem; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -115,7 +295,7 @@
         <span class="ledger-summary-label">支出合計</span>
         <strong class="amt-out" id="sumExpense">¥0</strong>
       </div>
-      <div>
+      <div class="tile-balance">
         <span class="ledger-summary-label">残額</span>
         <strong id="sumBalance">—</strong>
       </div>
@@ -162,7 +342,7 @@
     </section>
 
     <section class="card" id="list">
-      <h2>3. 一覧 <span id="entryCount" class="muted" style="font-size:.8rem;font-weight:500"></span></h2>
+      <h2>3. 一覧 <span id="entryCount"></span></h2>
       <div class="ledger-toolbar">
         <label class="field" style="margin:0;flex:1">絞り込み
           <select id="filterType">
