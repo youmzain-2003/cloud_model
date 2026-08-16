@@ -93,3 +93,9 @@
 - 000–999 の予測EV幅: -146.1〜-72.5円/口
 - 候補リスト: `n3_candidates_low_crowd_filters.csv`
 
+## 追記: 予想仮説と¥1000運用
+的中追及に戻した続報。詳細は `PREDICTION_AXIS_REPORT.md`。
+- 昇格軸数: 0
+- ¥1000の帰無上限: 約5%/回（5ミニ）→ 2–3回に1回は予算不足
+- ポートフォリオ要約: `n3_budget1000_portfolio_summary.csv`
+
