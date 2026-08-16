@@ -86,3 +86,10 @@
 4. 公式データが取れる環境ではミラー異常区間を再照合
 
 詳細JSON: `reports/analysis_summary.json`
+
+## 追記: ペイアウト条件付きEV
+番号予測から転換した続報。詳細は `PAYOUT_EV_REPORT.md` / `payout_ev_summary.json`。
+- 予測単価モデル corr(pred,actual prize)=0.479
+- 000–999 の予測EV幅: -146.1〜-72.5円/口
+- 候補リスト: `n3_candidates_low_crowd_filters.csv`
+

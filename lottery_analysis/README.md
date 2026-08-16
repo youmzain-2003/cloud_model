@@ -18,10 +18,14 @@ pip install -r requirements.txt
 python scripts/fetch_data.py
 python scripts/clean_data.py
 python scripts/analyze.py
+python scripts/payout_ev.py
 ```
 
 成果物は `data/` と `reports/` に出力されます。
 
+- 番号予測の棄却結果: `reports/REPORT.md`
+- ペイアウト条件付きEV: `reports/PAYOUT_EV_REPORT.md`
+- 候補買い目: `reports/n3_candidates_low_crowd_filters.csv`
 ## 検証の枠組み
 
 1. 帰無仮説: IID一様乱数
