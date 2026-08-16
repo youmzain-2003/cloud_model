@@ -56,3 +56,8 @@
 - `reports/prediction_axis_summary.json`
 - `reports/PREDICTION_AXIS_REPORT.md`
 
+## 追記: トップ5先読みの網羅検証
+詳細は `FORESIGHT_EXHAUSTIVE_REPORT.md`。
+- 最良 raw: cold_freq rate=0.0585 (null=0.05, p_Holm=0.3289)
+- Holm後の昇格軸: 0 件
+

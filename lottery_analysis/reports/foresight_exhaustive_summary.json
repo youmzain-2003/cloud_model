@@ -1,0 +1,339 @@
+{
+  "question": "Have we done everything? Is foresight impossible?",
+  "answer_short": "Not literally every method, but the ¥1000/5-mini metric (top-5 last2 hit-rate) was tested across frequency/recency/Markov/calendar/ensemble/ML. None survive Holm correction above the 5% null.",
+  "primary_metric": "P(true last2 in predicted top-5); null=0.05",
+  "previously_missing_now_covered": [
+    "last2 top-5 ranking as primary metric (matches ¥1000=5 minis)",
+    "exponential recency weighting",
+    "100-state last2 Markov",
+    "independent digit Markov product",
+    "weekday/month conditional frequencies",
+    "slide neighborhood scoring",
+    "parity-conditioned transitions",
+    "multi-lag exact-repeat tests",
+    "ensemble rank aggregation",
+    "ML 100-class RF/LogReg walk-forward top-5",
+    "Holm multiple-testing adjustment across methods",
+    "holdout entropy by weekday / parity runs"
+  ],
+  "still_not_covered_examples": [
+    "deep nets / transformers on raw sequences",
+    "Bayesian hierarchical time-varying models",
+    "external covariates (sales, weather) — not in draw tables",
+    "official RNG / physical bias audit",
+    "unpreregistered search over millions of formulas (false-positive factory)"
+  ],
+  "top5_methods_ranked": [
+    {
+      "method": "cold_freq",
+      "k": 5,
+      "hits": 164,
+      "n": 2803,
+      "top_k_hit_rate": 0.0585087406350338,
+      "null_rate": 0.05,
+      "lift": 0.0085087406350338,
+      "p_value": 0.023491607917725,
+      "p_holm": 0.3288825108481505,
+      "beat_null_raw_p05": true,
+      "promoted_axis": false
+    },
+    {
+      "method": "recency_hl15",
+      "k": 5,
+      "hits": 149,
+      "n": 2803,
+      "top_k_hit_rate": 0.05315733143061,
+      "null_rate": 0.05,
+      "lift": 0.00315733143061,
+      "p_value": 0.2327324687068644,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "recency_hl40",
+      "k": 5,
+      "hits": 149,
+      "n": 2803,
+      "top_k_hit_rate": 0.05315733143061,
+      "null_rate": 0.05,
+      "lift": 0.00315733143061,
+      "p_value": 0.2327324687068644,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "slide_neighborhood",
+      "k": 5,
+      "hits": 148,
+      "n": 2803,
+      "top_k_hit_rate": 0.0528005708169818,
+      "null_rate": 0.05,
+      "lift": 0.0028005708169818,
+      "p_value": 0.2595574905059288,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "uniform",
+      "k": 5,
+      "hits": 145,
+      "n": 2803,
+      "top_k_hit_rate": 0.051730288976097,
+      "null_rate": 0.05,
+      "lift": 0.001730288976097,
+      "p_value": 0.3489695492203369,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "digit_markov_product",
+      "k": 5,
+      "hits": 140,
+      "n": 2803,
+      "top_k_hit_rate": 0.0499464859079557,
+      "null_rate": 0.05,
+      "lift": -5.351409204423785e-05,
+      "p_value": 0.5172890880490908,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "ml_rf_topk",
+      "k": 5,
+      "hits": 140,
+      "n": 2803,
+      "top_k_hit_rate": 0.0499464859079557,
+      "null_rate": 0.05,
+      "lift": -5.351409204423785e-05,
+      "p_value": 0.5172890880490908,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "empirical_freq",
+      "k": 5,
+      "hits": 139,
+      "n": 2803,
+      "top_k_hit_rate": 0.0495897252943275,
+      "null_rate": 0.05,
+      "lift": -0.0004102747056724,
+      "p_value": 0.5518053323559129,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "parity_cond_trans",
+      "k": 5,
+      "hits": 139,
+      "n": 2803,
+      "top_k_hit_rate": 0.0495897252943275,
+      "null_rate": 0.05,
+      "lift": -0.0004102747056724,
+      "p_value": 0.5518053323559129,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "ml_logreg_topk",
+      "k": 5,
+      "hits": 138,
+      "n": 2803,
+      "top_k_hit_rate": 0.0492329646806992,
+      "null_rate": 0.05,
+      "lift": -0.0007670353193007,
+      "p_value": 0.5860107361886784,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "ensemble_rank_avg",
+      "k": 5,
+      "hits": 136,
+      "n": 2803,
+      "top_k_hit_rate": 0.0485194434534427,
+      "null_rate": 0.05,
+      "lift": -0.0014805565465572,
+      "p_value": 0.6524852032076998,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "weekday_freq",
+      "k": 5,
+      "hits": 132,
+      "n": 2803,
+      "top_k_hit_rate": 0.0470924009989297,
+      "null_rate": 0.05,
+      "lift": -0.0029075990010702,
+      "p_value": 0.7715575961904249,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "month_freq",
+      "k": 5,
+      "hits": 131,
+      "n": 2803,
+      "top_k_hit_rate": 0.0467356403853014,
+      "null_rate": 0.05,
+      "lift": -0.0032643596146985,
+      "p_value": 0.7974357605437157,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    },
+    {
+      "method": "markov_last2",
+      "k": 5,
+      "hits": 129,
+      "n": 2803,
+      "top_k_hit_rate": 0.0460221191580449,
+      "null_rate": 0.05,
+      "lift": -0.003977880841955,
+      "p_value": 0.8437910141702532,
+      "p_holm": 1.0,
+      "beat_null_raw_p05": false,
+      "promoted_axis": false
+    }
+  ],
+  "promoted_axes_after_holm": [],
+  "best_raw_method": {
+    "method": "cold_freq",
+    "k": 5,
+    "hits": 164,
+    "n": 2803,
+    "top_k_hit_rate": 0.0585087406350338,
+    "null_rate": 0.05,
+    "lift": 0.0085087406350338,
+    "p_value": 0.023491607917725,
+    "p_holm": 0.3288825108481505,
+    "beat_null_raw_p05": true,
+    "promoted_axis": false
+  },
+  "lag_tests": [
+    {
+      "test": "last2_equal_lag1",
+      "rate": 0.009989297181591153,
+      "null": 0.01,
+      "lift": -1.0702818408847223e-05,
+      "p_value": 0.5277784041569532,
+      "n": 2803,
+      "hits": 28
+    },
+    {
+      "test": "last2_equal_lag2",
+      "rate": 0.013200142704245452,
+      "null": 0.01,
+      "lift": 0.0032001427042454515,
+      "p_value": 0.05866242347013373,
+      "n": 2803,
+      "hits": 37
+    },
+    {
+      "test": "last2_equal_lag3",
+      "rate": 0.0067784516589368534,
+      "null": 0.01,
+      "lift": -0.0032215483410631468,
+      "p_value": 0.9709619260742633,
+      "n": 2803,
+      "hits": 19
+    },
+    {
+      "test": "last2_equal_lag5",
+      "rate": 0.013200142704245452,
+      "null": 0.01,
+      "lift": 0.0032001427042454515,
+      "p_value": 0.05866242347013373,
+      "n": 2803,
+      "hits": 37
+    },
+    {
+      "test": "last2_equal_lag10",
+      "rate": 0.012486621476988941,
+      "null": 0.01,
+      "lift": 0.002486621476988941,
+      "p_value": 0.1120977237906334,
+      "n": 2803,
+      "hits": 35
+    },
+    {
+      "test": "last2_equal_lag15",
+      "rate": 0.009632536567962896,
+      "null": 0.01,
+      "lift": -0.0003674634320371042,
+      "p_value": 0.6032155425800996,
+      "n": 2803,
+      "hits": 27
+    },
+    {
+      "test": "last2_equal_lag20",
+      "rate": 0.00784873349982162,
+      "null": 0.01,
+      "lift": -0.0021512665001783803,
+      "p_value": 0.8961703361834943,
+      "n": 2803,
+      "hits": 22
+    },
+    {
+      "test": "last2_equal_lag25",
+      "rate": 0.006421691045308598,
+      "null": 0.01,
+      "lift": -0.003578308954691402,
+      "p_value": 0.9827416879867901,
+      "n": 2803,
+      "hits": 18
+    },
+    {
+      "test": "last2_equal_lag50",
+      "rate": 0.008205494113449875,
+      "null": 0.01,
+      "lift": -0.001794505886550125,
+      "p_value": 0.854239364689351,
+      "n": 2803,
+      "hits": 23
+    },
+    {
+      "test": "d100_equal_lag1",
+      "rate": 0.10524438102033536,
+      "null": 0.1,
+      "lift": 0.005244381020335351,
+      "p_value": 0.1851848926453802,
+      "n": 2803,
+      "hits": 295
+    },
+    {
+      "test": "d10_equal_lag1",
+      "rate": 0.0984659293613985,
+      "null": 0.1,
+      "lift": -0.0015340706386015035,
+      "p_value": 0.6158323085341133,
+      "n": 2803,
+      "hits": 276
+    },
+    {
+      "test": "d1_equal_lag1",
+      "rate": 0.10346057795219407,
+      "null": 0.1,
+      "lift": 0.003460577952194066,
+      "p_value": 0.2793413629626036,
+      "n": 2803,
+      "hits": 290
+    }
+  ],
+  "interpretation": {
+    "can_always_make_a_forecast": true,
+    "can_beat_chance_for_budget_goal": false,
+    "why_patterns_feel_real": "In-sample motifs look structured; walk-forward top-5 collapses to ~5%."
+  }
+}
