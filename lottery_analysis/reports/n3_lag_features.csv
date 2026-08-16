@@ -1,0 +1,5 @@
+feature,rate,null
+exact_repeat,0.001284796573875803,0.001
+same_digit_same_pos_avg,0.10102307875327146,0.1
+any_shared_digit_multiset,0.6107066381156316,0.61
+any_pos_slide_pm1,0.45067808708065665,0.44765

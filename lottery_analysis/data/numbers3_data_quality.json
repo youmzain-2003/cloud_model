@@ -1,0 +1,43 @@
+{
+  "raw_rows": 7049,
+  "cleaned_rows": 7006,
+  "dropped_streak_continuations_note": "Length-2 repeats retained unless payout fields are identical (mirror duplicate). Streaks with length>=3 removed entirely.",
+  "long_streak_groups_removed": 4,
+  "long_streak_rows_removed": 20,
+  "duplicate_mirror_rows_removed": 8,
+  "duplicate_date_rows_raw": 32,
+  "long_streaks": [
+    {
+      "number": "361",
+      "len": 3,
+      "draw_from": 5280,
+      "draw_to": 5282,
+      "date_from": "2019-10-07",
+      "date_to": "2019-10-09"
+    },
+    {
+      "number": "808",
+      "len": 4,
+      "draw_from": 5287,
+      "draw_to": 5290,
+      "date_from": "2019-10-16",
+      "date_to": "2019-10-21"
+    },
+    {
+      "number": "178",
+      "len": 3,
+      "draw_from": 5440,
+      "draw_to": 5442,
+      "date_from": "2020-05-22",
+      "date_to": "2020-05-26"
+    },
+    {
+      "number": "458",
+      "len": 10,
+      "draw_from": 5546,
+      "draw_to": 5555,
+      "date_from": "2020-10-19",
+      "date_to": "2020-10-30"
+    }
+  ]
+}

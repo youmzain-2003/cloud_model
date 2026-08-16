@@ -1,0 +1,510 @@
+{
+  "meta": {
+    "numbers3_draws_raw": 7049,
+    "numbers3_draws_clean": 7006,
+    "numbers3_date_range_clean": [
+      "1994-10-07",
+      "2026-08-14"
+    ],
+    "bingo5_draws": 483,
+    "bingo5_date_range": [
+      "2017-04-05",
+      "2026-08-12"
+    ],
+    "sources": {
+      "numbers3": "https://numbers-renban.tokyo/numbers3/result_all",
+      "bingo5": "https://bingo5.money-plan.net/history/",
+      "mizuho_blocked": true
+    },
+    "data_quality": {
+      "raw_rows": 7049,
+      "cleaned_rows": 7006,
+      "dropped_streak_continuations_note": "Length-2 repeats retained unless payout fields are identical (mirror duplicate). Streaks with length>=3 removed entirely.",
+      "long_streak_groups_removed": 4,
+      "long_streak_rows_removed": 20,
+      "duplicate_mirror_rows_removed": 8,
+      "duplicate_date_rows_raw": 32,
+      "long_streaks": [
+        {
+          "number": "361",
+          "len": 3,
+          "draw_from": 5280,
+          "draw_to": 5282,
+          "date_from": "2019-10-07",
+          "date_to": "2019-10-09"
+        },
+        {
+          "number": "808",
+          "len": 4,
+          "draw_from": 5287,
+          "draw_to": 5290,
+          "date_from": "2019-10-16",
+          "date_to": "2019-10-21"
+        },
+        {
+          "number": "178",
+          "len": 3,
+          "draw_from": 5440,
+          "draw_to": 5442,
+          "date_from": "2020-05-22",
+          "date_to": "2020-05-26"
+        },
+        {
+          "number": "458",
+          "len": 10,
+          "draw_from": 5546,
+          "draw_to": 5555,
+          "date_from": "2020-10-19",
+          "date_to": "2020-10-30"
+        }
+      ]
+    },
+    "stake_yen": {
+      "numbers3": 200,
+      "bingo5": 200
+    }
+  },
+  "numbers3_randomness_tests": [
+    {
+      "name": "N3 chi2 uniform hundreds",
+      "metric": "chi2",
+      "value": 12.438481301741364,
+      "p_value": 0.1897029312075969,
+      "note": "Reject H0 if p<<0.05 (digit not uniform).",
+      "predictive": false
+    },
+    {
+      "name": "N3 chi2 uniform tens",
+      "metric": "chi2",
+      "value": 7.1601484441906935,
+      "p_value": 0.6204498196313629,
+      "note": "Reject H0 if p<<0.05 (digit not uniform).",
+      "predictive": false
+    },
+    {
+      "name": "N3 chi2 uniform ones",
+      "metric": "chi2",
+      "value": 6.8604053668284335,
+      "p_value": 0.6516505638447172,
+      "note": "Reject H0 if p<<0.05 (digit not uniform).",
+      "predictive": false
+    },
+    {
+      "name": "N3 runs-test sum parity",
+      "metric": "z",
+      "value": -0.16612171659448113,
+      "p_value": 0.8680611642342746,
+      "note": "Serial dependence in odd/even of digit-sum.",
+      "predictive": false
+    },
+    {
+      "name": "N3 empirical number entropy (bits)",
+      "metric": "entropy",
+      "value": 9.858335172060295,
+      "p_value": null,
+      "note": "Max entropy for observed support size 999 ≈ 9.964; full 1000-space max=9.966.",
+      "predictive": false
+    }
+  ],
+  "numbers3_lag_vs_null_clean": [
+    {
+      "feature": "exact_repeat",
+      "rate": 0.001284796573875803,
+      "null": 0.001
+    },
+    {
+      "feature": "same_digit_same_pos_avg",
+      "rate": 0.10102307875327146,
+      "null": 0.1
+    },
+    {
+      "feature": "any_shared_digit_multiset",
+      "rate": 0.6107066381156316,
+      "null": 0.61
+    },
+    {
+      "feature": "any_pos_slide_pm1",
+      "rate": 0.45067808708065665,
+      "null": 0.44765
+    }
+  ],
+  "numbers3_lag_vs_null_raw": [
+    {
+      "feature": "exact_repeat",
+      "rate": 0.004682179341657208,
+      "null": 0.001
+    },
+    {
+      "feature": "same_digit_same_pos_avg",
+      "rate": 0.10428490351872871,
+      "null": 0.1
+    },
+    {
+      "feature": "any_shared_digit_multiset",
+      "rate": 0.6126560726447219,
+      "null": 0.61
+    },
+    {
+      "feature": "any_pos_slide_pm1",
+      "rate": 0.44934733257661746,
+      "null": 0.44765
+    }
+  ],
+  "numbers3_markov": {
+    "d100": {
+      "mutual_information_bits": 0.0084675351605565,
+      "walkforward_next_digit_acc": 0.09843400447427293,
+      "uniform_baseline_acc": 0.1,
+      "lift_vs_uniform": -0.0015659955257270736
+    },
+    "d10": {
+      "mutual_information_bits": 0.009033365254616729,
+      "walkforward_next_digit_acc": 0.09947800149142431,
+      "uniform_baseline_acc": 0.1,
+      "lift_vs_uniform": -0.0005219985085756912
+    },
+    "d1": {
+      "mutual_information_bits": 0.00780509491097922,
+      "walkforward_next_digit_acc": 0.10156599552572707,
+      "uniform_baseline_acc": 0.1,
+      "lift_vs_uniform": 0.0015659955257270597
+    }
+  },
+  "numbers3_ml_walkforward": {
+    "logreg": {
+      "cv_accuracy_mean": 0.09365351629502573,
+      "cv_accuracy_std": 0.003926423033365213,
+      "cv_logloss_mean": 2.3614653796463427,
+      "uniform_accuracy": 0.1,
+      "uniform_logloss": 2.3025850929940455
+    },
+    "rf": {
+      "cv_accuracy_mean": 0.10034305317324185,
+      "cv_accuracy_std": 0.006598759540882106,
+      "cv_logloss_mean": 2.310438282890771,
+      "uniform_accuracy": 0.1,
+      "uniform_logloss": 2.3025850929940455,
+      "top_features": [
+        {
+          "feature": "lag1_sum",
+          "importance": 0.05908353920739905
+        },
+        {
+          "feature": "lag4_o",
+          "importance": 0.045136516167590575
+        },
+        {
+          "feature": "lag2_o",
+          "importance": 0.04178504079624133
+        },
+        {
+          "feature": "lag3_t",
+          "importance": 0.041716968679987004
+        },
+        {
+          "feature": "lag2_h",
+          "importance": 0.04158079485954306
+        },
+        {
+          "feature": "lag2_t",
+          "importance": 0.03998994214803394
+        },
+        {
+          "feature": "lag1_h",
+          "importance": 0.03885680590089652
+        },
+        {
+          "feature": "lag4_t",
+          "importance": 0.038713378594720974
+        },
+        {
+          "feature": "lag5_t",
+          "importance": 0.038010654184916004
+        },
+        {
+          "feature": "lag3_o",
+          "importance": 0.036920119535744964
+        },
+        {
+          "feature": "roll20_h_freq_8",
+          "importance": 0.03667102119510253
+        },
+        {
+          "feature": "lag5_h",
+          "importance": 0.036429846566342586
+        }
+      ]
+    }
+  },
+  "numbers3_strategy_backtest_clean": [
+    {
+      "strategy": "repeat_prev",
+      "holdout_draws": 2803,
+      "straight_hits": 5,
+      "hit_rate": 0.0017838030681412772,
+      "null_hit_rate": 0.001,
+      "spent_yen": 560600,
+      "won_yen": 480500.0,
+      "roi": -0.14288262575811628,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "random",
+      "holdout_draws": 2803,
+      "straight_hits": 5,
+      "hit_rate": 0.0017838030681412772,
+      "null_hit_rate": 0.001,
+      "spent_yen": 560600,
+      "won_yen": 428600.0,
+      "roi": -0.23546200499464864,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "hot_digits_W50",
+      "holdout_draws": 2803,
+      "straight_hits": 5,
+      "hit_rate": 0.0017838030681412772,
+      "null_hit_rate": 0.001,
+      "spent_yen": 560600,
+      "won_yen": 391000.0,
+      "roi": -0.30253300035676056,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "cold_digits_W50",
+      "holdout_draws": 2803,
+      "straight_hits": 4,
+      "hit_rate": 0.0014270424545130217,
+      "null_hit_rate": 0.001,
+      "spent_yen": 560600,
+      "won_yen": 386400.0,
+      "roi": -0.3107384944702105,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "slide_plus1",
+      "holdout_draws": 2803,
+      "straight_hits": 3,
+      "hit_rate": 0.0010702818408847663,
+      "null_hit_rate": 0.001,
+      "spent_yen": 560600,
+      "won_yen": 228900.0,
+      "roi": -0.5916874777024617,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "unseen_in_last500",
+      "holdout_draws": 2803,
+      "straight_hits": 2,
+      "hit_rate": 0.0007135212272565109,
+      "null_hit_rate": 0.001,
+      "spent_yen": 560600,
+      "won_yen": 175400.0,
+      "roi": -0.68712094184802,
+      "avg_prize_if_theory": 90000
+    }
+  ],
+  "numbers3_strategy_backtest_raw": [
+    {
+      "strategy": "repeat_prev",
+      "holdout_draws": 2820,
+      "straight_hits": 29,
+      "hit_rate": 0.01028368794326241,
+      "null_hit_rate": 0.001,
+      "spent_yen": 564000,
+      "won_yen": 2600600.0,
+      "roi": 3.6109929078014185,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "hot_digits_W50",
+      "holdout_draws": 2820,
+      "straight_hits": 7,
+      "hit_rate": 0.0024822695035460994,
+      "null_hit_rate": 0.001,
+      "spent_yen": 564000,
+      "won_yen": 579200.0,
+      "roi": 0.026950354609929006,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "unseen_in_last500",
+      "holdout_draws": 2820,
+      "straight_hits": 4,
+      "hit_rate": 0.0014184397163120568,
+      "null_hit_rate": 0.001,
+      "spent_yen": 564000,
+      "won_yen": 345900.0,
+      "roi": -0.38670212765957446,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "cold_digits_W50",
+      "holdout_draws": 2820,
+      "straight_hits": 3,
+      "hit_rate": 0.0010638297872340426,
+      "null_hit_rate": 0.001,
+      "spent_yen": 564000,
+      "won_yen": 279600.0,
+      "roi": -0.5042553191489362,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "slide_plus1",
+      "holdout_draws": 2820,
+      "straight_hits": 3,
+      "hit_rate": 0.0010638297872340426,
+      "null_hit_rate": 0.001,
+      "spent_yen": 564000,
+      "won_yen": 228900.0,
+      "roi": -0.5941489361702128,
+      "avg_prize_if_theory": 90000
+    },
+    {
+      "strategy": "random",
+      "holdout_draws": 2820,
+      "straight_hits": 1,
+      "hit_rate": 0.0003546099290780142,
+      "null_hit_rate": 0.001,
+      "spent_yen": 564000,
+      "won_yen": 115400.0,
+      "roi": -0.7953900709219859,
+      "avg_prize_if_theory": 90000
+    }
+  ],
+  "numbers3_box_and_payout": {
+    "all_diff": {
+      "count": 5028,
+      "share": 0.717670568084499,
+      "avg_straight_prize": 91255.07159904535,
+      "median_straight_prize": 90800.0,
+      "avg_winners": 121.76890092529904
+    },
+    "double": {
+      "count": 1923,
+      "share": 0.27447901798458463,
+      "avg_straight_prize": 101268.74674987,
+      "median_straight_prize": 100600.0,
+      "avg_winners": 124.53223915592028
+    },
+    "triple": {
+      "count": 55,
+      "share": 0.007850413930916357,
+      "avg_straight_prize": 73487.27272727272,
+      "median_straight_prize": 69600.0,
+      "avg_winners": 573.4565217391304
+    },
+    "_null_shares": {
+      "triple": 0.01,
+      "double": 0.27,
+      "all_diff": 0.72
+    },
+    "_payout_refs_yen_per_200": {
+      "straight_theory": 90000,
+      "box_6way_theory": 15000,
+      "mini_theory": 900,
+      "stake": 200,
+      "straight_theory_ev_ratio": 0.45
+    }
+  },
+  "numbers3_winners_vs_prize_corr": -0.542422635288481,
+  "bingo5": {
+    "draws": 483,
+    "structure": "one number from each of 8 bands of 5 (bingo card columns/rows)",
+    "band_uniform_chi2": [
+      {
+        "band": "1-5",
+        "chi2": 3.5734989648033126,
+        "p_value": 0.4667910154562446
+      },
+      {
+        "band": "6-10",
+        "chi2": 3.221532091097308,
+        "p_value": 0.5214601804608623
+      },
+      {
+        "band": "11-15",
+        "chi2": 2.20703933747412,
+        "p_value": 0.6977407285790403
+      },
+      {
+        "band": "16-20",
+        "chi2": 2.1242236024844723,
+        "p_value": 0.712923471583996
+      },
+      {
+        "band": "21-25",
+        "chi2": 3.6563146997929605,
+        "p_value": 0.4545115453312234
+      },
+      {
+        "band": "26-30",
+        "chi2": 2.6625258799171845,
+        "p_value": 0.6157878433536872
+      },
+      {
+        "band": "31-35",
+        "chi2": 11.792960662525882,
+        "p_value": 0.018959139907326797
+      },
+      {
+        "band": "36-40",
+        "chi2": 7.093167701863355,
+        "p_value": 0.13104589128755686
+      }
+    ],
+    "overlap_with_prev": {
+      "mean": 1.7053941908713692,
+      "null_mean_band_aware": 1.6038,
+      "std": 1.1703157490597886,
+      "null_std_band_aware": 1.1316914597185932
+    },
+    "consecutive_pairs_per_draw": {
+      "mean": 0.3064182194616977,
+      "null_mean_band_aware": 0.28085
+    },
+    "hot_W30_vs_random_overlap_band_aware": {
+      "hot_mean_overlap": 1.596026490066225,
+      "random_mean_overlap": 1.6313465783664458,
+      "note": "Overlap with next winning set (0-8), not prize EV."
+    },
+    "first_prize_yen": {
+      "mean": 7914112.215320911,
+      "median": 6252400.0,
+      "min": 0.0,
+      "max": 26436700.0
+    },
+    "first_winners": {
+      "mean": 3.399585921325052,
+      "median": 3.0
+    },
+    "stake_yen": 200,
+    "payout_note": "Bingo5 1st prize is pari-mutuel: more winners => lower yen. Avoiding popular cards can raise conditional payout, not hit probability."
+  },
+  "cross_n3_bingo5": {
+    "paired_same_date_rows": 473,
+    "pearson_sum_r": -0.001461437562185277,
+    "pearson_sum_p": 0.9747112266835897,
+    "n3_ones_in_bingo_mod10_rate": 0.5750528541226215,
+    "null_rate_sim": 0.5692
+  },
+  "verdict": {
+    "prediction_edge_found": false,
+    "criteria": "Edge requires holdout hit-rate or ROI statistically above random baseline after data-quality controls and multiple-testing.",
+    "key_findings": [
+      "Mirror data contains multi-day identical-number streaks and duplicate payout rows; raw repeat-prev backtests are invalid.",
+      "After removing long streaks and identical-payout duplicates, residual exact-repeats approach the null rate.",
+      "On cleaned Numbers3, digit marginals pass uniformity; lag lifts collapse near null.",
+      "ML digit prediction stays at chance (~10%).",
+      "Straight winners and prize are negatively correlated (sales/crowding effect on payout).",
+      "Bingo5 is band-structured (8x choose-1-of-5); band-aware nulls match overlaps/consecutives.",
+      "Same-day N3↔Bingo5 linkage is absent."
+    ],
+    "actionable_for_prediction_pipeline": [
+      "Treat indicator discovery as hypothesis testing with walk-forward ROI/logloss gates.",
+      "Optimize payout-conditioned objectives (avoid crowded numbers) separately from hit-probability.",
+      "Keep Numbers3 as high-frequency sandbox; Bingo5 for weekly variance/payout study.",
+      "Re-validate any mirror anomaly against official Mizuho results before claiming signal."
+    ]
+  }
+}
