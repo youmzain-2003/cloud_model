@@ -61,3 +61,9 @@
 - 最良 raw: cold_freq rate=0.0585 (null=0.05, p_Holm=0.3289)
 - Holm後の昇格軸: 0 件
 
+## 追記: ミニ/スト/ボ関係性探査
+詳細は `RELATION_MINE_REPORT.md`。
+- 先読み的中は偶然寄り／構造関係は存在
+- 条件付きルール holdout残存: 5 件
+- k-of-n holdout残存: 1 件
+

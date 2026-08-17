@@ -1,0 +1,251 @@
+{
+  "chance_status": {
+    "mini_straight_box_forecasting": "For picking tomorrow's winning tickets, current evidence stays near chance at each type's odds (mini 1/100, box ~6/1000, straight 1/1000).",
+    "but_structure_exists": "Draws have stable compositional structure (box-class mix, digit-sum shape, etc.). That is lawfulness of the GENERATOR's uniform design — not a forecasting edge by itself."
+  },
+  "baselines": {
+    "draws": 7006,
+    "empirical_box_class_share": {
+      "all_diff": 0.717670568084499,
+      "double": 0.27447901798458463,
+      "triple": 0.007850413930916357
+    },
+    "null_box_class_share": {
+      "all_diff": 0.72,
+      "double": 0.27,
+      "triple": 0.01
+    },
+    "single_ticket_hit_p_null": {
+      "mini_one_last2": 0.01,
+      "straight_one_number": 0.001,
+      "box_one_all_diff": 0.006,
+      "box_one_double": 0.003
+    },
+    "note": "Without a forecasting edge, Mini/Straight/Box outcomes are chance at their respective odds. Relations below are about STRUCTURE of draws, not automatic beatable edges."
+  },
+  "bet_type_map": {
+    "mini": {
+      "depends_on": "last2 only (10s+1s)",
+      "empirical_last2_entropy_bits": 6.636557786622095,
+      "max_entropy": 6.643856189774724,
+      "relation_to_straight": "shares tens/ones; hundreds independent if MI~0",
+      "relation_to_box": "box cares about multiset of all 3 digits; mini ignores hundreds and order beyond last2 order"
+    },
+    "straight": {
+      "depends_on": "exact 3-digit string",
+      "hardest": true
+    },
+    "box": {
+      "depends_on": "multiset of 3 digits",
+      "empirical_class_share": {
+        "all_diff": 0.717670568084499,
+        "double": 0.27447901798458463,
+        "triple": 0.007850413930916357
+      },
+      "note": "all_diff ≈72% of draws; box tickets on doubles pay differently"
+    }
+  },
+  "cross_type": {
+    "mi_last2_vs_d100_bits": 0.09885326489620919,
+    "mi_note": "0 means mini-relevant last2 independent of hundreds (straight-only digit)",
+    "p_consec_given_box_class": {
+      "0": {
+        "all_diff": 0.4747414478918059,
+        "double": 0.8055122204888195,
+        "triple": 1.0
+      },
+      "1": {
+        "all_diff": 0.5252585521081942,
+        "double": 0.19448777951118046,
+        "triple": 0.0
+      }
+    },
+    "box_class_transition": {
+      "double": {
+        "double": 0.2823712948517941,
+        "all_diff": 0.7119084763390535,
+        "triple": 0.005720228809152366
+      },
+      "all_diff": {
+        "all_diff": 0.7207081758504078,
+        "double": 0.2705390889198329,
+        "triple": 0.0087527352297593
+      },
+      "triple": {
+        "all_diff": 0.6545454545454545,
+        "double": 0.34545454545454546
+      }
+    },
+    "box_class_marginal": {
+      "all_diff": 0.717670568084499,
+      "double": 0.27447901798458463,
+      "triple": 0.007850413930916357
+    },
+    "last2_reappearance_gap": {
+      "median": 69.0,
+      "mean": 98.62887344338256,
+      "p_gap_le_5": 0.04648132059079062,
+      "null_geo_p_gap_le_5": 0.04900995010000009,
+      "note": "For a fixed last2, null P(return within 5 draws)≈1-0.99^5≈0.049"
+    },
+    "last2_seen_in_prev5": {
+      "rate": 0.04585059277246108,
+      "null": 0.04900995010000009,
+      "lift": -0.0031593573275390113,
+      "p_value": 0.23384650880187213,
+      "mini_implication": "If elevated, recent last2s are slightly better mini candidates than average (still must pass walk-forward)."
+    }
+  },
+  "strong_descriptive_rules_head": [
+    {
+      "rule": "prev_sum_le_9 => next_sum_gt_prev",
+      "support": 1519,
+      "hits": 1314,
+      "rate": 0.8650427913100724,
+      "base_rate": 0.4716630977872948,
+      "lift": 0.39337969352277763,
+      "lift_ratio": 1.8340268623265912,
+      "p_value": 1.32742674584677e-226
+    },
+    {
+      "rule": "prev_sum_ge_18 => next_sum_gt_prev",
+      "support": 1532,
+      "hits": 137,
+      "rate": 0.08942558746736293,
+      "base_rate": 0.4716630977872948,
+      "lift": -0.3822375103199319,
+      "lift_ratio": 0.1895963196758103,
+      "p_value": 6.81223075818403e-233
+    },
+    {
+      "rule": "prev_has_zero => next_sum_gt_prev",
+      "support": 1909,
+      "hits": 1347,
+      "rate": 0.7056050288108957,
+      "base_rate": 0.4716630977872948,
+      "lift": 0.2339419310236009,
+      "lift_ratio": 1.4959937127180158,
+      "p_value": 7.93347577033689e-95
+    },
+    {
+      "rule": "prev_double => next_shares_digit_with_prev",
+      "support": 1923,
+      "hits": 934,
+      "rate": 0.48569942797711907,
+      "base_rate": 0.6107066381156316,
+      "lift": -0.12500721013851257,
+      "lift_ratio": 0.7953072681112013,
+      "p_value": 1.6587765213055754e-28
+    },
+    {
+      "rule": "prev_all_diff => next_shares_digit_with_prev",
+      "support": 5027,
+      "hits": 3327,
+      "rate": 0.6618261388502089,
+      "base_rate": 0.6107066381156316,
+      "lift": 0.05111950073457727,
+      "lift_ratio": 1.0837054938395778,
+      "p_value": 7.182017614373557e-14
+    },
+    {
+      "rule": "prev_sum_le_9 => next_shares_digit_with_prev",
+      "support": 1519,
+      "hits": 887,
+      "rate": 0.5839368005266623,
+      "base_rate": 0.6107066381156316,
+      "lift": -0.026769837588969336,
+      "lift_ratio": 0.9561657988988476,
+      "p_value": 0.03307387487971739
+    },
+    {
+      "rule": "prev_double => next_sum_gt_prev",
+      "support": 1923,
+      "hits": 952,
+      "rate": 0.4950598023920957,
+      "base_rate": 0.4716630977872948,
+      "lift": 0.023396704604800866,
+      "lift_ratio": 1.0496046960522487,
+      "p_value": 0.042042685946995575
+    },
+    {
+      "rule": "prev_has_consec => next_shares_digit_with_prev",
+      "support": 3015,
+      "hits": 1907,
+      "rate": 0.6325041459369818,
+      "base_rate": 0.6107066381156316,
+      "lift": 0.02179750782135015,
+      "lift_ratio": 1.0356922726247213,
+      "p_value": 0.014412991375846285
+    },
+    {
+      "rule": "prev_sum_ge_18 => next_has_consec",
+      "support": 1532,
+      "hits": 692,
+      "rate": 0.4516971279373368,
+      "base_rate": 0.430406852248394,
+      "lift": 0.021290275688942817,
+      "lift_ratio": 1.0494654664016732,
+      "p_value": 0.09357157428044335
+    }
+  ],
+  "holdout_surviving_conditional_rules": [
+    {
+      "rule": "prev_sum_le_9 => next_sum_gt_prev",
+      "holdout_support": 628,
+      "holdout_rate": 0.8757961783439491,
+      "holdout_base": 0.4741348555119515,
+      "holdout_lift": 0.40166132283199757,
+      "holdout_p": 2.2140870523317033e-99,
+      "survives_p05": true
+    },
+    {
+      "rule": "prev_sum_ge_18 => next_sum_gt_prev",
+      "holdout_support": 581,
+      "holdout_rate": 0.09122203098106713,
+      "holdout_base": 0.4741348555119515,
+      "holdout_lift": -0.3829128245308844,
+      "holdout_p": 2.7752805836113854e-89,
+      "survives_p05": true
+    },
+    {
+      "rule": "prev_has_zero => next_sum_gt_prev",
+      "holdout_support": 795,
+      "holdout_rate": 0.680503144654088,
+      "holdout_base": 0.4741348555119515,
+      "holdout_lift": 0.2063682891421365,
+      "holdout_p": 1.1003059839024888e-31,
+      "survives_p05": true
+    },
+    {
+      "rule": "prev_double => next_shares_digit_with_prev",
+      "holdout_support": 764,
+      "holdout_rate": 0.5013089005235603,
+      "holdout_base": 0.6118444523724581,
+      "holdout_lift": -0.11053555184889785,
+      "holdout_p": 6.179684944831715e-10,
+      "survives_p05": true
+    },
+    {
+      "rule": "prev_all_diff => next_shares_digit_with_prev",
+      "holdout_support": 2021,
+      "holdout_rate": 0.657100445324097,
+      "holdout_base": 0.6118444523724581,
+      "holdout_lift": 0.045255992951638846,
+      "holdout_p": 2.6536418442825547e-05,
+      "survives_p05": true
+    }
+  ],
+  "holdout_surviving_k_of_n": [
+    {
+      "feature": "sum_le_12",
+      "window": 10,
+      "threshold": 8,
+      "holdout_triggers": 58,
+      "holdout_cont_rate": 0.5517241379310345,
+      "holdout_base": 0.42739921512665,
+      "holdout_lift": 0.12432492280438445,
+      "holdout_p": 0.038116516867248054
+    }
+  ],
+  "takeaway": "Yes: Mini/Straight/Box hit outcomes behave like chance at face odds for foresight. Yes also: many relational regularities exist in the sequence's labels (box-class transitions near marginal, k-of-n regimes, etc.). Most strong-looking descriptive lifts shrink on holdout; survivors are usually mild structural facts, not ticket-picking edges."
+}
