@@ -99,3 +99,6 @@
 - ¥1000の帰無上限: 約5%/回（5ミニ）→ 2–3回に1回は予算不足
 - ポートフォリオ要約: `n3_budget1000_portfolio_summary.csv`
 
+## 追記: ホライズン別予想
+新規枠の再分析: `HORIZON_ANALYSIS_REPORT.md` / `horizon_analysis_summary.json`
+

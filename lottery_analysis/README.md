@@ -20,9 +20,13 @@ python scripts/clean_data.py
 python scripts/analyze.py          # 番号予測の棄却（全体）
 python scripts/payout_ev.py        # 参考: 単価最適化（予想ではない）
 python scripts/predict_hypotheses.py  # 本線: 予想仮説＋¥1000運用
+python scripts/foresight_exhaustive.py  # トップ5先読み網羅
+python scripts/relation_mine.py         # 関係性探査
+python scripts/horizon_analysis.py      # 毎回/数日/週の再分析
 ```
 
 主なレポート:
+- ホライズン別再分析: `reports/HORIZON_ANALYSIS_REPORT.md`
 - 予想仮説と予算制約: `reports/PREDICTION_AXIS_REPORT.md`
 - 番号予測棄却: `reports/REPORT.md`
 - ペイアウト参考: `reports/PAYOUT_EV_REPORT.md`

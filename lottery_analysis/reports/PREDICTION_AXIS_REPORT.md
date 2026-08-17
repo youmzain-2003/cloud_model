@@ -67,3 +67,6 @@
 - 条件付きルール holdout残存: 5 件
 - k-of-n holdout残存: 1 件
 
+## 追記: ホライズン別再分析
+詳細は `HORIZON_ANALYSIS_REPORT.md`。毎回/数日/週で帰無的中率が大きく変わるが、先読みは帰無超えせず。
+
