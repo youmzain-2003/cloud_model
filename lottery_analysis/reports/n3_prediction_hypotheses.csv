@@ -1,0 +1,11 @@
+name,description,metric,null_value,observed_value,lift,p_value,n_eval,promoted_to_axis,reason,details
+repeat_prev_last2,前回の下2桁が再出現する,last2_repeat_rate,0.01,0.009989297181591153,-1.0702818408847223e-05,0.5277784041569532,2803,False,promote if holdout repeat rate >> 1/100 with p<0.01,"{""hits"": 28}"
+hot_last2_W30,直近30回で最多の下2桁を1口ミニ,mini_hit_rate,0.01,0.014270424545130217,0.004270424545130217,0.018752876192982666,2803,False,promote if mini hit-rate >= 1.5/100 and p<0.01,"{""hits"": 40, ""window"": 30}"
+hot_last2_W50,直近50回で最多の下2桁を1口ミニ,mini_hit_rate,0.01,0.007491972886193364,-0.0025080271138066363,0.9289976747579888,2803,False,promote if mini hit-rate >= 1.5/100 and p<0.01,"{""hits"": 21, ""window"": 50}"
+hot_last2_W100,直近100回で最多の下2桁を1口ミニ,mini_hit_rate,0.01,0.007491972886193364,-0.0025080271138066363,0.9289976747579888,2803,False,promote if mini hit-rate >= 1.5/100 and p<0.01,"{""hits"": 21, ""window"": 100}"
+cold_last2_W50,直近50回で最少の下2桁を1口ミニ,mini_hit_rate,0.01,0.00927577595433464,-0.0007242240456653594,0.6758275234965816,2803,False,promote if mini hit-rate >= 1.5/100 and p<0.01,"{""hits"": 26}"
+slide_plus1_last2,前回下2桁の各桁+1をミニ,mini_hit_rate,0.01,0.009989297181591153,-1.0702818408847223e-05,0.5277784041569532,2803,False,promote if mini hit-rate >= 1.5/100 and p<0.01,"{""hits"": 28}"
+hot_digits_straight_W50,位置別最頻桁のストレート,straight_hit_rate,0.001,0.0017838030681412772,0.0007838030681412771,0.15269804974925147,2803,False,promote if straight hit-rate >= 2/1000 and p<0.01,"{""hits"": 5}"
+hot_digits_box_W50,位置別最頻桁のボックス,box_hit_rate,0.006,0.004281127363539065,-0.001718872636460935,0.9093128275888107,2803,False,promote if box hit-rate >= 9/1000 and p<0.01 vs 6/1000,"{""hits"": 12, ""avg_conditional_null"": 0.005073135925793916}"
+markov_d100_W300,百の位の1次マルコフ最頻遷移,digit_hit_rate,0.1,0.09097395647520513,-0.009026043524794872,0.9493818575268105,2803,False,promote if digit accuracy >= 12% with p<0.01,"{""hits"": 255}"
+weekday_mode_last2,同曜日の過去最頻下2桁をミニ,mini_hit_rate,0.01,0.010702818408847663,0.0007028184088476632,0.3792125093654966,2803,False,promote if mini hit-rate >= 1.5/100 and p<0.01,"{""hits"": 30}"

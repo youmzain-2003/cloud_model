@@ -1,0 +1,25 @@
+horizon,draws,plan,p_any_hit,expected_gap_horizons,yen_per_horizon,note
+H1_every_draw,1,1x_mini_replay_H_days,0.010000000000000009,99.99999999999991,200,
+H1_every_draw,1,5x_mini_replay_each_day,0.050000000000000044,19.999999999999982,1000,
+H1_every_draw,1,1x_straight_replay_H_days,0.0010000000000000009,999.9999999999991,200,
+H1_every_draw,1,5x_straight_replay_each_day,0.004990009995000988,200.40040019996033,1000,
+H1_every_draw,1,1x_box_all_diff_replay_H_days,0.006000000000000005,166.66666666666652,200,
+H1_every_draw,1,5x_box_all_diff_replay_each_day,0.029642153527775994,33.735740524485045,1000,
+H1_every_draw,1,daily_¥1000_5mini_refresh,0.050000000000000044,19.999999999999982,1000,Best practical frequency under ¥1000/day without edge
+H1_every_draw,1,pool_5_distinct_minis_held_1_days,0.050000000000000044,19.999999999999982,1000,Front-load week budget into a standing mini cover set
+H3_few_days,3,1x_mini_replay_H_days,0.029700999999999977,33.66890003703582,600,
+H3_few_days,3,5x_mini_replay_each_day,0.1426250000000001,7.011393514460994,3000,
+H3_few_days,3,1x_straight_replay_H_days,0.002997000999999999,333.66688900003714,600,
+H3_few_days,3,5x_straight_replay_each_day,0.014895453637997935,67.13457839572101,3000,
+H3_few_days,3,1x_box_all_diff_replay_H_days,0.017892216000000016,55.890226230222076,600,
+H3_few_days,3,5x_box_all_diff_replay_each_day,0.08631653407960538,11.585265912991252,3000,
+H3_few_days,3,daily_¥1000_5mini_refresh,0.1426250000000001,7.011393514460994,3000,Best practical frequency under ¥1000/day without edge
+H3_few_days,3,pool_15_distinct_minis_held_3_days,0.3858750000000001,2.591512795594428,3000,Front-load week budget into a standing mini cover set
+H5_weekish,5,1x_mini_replay_H_days,0.04900995010000009,20.404019958387963,1000,
+H5_weekish,5,5x_mini_replay_each_day,0.22621906250000023,4.420493962572226,5000,
+H5_weekish,5,1x_straight_replay_H_days,0.004990009995000988,200.40040019996033,1000,
+H5_weekish,5,5x_straight_replay_each_day,0.024702287402953327,40.48208101896034,5000,
+H5_weekish,5,1x_box_all_diff_replay_H_days,0.029642153527775994,33.735740524485045,1000,
+H5_weekish,5,5x_box_all_diff_replay_each_day,0.1396808106088714,7.15917952967899,5000,
+H5_weekish,5,daily_¥1000_5mini_refresh,0.22621906250000023,4.420493962572226,5000,Best practical frequency under ¥1000/day without edge
+H5_weekish,5,pool_25_distinct_minis_held_5_days,0.7626953125,1.3111395646606914,5000,Front-load week budget into a standing mini cover set

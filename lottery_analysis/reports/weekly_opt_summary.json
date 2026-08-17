@@ -1,0 +1,28 @@
+{
+  "setting": "Weekly predicted numbers bought every day for 5 days; daily budget 5 units (¥1000) unless pool.",
+  "theorem": "Under theoretical equal return ratio (~45%), any mix with same weekly spend has the same E[net]. Worst-case loss is always -weekly_spend on a total miss week.",
+  "fixed_1000_per_day": {
+    "E_net_week": -2750.0,
+    "worst_loss_always": -5000,
+    "opt_min_full_miss_prob": {
+      "alloc": "M5B0S0",
+      "p_miss_week": 0.7737809374999998
+    },
+    "opt_max_upside_p95": {
+      "alloc": "M3B2S0",
+      "p95": 10000.0,
+      "p_miss_week": 0.8085791069323913
+    },
+    "opt_max_p_profit": {
+      "alloc": "M5B0S0",
+      "p_profit": 0.22582
+    },
+    "opt_balanced_freq_upside": {
+      "alloc": "M3B2S0"
+    },
+    "opt_balanced_3": {
+      "alloc": "M5B0S0"
+    },
+    "recommendation": "If goal is avoid empty weeks: all mini (M5B0S0). If goal is rare but large recovery: more straight. If goal is middle: M3B1S1 or M3B2S0. There is no mix that both raises expected profit AND lowers expected loss vs another same-budget mix."
+  }
+}

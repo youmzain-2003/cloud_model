@@ -1,0 +1,7 @@
+test,z,p_value,note,entropy_bits,max_bits,n
+parity_runs,1.0415122670371548,0.2976378629357872,two-sided dependence,,,
+holdout_entropy_weekday_0,,,,6.530557618112394,6.643856189774724,560.0
+holdout_entropy_weekday_1,,,,6.534730556603527,6.643856189774724,561.0
+holdout_entropy_weekday_2,,,,6.526594079341437,6.643856189774724,559.0
+holdout_entropy_weekday_3,,,,6.531417654888633,6.643856189774724,561.0
+holdout_entropy_weekday_4,,,,6.524802086919131,6.643856189774724,562.0

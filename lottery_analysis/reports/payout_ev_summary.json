@@ -1,0 +1,302 @@
+{
+  "objective": "Maximize E[prize|features]*P(hit) - stake with P(hit)≈1/1000",
+  "n3_walkforward_model": {
+    "n_scored": 3710,
+    "prize_r2_log": 0.19971232387627968,
+    "prize_mae_yen": 14220.172011099721,
+    "winners_r2_log": -0.10379007079749525,
+    "winners_mae": 50.62304926439652,
+    "corr_pred_prize_vs_actual": 0.4791468445291581,
+    "corr_pred_winners_vs_actual": 0.36574706678582974
+  },
+  "n3_top_coefficients_by_abs_crowd": [
+    {
+      "feature": "is_triple",
+      "coef_log_prize": -0.03135646379868866,
+      "coef_log_winners": 0.14453037169375116
+    },
+    {
+      "feature": "has_zero",
+      "coef_log_prize": 0.11117656890391828,
+      "coef_log_winners": -0.10436155595294914
+    },
+    {
+      "feature": "d10",
+      "coef_log_prize": 0.0679654995262587,
+      "coef_log_winners": -0.09433457847630243
+    },
+    {
+      "feature": "sum_sq",
+      "coef_log_prize": -0.00039539323528592807,
+      "coef_log_winners": -0.06023840185411359
+    },
+    {
+      "feature": "max_adj_diff",
+      "coef_log_prize": -0.047824914883085594,
+      "coef_log_winners": 0.053173976579585475
+    },
+    {
+      "feature": "d1",
+      "coef_log_prize": -0.0054007011122251284,
+      "coef_log_winners": 0.0416455962057243
+    },
+    {
+      "feature": "birthdayish",
+      "coef_log_prize": -0.018253856529367875,
+      "coef_log_winners": 0.03355941497790499
+    },
+    {
+      "feature": "is_all_diff",
+      "coef_log_prize": -0.008170774595195005,
+      "coef_log_winners": -0.02540168393848553
+    },
+    {
+      "feature": "parity_odd_count",
+      "coef_log_prize": -0.015739108178396213,
+      "coef_log_winners": 0.024300930162460925
+    },
+    {
+      "feature": "sum_digits",
+      "coef_log_prize": 0.04573393374493959,
+      "coef_log_winners": -0.020815433859512466
+    },
+    {
+      "feature": "is_sequential",
+      "coef_log_prize": -0.013153679983792575,
+      "coef_log_winners": 0.020238111463598996
+    },
+    {
+      "feature": "has_eight",
+      "coef_log_prize": -0.026551267792030098,
+      "coef_log_winners": 0.017775094486250843
+    }
+  ],
+  "n3_selection_summary": [
+    {
+      "strategy": "max_pred_prize_top5",
+      "eval_points": 619,
+      "hits": 6,
+      "hit_rate": 0.009693053311793215,
+      "total_spent": 619000,
+      "total_won": 555000.0,
+      "mean_pred_prize": 127555.68653203543,
+      "mean_pred_winners": 77.21401319041726,
+      "mean_pred_ev_5": -362.22156733982297,
+      "roi": -0.1033925686591276,
+      "null_hit_rate_5of1000": 0.005
+    },
+    {
+      "strategy": "avoid_crowd_top5",
+      "eval_points": 619,
+      "hits": 6,
+      "hit_rate": 0.009693053311793215,
+      "total_spent": 619000,
+      "total_won": 611100.0,
+      "mean_pred_prize": 122337.94694536903,
+      "mean_pred_winners": 70.92988198758744,
+      "mean_pred_ev_5": -388.3102652731548,
+      "roi": -0.012762520193861038,
+      "null_hit_rate_5of1000": 0.005
+    },
+    {
+      "strategy": "random_5",
+      "eval_points": 619,
+      "hits": 2,
+      "hit_rate": 0.0032310177705977385,
+      "total_spent": 619000,
+      "total_won": 191000.0,
+      "mean_pred_prize": 93507.59636884432,
+      "mean_pred_winners": 113.96083878061452,
+      "mean_pred_ev_5": -532.4620181557784,
+      "roi": -0.691437802907916,
+      "null_hit_rate_5of1000": 0.005
+    },
+    {
+      "strategy": "no_triple_random5",
+      "eval_points": 619,
+      "hits": 6,
+      "hit_rate": 0.009693053311793215,
+      "total_spent": 619000,
+      "total_won": 586200.0,
+      "mean_pred_prize": 93315.23381245603,
+      "mean_pred_winners": 109.38856726261275,
+      "mean_pred_ev_5": -533.4238309377198,
+      "roi": -0.05298869143780294,
+      "null_hit_rate_5of1000": 0.005
+    },
+    {
+      "strategy": "chase_crowd_top5",
+      "eval_points": 619,
+      "hits": 3,
+      "hit_rate": 0.004846526655896607,
+      "total_spent": 619000,
+      "total_won": 207500.0,
+      "mean_pred_prize": 62040.38931370358,
+      "mean_pred_winners": 673.4296466786446,
+      "mean_pred_ev_5": -689.7980534314821,
+      "roi": -0.6647819063004847,
+      "null_hit_rate_5of1000": 0.005
+    }
+  ],
+  "n3_theory_ev_straight": -110.0,
+  "n3_pred_ev_range_across_000_999": {
+    "best": -72.45070805419721,
+    "worst": -146.06472111922653,
+    "spread": 73.61401306502933
+  },
+  "n3_next_candidates_preview": [
+    {
+      "number": "690",
+      "pred_prize_yen": 116717.665255232,
+      "pred_winners": 71.59481803050433,
+      "pred_ev_straight": -83.282334744768
+    },
+    {
+      "number": "590",
+      "pred_prize_yen": 112486.2213671281,
+      "pred_winners": 74.55799027155075,
+      "pred_ev_straight": -87.51377863287189
+    },
+    {
+      "number": "490",
+      "pred_prize_yen": 112379.0594142247,
+      "pred_winners": 73.25553749175987,
+      "pred_ev_straight": -87.6209405857753
+    },
+    {
+      "number": "980",
+      "pred_prize_yen": 112166.73838224732,
+      "pred_winners": 74.88878482618878,
+      "pred_ev_straight": -87.83326161775268
+    },
+    {
+      "number": "560",
+      "pred_prize_yen": 112098.12649665191,
+      "pred_winners": 80.02570663688513,
+      "pred_ev_straight": -87.90187350334809
+    },
+    {
+      "number": "460",
+      "pred_prize_yen": 111991.33426906867,
+      "pred_winners": 78.62773837507557,
+      "pred_ev_straight": -88.00866573093133
+    },
+    {
+      "number": "096",
+      "pred_prize_yen": 111736.41282048478,
+      "pred_winners": 75.35293935680399,
+      "pred_ev_straight": -88.26358717951521
+    },
+    {
+      "number": "680",
+      "pred_prize_yen": 111189.8950385874,
+      "pred_winners": 75.07224094535137,
+      "pred_ev_straight": -88.81010496141259
+    },
+    {
+      "number": "960",
+      "pred_prize_yen": 110514.84508720516,
+      "pred_winners": 80.38267337319357,
+      "pred_ev_straight": -89.48515491279484
+    },
+    {
+      "number": "094",
+      "pred_prize_yen": 109158.48048300229,
+      "pred_winners": 75.7971479797662,
+      "pred_ev_straight": -90.8415195169977
+    }
+  ],
+  "bingo5": {
+    "n": 460,
+    "feature_corr": {
+      "sum": {
+        "vs_winners_r": 0.02716052841857061,
+        "vs_winners_p": 0.5612062851245495,
+        "vs_prize_r": -0.007814926850761902,
+        "vs_prize_p": 0.8672457116946781
+      },
+      "odd": {
+        "vs_winners_r": 0.013414483375597587,
+        "vs_winners_p": 0.7741592338741985,
+        "vs_prize_r": 0.001907567597465028,
+        "vs_prize_p": 0.9674541524200708
+      },
+      "consec": {
+        "vs_winners_r": -0.05161667782059447,
+        "vs_winners_p": 0.2692554036566154,
+        "vs_prize_r": 0.042969295607435704,
+        "vs_prize_p": 0.3578309656796622
+      },
+      "low": {
+        "vs_winners_r": -0.028150974972338722,
+        "vs_winners_p": 0.5470092171145391,
+        "vs_prize_r": 0.06023710186985456,
+        "vs_prize_p": 0.1971902437158718
+      },
+      "mid": {
+        "vs_winners_r": -0.007828904708163343,
+        "vs_winners_p": 0.8670104680314502,
+        "vs_prize_r": -0.03923920354233243,
+        "vs_prize_p": 0.4011210504819395
+      },
+      "high": {
+        "vs_winners_r": 0.0394845870715812,
+        "vs_winners_p": 0.3981803834581355,
+        "vs_prize_r": -0.005484840430472531,
+        "vs_prize_p": 0.9066084271210604
+      }
+    },
+    "pred_crowd_quintiles": [
+      {
+        "crowd_q": "Q1_low",
+        "n": 46,
+        "avg_winners": 4.021739130434782,
+        "avg_prize": 8052313.043478261,
+        "median_prize": 6318100.0
+      },
+      {
+        "crowd_q": "Q2",
+        "n": 46,
+        "avg_winners": 3.4347826086956523,
+        "avg_prize": 7615906.521739131,
+        "median_prize": 5980950.0
+      },
+      {
+        "crowd_q": "Q3",
+        "n": 46,
+        "avg_winners": 4.282608695652174,
+        "avg_prize": 7450595.652173913,
+        "median_prize": 6170950.0
+      },
+      {
+        "crowd_q": "Q4",
+        "n": 46,
+        "avg_winners": 3.652173913043478,
+        "avg_prize": 7823095.652173913,
+        "median_prize": 5839950.0
+      },
+      {
+        "crowd_q": "Q5_high",
+        "n": 46,
+        "avg_winners": 3.3043478260869565,
+        "avg_prize": 8953215.217391305,
+        "median_prize": 6441300.0
+      }
+    ],
+    "winners_vs_prize_corr": -0.7315437261992558,
+    "note": "Bingo5 1st prize is shared; lower predicted crowd quintiles historically associate with higher average 1st-prize yen when that board appeared."
+  },
+  "artifacts": [
+    "reports/n3_pattern_payout_table.csv",
+    "reports/n3_payout_walkforward_scores.csv",
+    "reports/n3_payout_selection_summary.csv",
+    "reports/n3_payout_selection_detail.csv",
+    "reports/n3_universe_pred_payout.csv",
+    "reports/n3_candidates_top_pred_prize.csv",
+    "reports/n3_candidates_all_diff_top.csv",
+    "reports/n3_candidates_low_crowd_filters.csv",
+    "reports/b5_crowd_quintile_payout.csv",
+    "reports/PAYOUT_EV_REPORT.md",
+    "reports/payout_ev_summary.json"
+  ]
+}

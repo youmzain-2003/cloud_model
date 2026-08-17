@@ -1,0 +1,407 @@
+{
+  "goal": {
+    "pursue_hits": true,
+    "desired_frequency": "one hit every 2–3 draws among straight/box/set/mini",
+    "budget_yen_per_day": 1000,
+    "units": 5
+  },
+  "budget_math": {
+    "stake_yen": 200,
+    "budget_yen": 1000,
+    "units_per_day": 5,
+    "bet_type_null_p": {
+      "straight": 0.001,
+      "box_all_diff": 0.006,
+      "box_double": 0.003,
+      "set_all_diff_coverage": 0.006,
+      "mini_last2": 0.01
+    },
+    "theory_prize_yen": {
+      "straight": 90000,
+      "box_6": 15000,
+      "box_3": 30000,
+      "set_straight": 52500,
+      "set_box_6": 7500,
+      "mini": 9000
+    },
+    "plans": [
+      {
+        "plan": "5x mini (distinct last2)",
+        "units": {
+          "mini": 5
+        },
+        "p_any_hit": 0.05,
+        "expected_draws_between_hits": 20.0,
+        "meets_every_2_3_draws": false,
+        "note": "Best pure frequency under ¥1000; still only 5%/day."
+      },
+      {
+        "plan": "4x mini + 1x box6",
+        "units": {
+          "mini": 4,
+          "box": 1
+        },
+        "p_any_hit_approx": 0.04576000000000002,
+        "expected_draws_between_hits_approx": 21.853146853146843,
+        "meets_every_2_3_draws": false
+      },
+      {
+        "plan": "3x mini + 1x box6 + 1x straight",
+        "units": {
+          "mini": 3,
+          "box": 1,
+          "straight": 1
+        },
+        "p_any_hit_approx": 0.036784180000000055,
+        "meets_every_2_3_draws": false
+      },
+      {
+        "plan": "2x mini + 2x box6 + 1x set",
+        "units": {
+          "mini": 2,
+          "box": 2,
+          "set": 1
+        },
+        "p_any_hit_approx": 0.03753437168000007,
+        "meets_every_2_3_draws": false,
+        "note": "Coverage overlaps possible; approx treats independent."
+      },
+      {
+        "plan": "1x mini only (reference)",
+        "units": {
+          "mini": 1
+        },
+        "p_any_hit": 0.01,
+        "expected_draws_between_hits": 100,
+        "meets_every_2_3_draws": false
+      }
+    ],
+    "frequency_requirement": {
+      "for_p_1_over_2": {
+        "target_p": 0.5,
+        "minis_needed_disjoint": 50,
+        "yen": 10000
+      },
+      "for_p_1_over_3": {
+        "target_p": 0.3333333333333333,
+        "minis_needed_disjoint": 34,
+        "yen": 6800
+      },
+      "budget_1000_max_p_with_minis": 0.05,
+      "budget_1000_expected_gap_days": 20.0
+    },
+    "verdict": "With ¥1000/day (5 units), even an all-mini distinct-last2 book only reaches P(hit)≈5%/draw (about once per 20 draws). Hitting every 2–3 draws needs roughly ¥6800–¥10000/day in mini coverage under null odds — not ¥1000. Prediction edge is required to beat that ceiling; hypotheses must be proven."
+  },
+  "hypotheses": [
+    {
+      "name": "repeat_prev_last2",
+      "description": "前回の下2桁が再出現する",
+      "metric": "last2_repeat_rate",
+      "null_value": 0.01,
+      "observed_value": 0.009989297181591153,
+      "lift": -1.0702818408847223e-05,
+      "p_value": 0.5277784041569532,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if holdout repeat rate >> 1/100 with p<0.01",
+      "details": {
+        "hits": 28
+      }
+    },
+    {
+      "name": "hot_last2_W30",
+      "description": "直近30回で最多の下2桁を1口ミニ",
+      "metric": "mini_hit_rate",
+      "null_value": 0.01,
+      "observed_value": 0.014270424545130217,
+      "lift": 0.004270424545130217,
+      "p_value": 0.018752876192982666,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if mini hit-rate >= 1.5/100 and p<0.01",
+      "details": {
+        "hits": 40,
+        "window": 30
+      }
+    },
+    {
+      "name": "hot_last2_W50",
+      "description": "直近50回で最多の下2桁を1口ミニ",
+      "metric": "mini_hit_rate",
+      "null_value": 0.01,
+      "observed_value": 0.007491972886193364,
+      "lift": -0.0025080271138066363,
+      "p_value": 0.9289976747579888,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if mini hit-rate >= 1.5/100 and p<0.01",
+      "details": {
+        "hits": 21,
+        "window": 50
+      }
+    },
+    {
+      "name": "hot_last2_W100",
+      "description": "直近100回で最多の下2桁を1口ミニ",
+      "metric": "mini_hit_rate",
+      "null_value": 0.01,
+      "observed_value": 0.007491972886193364,
+      "lift": -0.0025080271138066363,
+      "p_value": 0.9289976747579888,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if mini hit-rate >= 1.5/100 and p<0.01",
+      "details": {
+        "hits": 21,
+        "window": 100
+      }
+    },
+    {
+      "name": "cold_last2_W50",
+      "description": "直近50回で最少の下2桁を1口ミニ",
+      "metric": "mini_hit_rate",
+      "null_value": 0.01,
+      "observed_value": 0.00927577595433464,
+      "lift": -0.0007242240456653594,
+      "p_value": 0.6758275234965816,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if mini hit-rate >= 1.5/100 and p<0.01",
+      "details": {
+        "hits": 26
+      }
+    },
+    {
+      "name": "slide_plus1_last2",
+      "description": "前回下2桁の各桁+1をミニ",
+      "metric": "mini_hit_rate",
+      "null_value": 0.01,
+      "observed_value": 0.009989297181591153,
+      "lift": -1.0702818408847223e-05,
+      "p_value": 0.5277784041569532,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if mini hit-rate >= 1.5/100 and p<0.01",
+      "details": {
+        "hits": 28
+      }
+    },
+    {
+      "name": "hot_digits_straight_W50",
+      "description": "位置別最頻桁のストレート",
+      "metric": "straight_hit_rate",
+      "null_value": 0.001,
+      "observed_value": 0.0017838030681412772,
+      "lift": 0.0007838030681412771,
+      "p_value": 0.15269804974925147,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if straight hit-rate >= 2/1000 and p<0.01",
+      "details": {
+        "hits": 5
+      }
+    },
+    {
+      "name": "hot_digits_box_W50",
+      "description": "位置別最頻桁のボックス",
+      "metric": "box_hit_rate",
+      "null_value": 0.006,
+      "observed_value": 0.004281127363539065,
+      "lift": -0.001718872636460935,
+      "p_value": 0.9093128275888107,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if box hit-rate >= 9/1000 and p<0.01 vs 6/1000",
+      "details": {
+        "hits": 12,
+        "avg_conditional_null": 0.005073135925793916
+      }
+    },
+    {
+      "name": "markov_d100_W300",
+      "description": "百の位の1次マルコフ最頻遷移",
+      "metric": "digit_hit_rate",
+      "null_value": 0.1,
+      "observed_value": 0.09097395647520513,
+      "lift": -0.009026043524794872,
+      "p_value": 0.9493818575268105,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if digit accuracy >= 12% with p<0.01",
+      "details": {
+        "hits": 255
+      }
+    },
+    {
+      "name": "weekday_mode_last2",
+      "description": "同曜日の過去最頻下2桁をミニ",
+      "metric": "mini_hit_rate",
+      "null_value": 0.01,
+      "observed_value": 0.010702818408847663,
+      "lift": 0.0007028184088476632,
+      "p_value": 0.3792125093654966,
+      "n_eval": 2803,
+      "promoted_to_axis": false,
+      "reason": "promote if mini hit-rate >= 1.5/100 and p<0.01",
+      "details": {
+        "hits": 30
+      }
+    }
+  ],
+  "axes_promoted": [],
+  "portfolio_summary": [
+    {
+      "plan": "A_5mini_hot",
+      "draws": 2803,
+      "hits": 146,
+      "hit_rate": 0.05208704958972529,
+      "avg_gap": 19.198630136986303,
+      "total_spent": 2803000,
+      "total_won_theory": 1314000.0,
+      "roi_theory": -0.5312165536924723,
+      "target_hit_rate_every_2": 0.5,
+      "target_hit_rate_every_3": 0.3333333333333333,
+      "meets_every_2": false,
+      "meets_every_3": false,
+      "null_5mini_hit_rate": 0.05
+    },
+    {
+      "plan": "B_5mini_unseen",
+      "draws": 2803,
+      "hits": 145,
+      "hit_rate": 0.051730288976097036,
+      "avg_gap": 19.33103448275862,
+      "total_spent": 2803000,
+      "total_won_theory": 1305000.0,
+      "roi_theory": -0.5344273992151267,
+      "target_hit_rate_every_2": 0.5,
+      "target_hit_rate_every_3": 0.3333333333333333,
+      "meets_every_2": false,
+      "meets_every_3": false,
+      "null_5mini_hit_rate": 0.05
+    },
+    {
+      "plan": "F_5mini_random",
+      "draws": 2803,
+      "hits": 139,
+      "hit_rate": 0.04958972529432751,
+      "avg_gap": 20.16546762589928,
+      "total_spent": 2803000,
+      "total_won_theory": 1251000.0,
+      "roi_theory": -0.5536924723510525,
+      "target_hit_rate_every_2": 0.5,
+      "target_hit_rate_every_3": 0.3333333333333333,
+      "meets_every_2": false,
+      "meets_every_3": false,
+      "null_5mini_hit_rate": 0.05
+    },
+    {
+      "plan": "C_4mini_1box_hot",
+      "draws": 2803,
+      "hits": 117,
+      "hit_rate": 0.04174099179450589,
+      "avg_gap": 23.957264957264954,
+      "total_spent": 2803000,
+      "total_won_theory": 1179000.0,
+      "roi_theory": -0.5793792365322868,
+      "target_hit_rate_every_2": 0.5,
+      "target_hit_rate_every_3": 0.3333333333333333,
+      "meets_every_2": false,
+      "meets_every_3": false,
+      "null_5mini_hit_rate": 0.05
+    },
+    {
+      "plan": "D_3mini_1box_1straight",
+      "draws": 2803,
+      "hits": 91,
+      "hit_rate": 0.032465215840171244,
+      "avg_gap": 30.802197802197803,
+      "total_spent": 2803000,
+      "total_won_theory": 1395000.0,
+      "roi_theory": -0.5023189439885837,
+      "target_hit_rate_every_2": 0.5,
+      "target_hit_rate_every_3": 0.3333333333333333,
+      "meets_every_2": false,
+      "meets_every_3": false,
+      "null_5mini_hit_rate": 0.05
+    },
+    {
+      "plan": "E_3mini_1set_1straight_prev",
+      "draws": 2803,
+      "hits": 87,
+      "hit_rate": 0.031038173385658223,
+      "avg_gap": 32.2183908045977,
+      "total_spent": 2803000,
+      "total_won_theory": 1464000.0,
+      "roi_theory": -0.47770246164823404,
+      "target_hit_rate_every_2": 0.5,
+      "target_hit_rate_every_3": 0.3333333333333333,
+      "meets_every_2": false,
+      "meets_every_3": false,
+      "null_5mini_hit_rate": 0.05
+    }
+  ],
+  "next_suggestions": {
+    "as_of_draw": 7049,
+    "as_of_date": "2026-08-14",
+    "prev_number": "638",
+    "recommended_plan": "B_5mini_unseen_or_A_5mini_hot",
+    "budget_yen": 1000,
+    "books": {
+      "frequency_max_5mini_hot": {
+        "mini_last2": [
+          "38",
+          "49",
+          "07",
+          "77",
+          "26"
+        ],
+        "expected_null_p_hit": 0.05,
+        "comment": "頻度最大化の基本形。予想軸が無いときの上限付近。"
+      },
+      "frequency_max_5mini_unseen": {
+        "mini_last2": [
+          "00",
+          "01",
+          "02",
+          "03",
+          "05"
+        ],
+        "expected_null_p_hit": 0.05,
+        "comment": "窓内未出現の下2桁優先（コールド寄り）。"
+      },
+      "hybrid_3mini_1box_1straight": {
+        "mini_last2": [
+          "38",
+          "49",
+          "07"
+        ],
+        "box": "437",
+        "straight": "437",
+        "expected_null_p_hit_approx": 0.036784180000000055,
+        "comment": "頻度を少し犠牲にしてボックス/ストレートの上振れを残す。"
+      }
+    }
+  },
+  "conclusion": {
+    "frequency_target_with_1000_yen": false,
+    "best_null_hit_rate_approx": 0.05,
+    "best_holdout_plan": {
+      "plan": "A_5mini_hot",
+      "draws": 2803,
+      "hits": 146,
+      "hit_rate": 0.05208704958972529,
+      "avg_gap": 19.198630136986303,
+      "total_spent": 2803000,
+      "total_won_theory": 1314000.0,
+      "roi_theory": -0.5312165536924723,
+      "target_hit_rate_every_2": 0.5,
+      "target_hit_rate_every_3": 0.3333333333333333,
+      "meets_every_2": false,
+      "meets_every_3": false,
+      "null_5mini_hit_rate": 0.05
+    },
+    "prediction_axes_found": 0,
+    "message": "予想の正解は『的中を追い求めること』で一致。ただし¥1000ではタイプ組合せだけでは2–3回に1回に届かない。届かせるには予想エッジ（軸）が必要だが、先読み検証で軸昇格した仮説はゼロ。運用は当面『頻度上限の5ミニ』か『頻度+上振れのハイブリッド』で、仮説レジストリを更新し続ける。"
+  }
+}

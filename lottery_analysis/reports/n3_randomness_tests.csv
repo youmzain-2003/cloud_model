@@ -1,0 +1,6 @@
+name,metric,value,p_value,note,predictive
+N3 chi2 uniform hundreds,chi2,12.438481301741364,0.1897029312075969,Reject H0 if p<<0.05 (digit not uniform).,False
+N3 chi2 uniform tens,chi2,7.1601484441906935,0.6204498196313629,Reject H0 if p<<0.05 (digit not uniform).,False
+N3 chi2 uniform ones,chi2,6.8604053668284335,0.6516505638447172,Reject H0 if p<<0.05 (digit not uniform).,False
+N3 runs-test sum parity,z,-0.16612171659448113,0.8680611642342746,Serial dependence in odd/even of digit-sum.,False
+N3 empirical number entropy (bits),entropy,9.858335172060295,,Max entropy for observed support size 999 ≈ 9.964; full 1000-space max=9.966.,False
