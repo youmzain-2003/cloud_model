@@ -4,3 +4,7 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+
+# lookbook working extracts (PDFs + previews are published)
+docs/lookbook/v9-full/
+docs/lookbook/v10-full/
