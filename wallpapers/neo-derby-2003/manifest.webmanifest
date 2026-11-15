@@ -1,0 +1,17 @@
+{
+  "name": "ネオ・ダービー 動く壁紙",
+  "short_name": "ネオダービー",
+  "start_url": "./live-wallpaper.html",
+  "display": "fullscreen",
+  "background_color": "#10141a",
+  "theme_color": "#10141a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./iphone15promax.jpg",
+      "sizes": "1290x2796",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

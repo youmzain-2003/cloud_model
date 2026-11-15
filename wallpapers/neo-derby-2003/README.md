@@ -1,24 +1,18 @@
-# ネオ・ダービー ライブ壁紙（Live Photo）
+# ネオ・ダービー 動く壁紙
 
-2003年日本ダービー（**天候・曇 / 芝・重**）をオマージュした iPhone 向けライブ壁紙です。  
-このリポジトリは **GitHub Pages 未設定**なので、サイトURLでは開きません。下の直リンクから取ってください。
+2003年日本ダービー（天候・曇 / 芝・重）をオマージュ。  
+**東京直線・ゴール板・スタンド・半馬身差の差し切り**をモチーフにしています。
 
-## 今すぐダウンロード（iPhoneのSafariでタップ）
+## 動く壁紙（推奨・第三者アプリ不要）
 
-- [Live Photo ZIP（JPG+MOV）](https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY_LivePhoto.zip)
-- [NEO_DERBY.JPG](https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG)
-- [NEO_DERBY.MOV](https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV)
+Safariでこれを開く → 共有 → **ホーム画面に追加** → アイコンを開く：
 
-## iPhone への入れ方
+https://cdn.jsdelivr.net/gh/youmzain-2003/cloud_model@cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html
 
-1. 上の ZIP を保存して展開（または JPG と MOV を両方保存）
-2. **iCloud.com → 写真 → アップロード** で **2つを同時選択**
-3. 写真アプリに Live として1枚出たら、**設定 → 壁紙** で選択
-4. 壁紙編集で Live Photo をオン
+全画面でループします。怪しい壁紙アプリは不要です。
 
-AirDrop（Macから両方同時）も確実です。**Filesアプリ経由は壊れやすい**です。  
-片方だけでは Live になりません。
+## システム壁紙（Live Photo）
 
-## 補足
+PCの iCloud.com 写真、または Mac AirDrop で `livephoto/NEO_DERBY.JPG` と `NEO_DERBY.MOV` を同時取り込み。
 
-iOS のライブ壁紙は、ロック画面の長押し／起床時に動く方式です。Android のような常時ループ壁紙ではありません。
+- ZIP: https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY_LivePhoto.zip

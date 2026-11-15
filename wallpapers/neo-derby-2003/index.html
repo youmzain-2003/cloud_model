@@ -4,254 +4,92 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#1c2229" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>ネオ・ダービー ライブ壁紙（Live Photo）</title>
+  <title>ネオ・ダービー 動く壁紙</title>
   <style>
     :root {
-      --bg: #1c2229;
-      --panel: rgba(28, 34, 41, 0.92);
-      --ink: #f2eee6;
-      --muted: #b7b1a6;
-      --line: rgba(242, 238, 230, 0.22);
-      --accent: #d2b48c;
-      --ok: #8fbc8f;
-      --warn: #e0c07a;
+      --bg: #1c2229; --ink: #f2eee6; --muted: #b7b1a6; --line: rgba(242,238,230,.22);
+      --accent: #d2b48c; --ok: #8fbc8f;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--ink);
+    body {
+      min-height: 100%; background: var(--bg); color: var(--ink);
       font-family: -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
     }
     .wrap {
-      max-width: 28rem;
-      margin: 0 auto;
+      max-width: 28rem; margin: 0 auto;
       padding: calc(1rem + env(safe-area-inset-top)) 1rem calc(1.5rem + env(safe-area-inset-bottom));
     }
-    .eyebrow {
-      color: var(--accent);
-      letter-spacing: 0.14em;
-      font-size: 0.72rem;
-      margin-bottom: 0.4rem;
-    }
+    .eyebrow { color: var(--accent); letter-spacing: .14em; font-size: .72rem; margin-bottom: .4rem; }
     h1 {
       font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-      font-weight: 500;
-      font-size: 1.5rem;
-      line-height: 1.35;
-      margin-bottom: 0.55rem;
+      font-weight: 500; font-size: 1.45rem; line-height: 1.35; margin-bottom: .55rem;
     }
-    .lede {
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.6;
-      margin-bottom: 0.9rem;
-    }
-    .callout {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 0.85rem 0.95rem;
-      margin-bottom: 1rem;
-      background: rgba(224, 192, 122, 0.08);
-      color: var(--warn);
-      font-size: 0.86rem;
-      line-height: 1.55;
-    }
-    .callout strong { color: var(--ink); }
-    .preview-shell {
-      position: relative;
-      border-radius: 28px;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      background: #0f1216;
-      aspect-ratio: 1290 / 2796;
-      max-height: 52vh;
-      margin: 0 auto 1rem;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-    }
-    .preview-shell video,
-    .preview-shell img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .lede { color: var(--muted); font-size: .92rem; line-height: 1.6; margin-bottom: .9rem; }
     .card {
-      margin-bottom: 0.85rem;
-      padding: 0.95rem 1rem;
-      border-radius: 14px;
-      background: var(--panel);
-      border: 1px solid var(--line);
+      margin-bottom: .85rem; padding: .95rem 1rem; border-radius: 14px;
+      background: rgba(28,34,41,.92); border: 1px solid var(--line);
     }
-    .card h2 {
-      font-size: 0.95rem;
-      margin-bottom: 0.55rem;
-      font-weight: 650;
-    }
-    .card ol, .card ul {
-      padding-left: 1.15rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.55;
-      display: grid;
-      gap: 0.35rem;
-    }
+    .card h2 { font-size: .95rem; margin-bottom: .5rem; }
+    .card ol, .card p { color: var(--muted); font-size: .9rem; line-height: 1.55; }
+    .card ol { padding-left: 1.15rem; display: grid; gap: .35rem; }
     .card li::marker { color: var(--accent); }
-    .actions { display: grid; gap: 0.6rem; margin: 0.9rem 0; }
-    a.btn, button {
-      appearance: none;
-      width: 100%;
-      border: 1px solid var(--line);
-      background: rgba(242, 238, 230, 0.08);
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 0.95rem 1rem;
-      font-size: 1rem;
-      font-weight: 650;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
+    .preview {
+      border-radius: 28px; overflow: hidden; border: 1px solid var(--line);
+      aspect-ratio: 1290/2796; max-height: 48vh; margin: 0 auto 1rem; background: #0f1216;
     }
-    a.btn.primary, button.primary {
-      background: linear-gradient(180deg, #e8d7bc, #c9ae86);
-      color: #1c2229;
-      border-color: transparent;
+    .preview video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    a.btn {
+      display: block; width: 100%; text-align: center; text-decoration: none;
+      border-radius: 999px; padding: .95rem 1rem; margin: .55rem 0; font-weight: 650; color: var(--ink);
+      border: 1px solid var(--line); background: rgba(242,238,230,.08);
     }
-    .status {
-      min-height: 1.35rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 0.6rem;
+    a.btn.primary {
+      background: linear-gradient(180deg, #e8d7bc, #c9ae86); color: #1c2229; border-color: transparent;
     }
-    .status.ok { color: var(--ok); }
-    .status.err { color: #e6a0a0; }
-    .note {
-      font-size: 0.8rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-    .files {
-      margin-top: 0.7rem;
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-    .files a { color: var(--accent); }
+    .note { font-size: .8rem; color: var(--muted); line-height: 1.55; margin-top: .7rem; }
+    code { font-size: .78rem; word-break: break-all; color: var(--accent); }
   </style>
 </head>
 <body>
   <main class="wrap">
-    <p class="eyebrow">Live Photo · iPhone 15 Pro Max</p>
-    <h1>ネオ・ダービー ライブ壁紙</h1>
+    <p class="eyebrow">2003 Derby homage · 動く壁紙</p>
+    <h1>差し切りゴールが動く壁紙</h1>
     <p class="lede">
-      標準のiOSで「動く壁紙」にする本命は <strong>Live Photo</strong> です。
-      曇天・重馬場（2003ダービー公式条件）のオマージュ、約3秒ループです。
+      モチーフは<strong>東京直線・ゴール板・スタンド・曇天の重馬場・半馬身差の差し切り</strong>。
+      第三者アプリは不要です。下の「動く壁紙を開く」→ ホーム画面に追加で使えます。
     </p>
 
-    <div class="callout">
-      <strong>重要：</strong>JPGとMOVを<strong>同時に</strong>写真へ入れる必要があります。片方だけだと動きません。
-      AirDropか、iCloud.comの写真アップロードが確実です（Files経由は壊れやすい）。
-    </div>
-
-    <div class="preview-shell">
-      <video src="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV" playsinline muted loop autoplay poster="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG"></video>
+    <div class="preview">
+      <video
+        playsinline muted loop autoplay
+        poster="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/iphone15promax.jpg"
+        src="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/iphone15promax.mp4"
+      ></video>
     </div>
 
     <section class="card">
-      <h2>いちばん確実な入れ方（iPhoneだけ）</h2>
+      <h2>1. 動く壁紙（推奨・アプリ不要）</h2>
       <ol>
-        <li>下のZIPをダウンロードして展開（JPG＋MOVが出る）</li>
-        <li>iPhoneのSafariで <strong>iCloud.com → 写真 → アップロード</strong></li>
-        <li><strong>NEO_DERBY.JPG と NEO_DERBY.MOV を一度に選択</strong>してアップロード</li>
-        <li>写真アプリに Live のマークが付いた1枚として出るのを確認</li>
-        <li><strong>設定 → 壁紙 → 写真を追加</strong> → そのLive Photoを選ぶ</li>
-        <li>壁紙編集で Live Photo がオンになっていることを確認</li>
+        <li>下のボタンで動く壁紙を開く</li>
+        <li>Safariの共有 → <strong>ホーム画面に追加</strong></li>
+        <li>追加したアイコンを開くと全画面でループ再生</li>
       </ol>
+      <a class="btn primary" href="https://cdn.jsdelivr.net/gh/youmzain-2003/cloud_model@cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html">動く壁紙を開く</a>
+      <p class="note">システム壁紙そのものではなく、ホーム画面アプリとして常時動く方式です。怪しい壁紙アプリは不要です。</p>
     </section>
 
     <section class="card">
-      <h2>Macがある場合</h2>
-      <ol>
-        <li>ZIPを展開</li>
-        <li>JPGとMOVを<strong>両方選択</strong>してAirDrop → iPhone</li>
-        <li>写真にLiveとして入ったら、設定から壁紙に</li>
-      </ol>
+      <h2>2. システム壁紙にしたい場合（Live Photo）</h2>
+      <p>PCのブラウザで iCloud.com 写真へ JPG+MOV を同時アップロードするか、MacからAirDropしてください。iPhone単体のSafariアップロードは失敗しやすいです。</p>
+      <a class="btn" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY_LivePhoto.zip">Live Photo ZIP</a>
+      <a class="btn" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG">JPG</a>
+      <a class="btn" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV">MOV</a>
     </section>
-
-    <div class="actions">
-      <a class="btn primary" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY_LivePhoto.zip">Live Photo ZIPを保存</a>
-      <a class="btn" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG">JPGだけ開く</a>
-      <a class="btn" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV">MOVだけ開く</a>
-      <button type="button" class="primary" id="shareZip">共有シートでZIPを送る</button>
-      <button type="button" id="sharePair">JPGとMOVをまとめて共有</button>
-    </div>
-    <p class="status" id="status" aria-live="polite"></p>
 
     <p class="note">
-      iOSのライブ壁紙は、ロック画面で長押し／起こしたときに動く方式です。Androidのような常時ループ壁紙とは違います。
+      直リンク（動かないとき用）:<br />
+      <code>https://cdn.jsdelivr.net/gh/youmzain-2003/cloud_model@cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html</code>
     </p>
-    <div class="files">
-      このリポジトリは Pages 未設定なので、サイトURLでは出ません。上の直リンクか、下のRAWから取ってください。<br />
-      個別：
-      <a href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG">JPG</a>・
-      <a href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV">MOV</a>
-      （必ず両方・同時に取り込む）
-    </div>
   </main>
-
-  <script>
-    (() => {
-      const status = document.getElementById("status");
-      function setStatus(text, kind) {
-        status.textContent = text || "";
-        status.className = "status" + (kind ? " " + kind : "");
-      }
-
-      const RAW = "https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto";
-
-      async function fetchFile(url, name, type) {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("取得に失敗しました");
-        const blob = await res.blob();
-        return new File([blob], name, { type: type || blob.type });
-      }
-
-      async function shareFiles(files, title) {
-        if (!navigator.share) throw new Error("共有未対応です。ZIPリンクを使ってください。");
-        if (navigator.canShare && !navigator.canShare({ files })) {
-          throw new Error("ファイル共有未対応です。ZIPを保存してください。");
-        }
-        await navigator.share({ files, title });
-      }
-
-      document.getElementById("shareZip").addEventListener("click", async () => {
-        setStatus("ZIPを準備中…");
-        try {
-          const file = await fetchFile(`${RAW}/NEO_DERBY_LivePhoto.zip`, "NEO_DERBY_LivePhoto.zip", "application/zip");
-          await shareFiles([file], "ネオ・ダービー Live Photo");
-          setStatus("共有シートを開きました。保存後、iCloud写真へJPGとMOVを同時アップロードしてください。", "ok");
-        } catch (err) {
-          if (err && err.name === "AbortError") setStatus("キャンセルしました");
-          else setStatus((err && err.message) || "失敗しました", "err");
-        }
-      });
-
-      document.getElementById("sharePair").addEventListener("click", async () => {
-        setStatus("Live Photoペアを準備中…");
-        try {
-          const files = await Promise.all([
-            fetchFile(`${RAW}/NEO_DERBY.JPG`, "NEO_DERBY.JPG", "image/jpeg"),
-            fetchFile(`${RAW}/NEO_DERBY.MOV`, "NEO_DERBY.MOV", "video/quicktime"),
-          ]);
-          await shareFiles(files, "ネオ・ダービー Live Photo");
-          setStatus("共有シートを開きました。可能なら両方を一度に写真へ入れてください。", "ok");
-        } catch (err) {
-          if (err && err.name === "AbortError") setStatus("キャンセルしました");
-          else setStatus((err && err.message) || "失敗しました。ZIP経由が確実です。", "err");
-        }
-      });
-    })();
-  </script>
 </body>
 </html>
