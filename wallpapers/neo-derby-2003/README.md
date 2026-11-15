@@ -1,18 +1,23 @@
-# ネオ・ダービー 動く壁紙
+# 2003日本ダービー 動く壁紙（スマホ単独）
 
-2003年日本ダービー（天候・曇 / 芝・重）をオマージュ。  
-**東京直線・ゴール板・スタンド・半馬身差の差し切り**をモチーフにしています。
+## モチーフ（史実ベースのオマージュ）
 
-## 動く壁紙（推奨・第三者アプリ不要）
+| 項目 | 内容 |
+|------|------|
+| 開催 | 2003-06-01 東京芝2400 / 天候・曇 / 芝・重 |
+| シーン | 4角〜直線差し切り〜決勝線通過 |
+| 1着 | ネオユニヴァース（鹿毛）社台・黄黒縦縞／袖青一本輪、デムーロ想定 |
+| 2着 | ゼンノロブロイ（黒鹿毛）黄・緑鋸歯形／袖緑一本輪 |
+| 3着 | ザッツザプレンティ（鹿毛）社台服（帽子色で区別） |
+| 位置 | 外へ振る先行勢、内〜中を突くネオ、直線でロブロイを差し半馬身 |
 
-Safariでこれを開く → 共有 → **ホーム画面に追加** → アイコンを開く：
+実写映像の複製ではありません。
 
-https://htmlpreview.github.io/?https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html
+## スマホだけで使う
 
-全画面でループします。怪しい壁紙アプリは不要です。
+1. Safariで開く  
+   https://htmlpreview.github.io/?https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html
+2. **共有 → ホーム画面に追加**
+3. アイコンを開く（全画面ループ）
 
-## システム壁紙（Live Photo）
-
-PCの iCloud.com 写真、または Mac AirDrop で `livephoto/NEO_DERBY.JPG` と `NEO_DERBY.MOV` を同時取り込み。
-
-- ZIP: https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY_LivePhoto.zip
+第三者アプリ・PC不要です。
