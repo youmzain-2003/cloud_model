@@ -3,308 +3,280 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#1a1c1f" />
-  <title>ネオ・ダービー 2003 — 動く壁紙</title>
+  <meta name="theme-color" content="#2a3038" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>ネオ・ダービー壁紙 — iPhone 15 Pro Max保存</title>
   <style>
     :root {
-      --bg: #12141a;
-      --ink: #e8e4dc;
-      --muted: #a7a297;
-      --accent: #c4a574;
-      --panel: rgba(18, 20, 26, 0.72);
+      --bg: #1c2229;
+      --panel: rgba(28, 34, 41, 0.88);
+      --ink: #f2eee6;
+      --muted: #b7b1a6;
+      --line: rgba(242, 238, 230, 0.22);
+      --accent: #d2b48c;
+      --ok: #8fbc8f;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+      min-height: 100%;
       background: var(--bg);
       color: var(--ink);
-      font-family: "Hiragino Mincho ProN", "Noto Serif JP", "Yu Mincho", serif;
+      font-family: -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
     }
-
-    .stage {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      background: #0d0f14;
-      cursor: none;
-    }
-
-    .stage.show-ui { cursor: auto; }
-
-    .scene {
-      position: absolute;
-      inset: -8%;
-      width: 116%;
-      height: 116%;
-      background:
-        url("./hero.jpg") center 42% / cover no-repeat;
-      transform-origin: 55% 58%;
-      will-change: transform, filter;
-      filter: contrast(1.05) saturate(0.92) brightness(0.98);
-    }
-
-    .mist {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 45% at 50% 18%, rgba(160, 170, 180, 0.18), transparent 70%),
-        linear-gradient(180deg, rgba(20, 24, 30, 0.15), transparent 28%, rgba(10, 12, 16, 0.35) 100%);
-      pointer-events: none;
-      mix-blend-mode: soft-light;
-    }
-
-    #rain {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      opacity: 0.75;
-    }
-
-    .vignette {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.45) 100%),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, transparent 18%, transparent 72%, rgba(0, 0, 0, 0.5) 100%);
-    }
-
-    .grain {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.08;
-      mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      animation: grainShift 0.35s steps(2) infinite;
-    }
-
-    @keyframes grainShift {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(-1.5%, 1%); }
-    }
-
-    .hud {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 10;
-      padding: 1.1rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, transparent, var(--panel));
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.35s ease, transform 0.35s ease;
-      pointer-events: none;
-    }
-
-    .stage.show-ui .hud {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .hud-inner {
-      max-width: 34rem;
+    .wrap {
+      max-width: 28rem;
       margin: 0 auto;
+      padding: calc(1rem + env(safe-area-inset-top)) 1rem calc(1.5rem + env(safe-area-inset-bottom));
     }
-
     .eyebrow {
-      font-size: 0.72rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 0.35rem;
-      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      letter-spacing: 0.16em;
+      font-size: 0.72rem;
+      margin-bottom: 0.4rem;
     }
-
     h1 {
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
       font-weight: 500;
-      font-size: clamp(1.35rem, 4.5vw, 1.85rem);
+      font-size: 1.55rem;
       line-height: 1.35;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.55rem;
     }
-
     .lede {
       color: var(--muted);
       font-size: 0.92rem;
-      line-height: 1.55;
-      margin-bottom: 0.9rem;
-      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      line-height: 1.6;
+      margin-bottom: 1rem;
     }
+    .facts {
+      display: grid;
+      gap: 0.35rem;
+      margin-bottom: 1.1rem;
+      padding: 0.85rem 0.95rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+    .facts strong { color: var(--ink); font-weight: 600; }
+
+    .preview-shell {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #0f1216;
+      aspect-ratio: 1290 / 2796;
+      max-height: 62vh;
+      margin: 0 auto 1rem;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    }
+    .preview-shell img,
+    .preview-shell video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .preview-shell video { display: none; }
+    .preview-shell.mode-video img { display: none; }
+    .preview-shell.mode-video video { display: block; }
+
+    .steps {
+      margin-bottom: 1rem;
+      padding: 0.95rem 1rem;
+      border-radius: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+    .steps h2 {
+      font-size: 0.95rem;
+      margin-bottom: 0.55rem;
+      font-weight: 600;
+    }
+    .steps ol {
+      padding-left: 1.15rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      display: grid;
+      gap: 0.35rem;
+    }
+    .steps li::marker { color: var(--accent); }
 
     .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.55rem;
+      display: grid;
+      gap: 0.65rem;
+      margin-bottom: 0.85rem;
     }
-
     button, a.btn {
       appearance: none;
-      border: 1px solid rgba(232, 228, 220, 0.28);
-      background: rgba(232, 228, 220, 0.08);
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(242, 238, 230, 0.08);
       color: var(--ink);
       border-radius: 999px;
-      padding: 0.62rem 1rem;
-      font-size: 0.85rem;
+      padding: 0.95rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
       text-decoration: none;
-      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
       cursor: pointer;
-      backdrop-filter: blur(8px);
     }
-
-    button:active, a.btn:active { transform: scale(0.98); }
-
-    .tap-hint {
-      position: fixed;
-      top: calc(0.8rem + env(safe-area-inset-top));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      color: rgba(232, 228, 220, 0.55);
-      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
+    button.primary {
+      background: linear-gradient(180deg, #e8d7bc, #c9ae86);
+      color: #1c2229;
+      border-color: transparent;
     }
-
-    .stage.show-ui .tap-hint { opacity: 1; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .grain { animation: none; }
+    button:disabled { opacity: 0.55; cursor: wait; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
     }
+    .status {
+      min-height: 1.4rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .status.ok { color: var(--ok); }
+    .status.err { color: #e6a0a0; }
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .fallback {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--line);
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .fallback a { color: var(--accent); }
   </style>
 </head>
 <body>
-  <div class="stage show-ui" id="stage" title="画面をタップでUI表示/非表示">
-    <div class="scene" id="scene" role="img" aria-label="2003年ダービー風、差し切りゴールシーンの動く壁紙"></div>
-    <div class="mist"></div>
-    <canvas id="rain"></canvas>
-    <div class="vignette"></div>
-    <div class="grain"></div>
+  <main class="wrap">
+    <p class="eyebrow">iPhone 15 Pro Max · 1290×2796</p>
+    <h1>ネオ・ダービー壁紙を写真に保存</h1>
+    <p class="lede">
+      2003年日本ダービーに合わせ、<strong>天候は曇・芝は重</strong>（前日雨で当日はほぼ上がった状態）のオマージュです。土砂降り表現はやめています。
+    </p>
 
-    <div class="tap-hint">タップで操作表示</div>
+    <div class="facts">
+      <div><strong>公式条件</strong>：天候・曇 / 芝・重</div>
+      <div><strong>端末向け</strong>：iPhone 15 Pro Max ネイティブ解像度</div>
+      <div><strong>保存先</strong>：写真アプリ（共有シート → 写真に追加）</div>
+    </div>
 
-    <div class="hud">
-      <div class="hud-inner">
-        <div class="eyebrow">Homage · 2003 Tokyo Derby</div>
-        <h1>ネオユニヴァース型・差し切りゴール</h1>
-        <p class="lede">
-          重馬場の直線、先行を半馬身差で捕らえる6秒ループ。実在レースの映像ではなくオマージュ表現です。
-          スマホは全画面表示のまま録画、または下のMP4を壁紙アプリへ。
-        </p>
-        <div class="actions">
-          <button type="button" id="btnFullscreen">全画面</button>
-          <button type="button" id="btnHide">壁紙モード</button>
-          <a class="btn" href="./neo-derby-4k.mp4" download>4K MP4を保存</a>
-        </div>
+    <div class="preview-shell mode-still" id="preview">
+      <img id="still" src="./iphone15promax.jpg" alt="曇天・重馬場のダービー風壁紙プレビュー" width="1290" height="2796" />
+      <video id="motion" src="./iphone15promax.mp4" playsinline muted loop autoplay></video>
+    </div>
+
+    <section class="steps">
+      <h2>この端末での手順</h2>
+      <ol>
+        <li>下の「静止画を写真に追加」を押す</li>
+        <li>共有シートで「写真に追加」</li>
+        <li>設定 → 壁紙 → 写真から選んでロック画面に設定</li>
+        <li>動きも欲しければ「動画を写真に追加」→写真に保存（標準iOSは動画を常時壁紙にしにくいので、まずは静止画推奨）</li>
+      </ol>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="primary" id="saveStill">静止画を写真に追加</button>
+      <button type="button" id="saveVideo">動画を写真に追加（6秒ループ）</button>
+      <div class="row">
+        <button type="button" id="showStill">静止画プレビュー</button>
+        <button type="button" id="showVideo">動画プレビュー</button>
       </div>
     </div>
-  </div>
+    <p class="status" id="status" aria-live="polite"></p>
+    <p class="note">
+      Safari推奨。共有シートが出たら「写真に追加」または「画像を保存」。うまくいかないときは下の直リンクから開いて長押し保存してください。
+    </p>
+    <div class="fallback">
+      予備リンク：
+      <a href="./iphone15promax.jpg" download="neo-derby-iphone15promax.jpg">静止画 JPG</a>
+      ・
+      <a href="./iphone15promax.png" download="neo-derby-iphone15promax.png">静止画 PNG</a>
+      ・
+      <a href="./iphone15promax.mp4" download="neo-derby-iphone15promax.mp4">動画 MP4</a>
+    </div>
+  </main>
 
   <script>
     (() => {
-      const LOOP_MS = 6000;
-      const stage = document.getElementById("stage");
-      const scene = document.getElementById("scene");
-      const canvas = document.getElementById("rain");
-      const ctx = canvas.getContext("2d", { alpha: true });
-      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const status = document.getElementById("status");
+      const preview = document.getElementById("preview");
+      const motion = document.getElementById("motion");
 
-      let drops = [];
-      let w = 0;
-      let h = 0;
-      let dpr = 1;
-
-      function resize() {
-        dpr = Math.min(devicePixelRatio || 1, 2.5);
-        w = Math.floor(innerWidth * dpr);
-        h = Math.floor(innerHeight * dpr);
-        canvas.width = w;
-        canvas.height = h;
-        canvas.style.width = innerWidth + "px";
-        canvas.style.height = innerHeight + "px";
-        const count = Math.floor((innerWidth * innerHeight) / 4200);
-        drops = Array.from({ length: count }, () => spawn(true));
+      function setStatus(text, kind) {
+        status.textContent = text || "";
+        status.className = "status" + (kind ? " " + kind : "");
       }
 
-      function spawn(randomY) {
-        return {
-          x: Math.random() * w,
-          y: randomY ? Math.random() * h : -Math.random() * h * 0.2,
-          len: (12 + Math.random() * 18) * dpr,
-          speed: (4.2 + Math.random() * 5.5) * dpr,
-          width: (0.7 + Math.random() * 1.1) * dpr,
-          alpha: 0.12 + Math.random() * 0.28,
-        };
+      async function fetchFile(url, name, type) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("ファイル取得に失敗しました");
+        const blob = await res.blob();
+        return new File([blob], name, { type: type || blob.type });
       }
 
-      function drawRain() {
-        ctx.clearRect(0, 0, w, h);
-        ctx.lineCap = "round";
-        for (const d of drops) {
-          d.y += d.speed;
-          d.x += d.speed * 0.18;
-          if (d.y > h + 20 || d.x > w + 20) {
-            Object.assign(d, spawn(false));
-            d.x = Math.random() * w;
-          }
-          ctx.strokeStyle = `rgba(210, 220, 230, ${d.alpha})`;
-          ctx.lineWidth = d.width;
-          ctx.beginPath();
-          ctx.moveTo(d.x, d.y);
-          ctx.lineTo(d.x - d.len * 0.22, d.y + d.len);
-          ctx.stroke();
+      async function shareFile(file, title) {
+        if (!navigator.share) {
+          throw new Error("このブラウザは共有に未対応です。下の予備リンクを長押ししてください。");
         }
-      }
-
-      function tick(now) {
-        const t = (now % LOOP_MS) / LOOP_MS;
-        const wave = Math.sin(t * Math.PI * 2);
-        const wave2 = Math.cos(t * Math.PI * 2);
-        if (!reduced) {
-          const scale = 1.08 + wave * 0.045;
-          const tx = wave2 * 1.4;
-          const ty = wave * 1.1;
-          scene.style.transform = `translate3d(${tx}%, ${ty}%, 0) scale(${scale})`;
-          drawRain();
+        if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+          throw new Error("ファイル共有に未対応です。予備リンクから保存してください。");
         }
-        requestAnimationFrame(tick);
+        await navigator.share({ files: [file], title });
       }
 
-      function toggleUi() {
-        stage.classList.toggle("show-ui");
-      }
-
-      stage.addEventListener("click", (e) => {
-        if (e.target.closest("button, a")) return;
-        toggleUi();
-      });
-
-      document.getElementById("btnHide").addEventListener("click", (e) => {
-        e.stopPropagation();
-        stage.classList.remove("show-ui");
-      });
-
-      document.getElementById("btnFullscreen").addEventListener("click", async (e) => {
-        e.stopPropagation();
+      async function save(kind) {
+        const btnStill = document.getElementById("saveStill");
+        const btnVideo = document.getElementById("saveVideo");
+        btnStill.disabled = true;
+        btnVideo.disabled = true;
+        setStatus("準備中…");
         try {
-          if (!document.fullscreenElement) await stage.requestFullscreen();
-          else await document.exitFullscreen();
-        } catch (_) {}
-      });
+          if (kind === "still") {
+            const file = await fetchFile("./iphone15promax.jpg", "neo-derby-iphone15promax.jpg", "image/jpeg");
+            setStatus("共有シートで「写真に追加」を選んでください");
+            await shareFile(file, "ネオ・ダービー壁紙");
+            setStatus("共有シートを開きました。写真に追加 → 設定で壁紙に。", "ok");
+          } else {
+            const file = await fetchFile("./iphone15promax.mp4", "neo-derby-iphone15promax.mp4", "video/mp4");
+            setStatus("共有シートで「ビデオを保存」または「写真に追加」を選んでください");
+            await shareFile(file, "ネオ・ダービー動画壁紙");
+            setStatus("共有シートを開きました。写真アプリに保存できます。", "ok");
+          }
+        } catch (err) {
+          if (err && err.name === "AbortError") {
+            setStatus("共有をキャンセルしました");
+          } else {
+            setStatus((err && err.message) || "保存に失敗しました。予備リンクを使ってください。", "err");
+          }
+        } finally {
+          btnStill.disabled = false;
+          btnVideo.disabled = false;
+        }
+      }
 
-      addEventListener("resize", resize);
-      resize();
-      requestAnimationFrame(tick);
+      document.getElementById("saveStill").addEventListener("click", () => save("still"));
+      document.getElementById("saveVideo").addEventListener("click", () => save("video"));
+      document.getElementById("showStill").addEventListener("click", () => {
+        preview.classList.remove("mode-video");
+        motion.pause();
+      });
+      document.getElementById("showVideo").addEventListener("click", () => {
+        preview.classList.add("mode-video");
+        motion.play().catch(() => {});
+      });
     })();
   </script>
 </body>
