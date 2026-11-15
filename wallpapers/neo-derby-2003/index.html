@@ -155,7 +155,7 @@
     </div>
 
     <div class="preview-shell">
-      <video src="./livephoto/NEO_DERBY.MOV" playsinline muted loop autoplay poster="./livephoto/NEO_DERBY.JPG"></video>
+      <video src="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV" playsinline muted loop autoplay poster="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG"></video>
     </div>
 
     <section class="card">
@@ -180,7 +180,9 @@
     </section>
 
     <div class="actions">
-      <a class="btn primary" href="./livephoto/NEO_DERBY_LivePhoto.zip" download="NEO_DERBY_LivePhoto.zip">Live Photo ZIPを保存</a>
+      <a class="btn primary" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY_LivePhoto.zip">Live Photo ZIPを保存</a>
+      <a class="btn" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG">JPGだけ開く</a>
+      <a class="btn" href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV">MOVだけ開く</a>
       <button type="button" class="primary" id="shareZip">共有シートでZIPを送る</button>
       <button type="button" id="sharePair">JPGとMOVをまとめて共有</button>
     </div>
@@ -190,9 +192,10 @@
       iOSのライブ壁紙は、ロック画面で長押し／起こしたときに動く方式です。Androidのような常時ループ壁紙とは違います。
     </p>
     <div class="files">
-      個別ファイル：
-      <a href="./livephoto/NEO_DERBY.JPG">NEO_DERBY.JPG</a>・
-      <a href="./livephoto/NEO_DERBY.MOV">NEO_DERBY.MOV</a>
+      このリポジトリは Pages 未設定なので、サイトURLでは出ません。上の直リンクか、下のRAWから取ってください。<br />
+      個別：
+      <a href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.JPG">JPG</a>・
+      <a href="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto/NEO_DERBY.MOV">MOV</a>
       （必ず両方・同時に取り込む）
     </div>
   </main>
@@ -204,6 +207,8 @@
         status.textContent = text || "";
         status.className = "status" + (kind ? " " + kind : "");
       }
+
+      const RAW = "https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/livephoto";
 
       async function fetchFile(url, name, type) {
         const res = await fetch(url);
@@ -223,7 +228,7 @@
       document.getElementById("shareZip").addEventListener("click", async () => {
         setStatus("ZIPを準備中…");
         try {
-          const file = await fetchFile("./livephoto/NEO_DERBY_LivePhoto.zip", "NEO_DERBY_LivePhoto.zip", "application/zip");
+          const file = await fetchFile(`${RAW}/NEO_DERBY_LivePhoto.zip`, "NEO_DERBY_LivePhoto.zip", "application/zip");
           await shareFiles([file], "ネオ・ダービー Live Photo");
           setStatus("共有シートを開きました。保存後、iCloud写真へJPGとMOVを同時アップロードしてください。", "ok");
         } catch (err) {
@@ -236,8 +241,8 @@
         setStatus("Live Photoペアを準備中…");
         try {
           const files = await Promise.all([
-            fetchFile("./livephoto/NEO_DERBY.JPG", "NEO_DERBY.JPG", "image/jpeg"),
-            fetchFile("./livephoto/NEO_DERBY.MOV", "NEO_DERBY.MOV", "video/quicktime"),
+            fetchFile(`${RAW}/NEO_DERBY.JPG`, "NEO_DERBY.JPG", "image/jpeg"),
+            fetchFile(`${RAW}/NEO_DERBY.MOV`, "NEO_DERBY.MOV", "video/quicktime"),
           ]);
           await shareFiles(files, "ネオ・ダービー Live Photo");
           setStatus("共有シートを開きました。可能なら両方を一度に写真へ入れてください。", "ok");
