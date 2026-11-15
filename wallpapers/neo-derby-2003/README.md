@@ -7,7 +7,7 @@
 
 Safariでこれを開く → 共有 → **ホーム画面に追加** → アイコンを開く：
 
-https://cdn.jsdelivr.net/gh/youmzain-2003/cloud_model@cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html
 
 全画面でループします。怪しい壁紙アプリは不要です。
 
