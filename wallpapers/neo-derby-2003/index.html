@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1c1f" />
+  <title>ネオ・ダービー 2003 — 動く壁紙</title>
+  <style>
+    :root {
+      --bg: #12141a;
+      --ink: #e8e4dc;
+      --muted: #a7a297;
+      --accent: #c4a574;
+      --panel: rgba(18, 20, 26, 0.72);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Hiragino Mincho ProN", "Noto Serif JP", "Yu Mincho", serif;
+    }
+
+    .stage {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: #0d0f14;
+      cursor: none;
+    }
+
+    .stage.show-ui { cursor: auto; }
+
+    .scene {
+      position: absolute;
+      inset: -8%;
+      width: 116%;
+      height: 116%;
+      background:
+        url("./hero.jpg") center 42% / cover no-repeat;
+      transform-origin: 55% 58%;
+      will-change: transform, filter;
+      filter: contrast(1.05) saturate(0.92) brightness(0.98);
+    }
+
+    .mist {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 45% at 50% 18%, rgba(160, 170, 180, 0.18), transparent 70%),
+        linear-gradient(180deg, rgba(20, 24, 30, 0.15), transparent 28%, rgba(10, 12, 16, 0.35) 100%);
+      pointer-events: none;
+      mix-blend-mode: soft-light;
+    }
+
+    #rain {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.75;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.45) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, transparent 18%, transparent 72%, rgba(0, 0, 0, 0.5) 100%);
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grainShift 0.35s steps(2) infinite;
+    }
+
+    @keyframes grainShift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-1.5%, 1%); }
+    }
+
+    .hud {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      padding: 1.1rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, transparent, var(--panel));
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+
+    .stage.show-ui .hud {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .hud-inner {
+      max-width: 34rem;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: clamp(1.35rem, 4.5vw, 1.85rem);
+      line-height: 1.35;
+      margin-bottom: 0.35rem;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin-bottom: 0.9rem;
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+    }
+
+    button, a.btn {
+      appearance: none;
+      border: 1px solid rgba(232, 228, 220, 0.28);
+      background: rgba(232, 228, 220, 0.08);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.62rem 1rem;
+      font-size: 0.85rem;
+      text-decoration: none;
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    button:active, a.btn:active { transform: scale(0.98); }
+
+    .tap-hint {
+      position: fixed;
+      top: calc(0.8rem + env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: rgba(232, 228, 220, 0.55);
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .stage.show-ui .tap-hint { opacity: 1; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .grain { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage show-ui" id="stage" title="画面をタップでUI表示/非表示">
+    <div class="scene" id="scene" role="img" aria-label="2003年ダービー風、差し切りゴールシーンの動く壁紙"></div>
+    <div class="mist"></div>
+    <canvas id="rain"></canvas>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+
+    <div class="tap-hint">タップで操作表示</div>
+
+    <div class="hud">
+      <div class="hud-inner">
+        <div class="eyebrow">Homage · 2003 Tokyo Derby</div>
+        <h1>ネオユニヴァース型・差し切りゴール</h1>
+        <p class="lede">
+          重馬場の直線、先行を半馬身差で捕らえる6秒ループ。実在レースの映像ではなくオマージュ表現です。
+          スマホは全画面表示のまま録画、または下のMP4を壁紙アプリへ。
+        </p>
+        <div class="actions">
+          <button type="button" id="btnFullscreen">全画面</button>
+          <button type="button" id="btnHide">壁紙モード</button>
+          <a class="btn" href="./neo-derby-4k.mp4" download>4K MP4を保存</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const LOOP_MS = 6000;
+      const stage = document.getElementById("stage");
+      const scene = document.getElementById("scene");
+      const canvas = document.getElementById("rain");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let drops = [];
+      let w = 0;
+      let h = 0;
+      let dpr = 1;
+
+      function resize() {
+        dpr = Math.min(devicePixelRatio || 1, 2.5);
+        w = Math.floor(innerWidth * dpr);
+        h = Math.floor(innerHeight * dpr);
+        canvas.width = w;
+        canvas.height = h;
+        canvas.style.width = innerWidth + "px";
+        canvas.style.height = innerHeight + "px";
+        const count = Math.floor((innerWidth * innerHeight) / 4200);
+        drops = Array.from({ length: count }, () => spawn(true));
+      }
+
+      function spawn(randomY) {
+        return {
+          x: Math.random() * w,
+          y: randomY ? Math.random() * h : -Math.random() * h * 0.2,
+          len: (12 + Math.random() * 18) * dpr,
+          speed: (4.2 + Math.random() * 5.5) * dpr,
+          width: (0.7 + Math.random() * 1.1) * dpr,
+          alpha: 0.12 + Math.random() * 0.28,
+        };
+      }
+
+      function drawRain() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.lineCap = "round";
+        for (const d of drops) {
+          d.y += d.speed;
+          d.x += d.speed * 0.18;
+          if (d.y > h + 20 || d.x > w + 20) {
+            Object.assign(d, spawn(false));
+            d.x = Math.random() * w;
+          }
+          ctx.strokeStyle = `rgba(210, 220, 230, ${d.alpha})`;
+          ctx.lineWidth = d.width;
+          ctx.beginPath();
+          ctx.moveTo(d.x, d.y);
+          ctx.lineTo(d.x - d.len * 0.22, d.y + d.len);
+          ctx.stroke();
+        }
+      }
+
+      function tick(now) {
+        const t = (now % LOOP_MS) / LOOP_MS;
+        const wave = Math.sin(t * Math.PI * 2);
+        const wave2 = Math.cos(t * Math.PI * 2);
+        if (!reduced) {
+          const scale = 1.08 + wave * 0.045;
+          const tx = wave2 * 1.4;
+          const ty = wave * 1.1;
+          scene.style.transform = `translate3d(${tx}%, ${ty}%, 0) scale(${scale})`;
+          drawRain();
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function toggleUi() {
+        stage.classList.toggle("show-ui");
+      }
+
+      stage.addEventListener("click", (e) => {
+        if (e.target.closest("button, a")) return;
+        toggleUi();
+      });
+
+      document.getElementById("btnHide").addEventListener("click", (e) => {
+        e.stopPropagation();
+        stage.classList.remove("show-ui");
+      });
+
+      document.getElementById("btnFullscreen").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          if (!document.fullscreenElement) await stage.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch (_) {}
+      });
+
+      addEventListener("resize", resize);
+      resize();
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
