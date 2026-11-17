@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#10141a" />
+  <title>2003ダービー → WidgetClub Live Photo</title>
+  <style>
+    :root {
+      --bg: #10141a;
+      --fg: #f2eee6;
+      --muted: rgba(242,238,230,.72);
+      --accent: #d4a017;
+      --card: rgba(255,255,255,.06);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; min-height: 100%;
+      background: radial-gradient(120% 80% at 50% 0%, #1c2430 0%, var(--bg) 55%);
+      color: var(--fg);
+      font: 400 1rem/1.55 -apple-system, "Hiragino Sans", "Helvetica Neue", sans-serif;
+    }
+    main {
+      max-width: 28rem; margin: 0 auto; padding: 1.25rem 1.1rem 3rem;
+    }
+    h1 {
+      font-size: 1.35rem; font-weight: 700; letter-spacing: .02em;
+      margin: 0.4rem 0 0.35rem;
+    }
+    .eyebrow {
+      color: var(--accent); font-size: .75rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    p { color: var(--muted); margin: 0.55rem 0 1rem; }
+    video {
+      width: 100%; border-radius: 1rem; background: #000;
+      aspect-ratio: 9 / 19.5; object-fit: cover;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+    ol {
+      margin: 0; padding-left: 1.2rem; color: var(--muted);
+    }
+    ol li { margin: 0.55rem 0; }
+    a.btn {
+      display: block; text-align: center; text-decoration: none;
+      margin: 0.55rem 0; padding: 0.9rem 1rem; border-radius: 999px;
+      background: var(--accent); color: #1a1200; font-weight: 700;
+    }
+    a.btn.secondary {
+      background: var(--card); color: var(--fg);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .note {
+      margin-top: 1.25rem; padding: 0.85rem 1rem; border-radius: .9rem;
+      background: var(--card); color: var(--muted); font-size: .9rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">WidgetClub 向け</div>
+    <h1>2003ダービー 1.5秒動画</h1>
+    <p>差し切り〜デムーロのガッツ。iPhone Live Photo（約1.5秒）用に切った縦動画です。</p>
+
+    <video
+      controls
+      playsinline
+      muted
+      loop
+      autoplay
+      poster="./widgetclub-poster.jpg"
+      src="./widgetclub-1.5s-1080.mp4"
+    ></video>
+
+    <a class="btn" href="./widgetclub-1.5s-1080.mp4" download>動画を保存（1080p・推奨）</a>
+    <a class="btn secondary" href="./widgetclub-1.5s.mp4" download>高解像度版を保存（1290×2796）</a>
+    <a class="btn secondary" href="https://widget-club.com/ja/livephotos/create" target="_blank" rel="noopener">WidgetClubで変換する</a>
+
+    <ol>
+      <li>上のボタンで MP4 を iPhone に保存</li>
+      <li><a href="https://widget-club.com/ja/livephotos/create" style="color:var(--accent)">WidgetClub</a> にアップロード</li>
+      <li>「動く壁紙を作成する」→ 案内どおり Live Photo を保存</li>
+      <li>写真アプリ → 共有 → 壁紙に設定 → 再生マークを ON</li>
+    </ol>
+
+    <div class="note">
+      iPhone の動く壁紙は約1.5秒の Live Photo 前提です。動きが弱いと「モーションエフェクトは使用できません」と出ることがあるので、この動画は追従パン＋腕上げを入れています。
+    </div>
+  </main>
+</body>
+</html>

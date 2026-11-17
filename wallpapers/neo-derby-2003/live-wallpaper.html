@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#10141a" />
+  <meta name="apple-mobile-web-app-title" content="03ダービー" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>2003ダービー 動く壁紙</title>
+  <style>
+    html, body {
+      margin: 0; width: 100%; height: 100%;
+      background: #10141a; overflow: hidden;
+      touch-action: none; user-select: none; -webkit-user-select: none;
+    }
+    video {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; background: #10141a;
+    }
+    .hint {
+      position: fixed; left: 50%; bottom: calc(1.1rem + env(safe-area-inset-bottom));
+      transform: translateX(-50%); z-index: 2; max-width: 92vw;
+      padding: 0.65rem 0.9rem; border-radius: 999px;
+      background: rgba(16,20,26,.55); color: rgba(242,238,230,.9);
+      font: 600 0.8rem/1.35 -apple-system, "Hiragino Sans", sans-serif;
+      backdrop-filter: blur(8px); transition: opacity .6s ease; pointer-events: none;
+      text-align: center;
+    }
+    .hint.hide { opacity: 0; }
+  </style>
+</head>
+<body>
+  <video
+    id="wall"
+    playsinline muted loop autoplay preload="auto"
+    poster="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/iphone15promax.jpg"
+    src="https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/iphone15promax.mp4"
+  ></video>
+  <div class="hint" id="hint">共有 → ホーム画面に追加 → アイコンを開く（アプリ不要）</div>
+  <script>
+    const v = document.getElementById("wall");
+    const hint = document.getElementById("hint");
+    const play = () => v.play().catch(() => {});
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) play(); });
+    const hide = () => { play(); hint.classList.add("hide"); };
+    document.body.addEventListener("touchstart", hide, { passive: true });
+    document.body.addEventListener("click", hide);
+    play();
+    setTimeout(() => hint.classList.add("hide"), 4500);
+  </script>
+</body>
+</html>
