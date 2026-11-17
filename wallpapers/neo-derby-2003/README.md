@@ -5,7 +5,7 @@
 | 項目 | 内容 |
 |------|------|
 | 開催 | 2003-06-01 東京芝2400 / 天候・曇 / 芝・重 |
-| シーン | 差し切り〜決勝ガッツ／**1.5秒 Live Photo 用**（実況の**横追い**構図） |
+| シーン | ゴール前の**ハナ〜アタマ差**／外側斜め上の実況アングル／**6秒** |
 | 位置 | 内から進出するネオ、外のゼンノ／ザッツ。フィールドも薄く残す |
 | 騎乗 | 溜め→手綱しごき→差し→ゴール板で右腕ガッツ（史実のデムーロ） |
 
@@ -22,25 +22,18 @@
 
 実写映像の複製ではありません。馬・騎手・服色・帽色・装具は史実に揃えています。
 
-## 本命: WidgetClub で Live Photo 壁紙（iPhone）
+## 本命: 僅差ゴール前・6秒（実況の外側斜め上）
 
-iPhoneの動く壁紙は約 **1.5秒の Live Photo** 前提。それに合わせた縦動画を用意してある。
-
-1. Safariで開く  
-   https://htmlpreview.github.io/?https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/widgetclub.html
-2. **1080p動画を保存**
-3. [WidgetClub（動画→Live Photo）](https://widget-club.com/ja/livephotos/create) にアップロードして変換
-4. 写真アプリ → 共有 → **壁紙に設定** → 再生マークを ON
-
-中身: 差し切り〜デムーロ右腕ガッツ / 1.5秒 / 縦9:16 / 追従パンあり（モーション検出向け）
-
-ファイル直リンク:
-- `widgetclub-1.5s-1080.mp4`（推奨・約1MB）
-- `widgetclub-1.5s.mp4`（1290×2796）
-
-## 代替: アプリ不要の6秒ループ
+ハナ差〜アタマ差のゴール前を、テレビ実況の外側斜め上アングルで固定した6秒ループ。
 
 1. Safariで開く  
    https://htmlpreview.github.io/?https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/live-wallpaper.html
 2. **共有 → ホーム画面に追加**
 3. アイコンを開く（全画面ループ）
+
+横16:9版: `close-finish-6s-16x9.mp4`
+
+## 代替: WidgetClub で Live Photo（約1.5秒）
+
+1. https://htmlpreview.github.io/?https://raw.githubusercontent.com/youmzain-2003/cloud_model/cursor/neo-derby-live-wallpaper-318d/wallpapers/neo-derby-2003/widgetclub.html
+2. 動画を保存 → [WidgetClub](https://widget-club.com/ja/livephotos/create) で変換 → 壁紙に設定
